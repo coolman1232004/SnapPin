@@ -12,7 +12,7 @@
 <p align="center">
   <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows">
   <img alt=".NET 8" src="https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet">
-  <img alt="Current version" src="https://img.shields.io/badge/version-1.2.3-2C978E">
+  <img alt="Current version" src="https://img.shields.io/badge/version-1.2.4-2C978E">
   <img alt="Local first" src="https://img.shields.io/badge/privacy-local--first-41BBAC">
   <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-C5E6F7">
 </p>
@@ -72,7 +72,7 @@ The installer places SnapPin under `%LOCALAPPDATA%\Programs\SnapPin` by default 
 2. Extract the entire ZIP to a writable folder.
 3. Open the extracted folder and run `SnapPin.exe`.
 
-The package is self-contained; a separate .NET installation is not required.
+The package is self-contained; a separate .NET installation is not required. Portable copies update in place from official GitHub releases: SnapPin verifies the ZIP, retains a rollback backup, replaces the program files after closing, and restarts automatically. No installer or manual re-extraction is required.
 
 > [!NOTE]
 > Current packages are not code-signed. Windows SmartScreen may therefore show an “Unknown publisher” warning. Verify that the file came from this repository's release page and compare its SHA-256 value with `release.json` before running it.
@@ -139,7 +139,7 @@ Run the regression suite:
 Create the portable ZIP and installer:
 
 ```powershell
-.\packaging\Build-Packages.ps1 -Version 1.2.3
+.\packaging\Build-Packages.ps1 -Version 1.2.4
 ```
 
 Generated packages are written to `dist\`. That directory is intentionally excluded from Git and should be uploaded as GitHub Release assets.

@@ -319,9 +319,13 @@
                     </Border>
                     <TextBlock Text="GitHub updates" FontWeight="SemiBold"/>
                     <CheckBox x:Name="CheckUpdatesOnStartupBox" Content="Check for updates when SnapPin starts" Margin="0,8,0,0"/>
-                    <DockPanel Margin="0,6,0,0">
-                        <Button DockPanel.Dock="Right" Content="Check now" Style="{StaticResource AccentDialogButton}" Click="CheckUpdates_Click" Margin="8,0,0,0"/>
-                        <TextBox x:Name="UpdateFeedBox" Height="30" Padding="7,4" ToolTip="Official SnapPin GitHub release manifest. Custom HTTPS feeds are also supported."/>
+                    <DockPanel Margin="0,7,0,0">
+                        <Button DockPanel.Dock="Right" Content="Check now" Style="{StaticResource AccentDialogButton}" Click="CheckUpdates_Click" Margin="12,0,0,0"/>
+                        <TextBlock VerticalAlignment="Center" Foreground="#667085">
+                            <Run Text="Updates are published on "/>
+                            <Hyperlink NavigateUri="https://github.com/coolman1232004/SnapPin" RequestNavigate="GitHubLink_RequestNavigate">GitHub</Hyperlink>
+                            <Run Text="."/>
+                        </TextBlock>
                     </DockPanel>
                 </StackPanel>
             </TabItem>

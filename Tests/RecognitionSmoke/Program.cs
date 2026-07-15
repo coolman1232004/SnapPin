@@ -730,6 +730,11 @@ internal static class Program
             overlayType.GetMethod("Handle_MouseLeftButtonDown", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .Invoke(overlay, [handle, down]);
             var hiddenWhileDragging = actionBar.Visibility == Visibility.Collapsed;
+            // Showing a transparent overlay can deliver a real cursor move on
+            // multi-monitor test machines. Restore the controlled rectangle so
+            // this probe measures toolbar lifecycle rather than cursor location.
+            overlayType.GetField("_selection", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(overlay, selection);
             var up = new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice,
                 Environment.TickCount, System.Windows.Input.MouseButton.Left)
             {
@@ -910,7 +915,13 @@ internal static class Program
             !Uri.TryCreate(AppSettings.DefaultUpdateFeedUrl, UriKind.Absolute, out var updateFeed) ||
             updateFeed.Scheme != Uri.UriSchemeHttps ||
             !updateFeed.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)) return 58;
-        Console.WriteLine("UPDATE CHANNEL: official HTTPS GitHub release feed configured");
+        var installedExecutable = Path.Combine(Path.GetTempPath(), "SnapPinInstalled", "SnapPin.exe");
+        var portableExecutable = Path.Combine(Path.GetTempPath(), "SnapPinPortable", "SnapPin.exe");
+        var portableUrl = UpdateService.ResolvePackageUrl(updateFeed, null, "SnapPin-Portable-win-x64.zip");
+        if (UpdateService.IsPortableLocation(installedExecutable, Path.GetDirectoryName(installedExecutable)) ||
+            !UpdateService.IsPortableLocation(portableExecutable, Path.GetDirectoryName(installedExecutable)) ||
+            !portableUrl.Equals("https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip", StringComparison.OrdinalIgnoreCase)) return 62;
+        Console.WriteLine("UPDATE CHANNEL: official GitHub feed and installed/portable package routing verified");
 
         var effectedOutput = CaptureService.ApplyOutputEffects(CreatePatternImage(160, 96), new AppSettings
         {

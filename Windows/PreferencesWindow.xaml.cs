@@ -103,7 +103,6 @@ public partial class PreferencesWindow : Window
         OcrLanguageBox.SelectedValue = _settings.OcrLanguage;
         if (OcrLanguageBox.SelectedIndex < 0) OcrLanguageBox.SelectedIndex = 3;
         ToolbarSizeBox.SelectedValue = ToolbarThemeService.Normalize(_settings.ToolbarSizeMode);
-        UpdateFeedBox.Text = _settings.UpdateFeedUrl;
         VersionText.Text = $"Version {DiagnosticsService.Version}";
         PopulateCaptureToolbar(_settings.CaptureToolbarOrder, _settings.CaptureToolbarEnabled);
         PopulateToolbar(_settings.AnnotationToolbarOrder, _settings.AnnotationToolbarEnabled);
@@ -266,7 +265,7 @@ public partial class PreferencesWindow : Window
         _settings.RecordingHotkey = Selected(RecordingHotkeyBox, "CtrlShiftR");
         _settings.OcrLanguage = OcrLanguageBox.SelectedValue as string ?? "eng+chi_sim+chi_tra";
         _settings.ToolbarSizeMode = ToolbarThemeService.Normalize(ToolbarSizeBox.SelectedValue as string);
-        _settings.UpdateFeedUrl = UpdateFeedBox.Text.Trim();
+        _settings.UpdateFeedUrl = AppSettings.DefaultUpdateFeedUrl;
         _settings.AnnotationToolbarOrder = AnnotationToolbarCatalog.NormalizeOrder(
             ToolbarToolsList.Items.OfType<ListBoxItem>().Select(item => item.Tag as string ?? string.Empty));
         _settings.AnnotationToolbarEnabled = AnnotationToolbarCatalog.NormalizeEnabled(
@@ -308,7 +307,7 @@ public partial class PreferencesWindow : Window
     {
         try
         {
-            var result = await UpdateService.CheckAsync(UpdateFeedBox.Text);
+            var result = await UpdateService.CheckAsync(AppSettings.DefaultUpdateFeedUrl);
             var answer = MessageBox.Show(this, result.Message,
                 result.UpdateAvailable ? "SnapPin update available" : "SnapPin update",
                 result.UpdateAvailable && !string.IsNullOrWhiteSpace(result.DownloadUrl) ? MessageBoxButton.YesNo : MessageBoxButton.OK,
@@ -324,6 +323,12 @@ public partial class PreferencesWindow : Window
             DiagnosticsService.Log("update", ex.Message, ex);
             MessageBox.Show(this, $"Update check failed: {ex.Message}", "SnapPin update", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+    }
+
+    private void GitHubLink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        e.Handled = true;
     }
 
     private void AddExcludedApp_Click(object sender, RoutedEventArgs e)

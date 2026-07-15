@@ -2,6 +2,25 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.4] - 2026-07-15
+
+### Added
+
+- True in-place updates for portable SnapPin copies
+- Automatic portable-package selection, SHA-256 verification, rollback backup, and restart
+- Friendly link to the SnapPin GitHub page in Preferences
+
+### Changed
+
+- Installed copies continue to update through the guided Windows installer
+- The internal `release.json` address is no longer displayed or editable
+- Existing custom or empty update-source settings migrate to the official GitHub release channel
+
+### Validation
+
+- Installed/portable mode routing and GitHub asset URL regression coverage
+- Release build and complete x64 smoke-test suite pass
+
 ## [1.2.3] - 2026-07-15
 
 ### Fixed

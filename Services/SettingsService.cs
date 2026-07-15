@@ -186,10 +186,9 @@ internal static class SettingsService
 
     private static AppSettings Normalize(AppSettings settings)
     {
-        // Older local settings stored an empty feed before SnapPin had a public
-        // release channel. Migrate them while preserving custom feeds.
-        if (string.IsNullOrWhiteSpace(settings.UpdateFeedUrl))
-            settings.UpdateFeedUrl = AppSettings.DefaultUpdateFeedUrl;
+        // Updates always come from SnapPin's official GitHub release channel.
+        // Older custom or empty feed values are migrated to the trusted source.
+        settings.UpdateFeedUrl = AppSettings.DefaultUpdateFeedUrl;
 
         // Older builds used the size/dimension checkbox as the closest capture-
         // guidance preference. Preserve the user's choice when introducing the

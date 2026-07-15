@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.3',
+    [string]$Version = '1.2.4',
     [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
 )
 
@@ -94,7 +94,8 @@ $manifest = [ordered]@{
     minimumWindowsBuild = 17763
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
-    releaseNotes = 'The capture toolbar now hides during eight-handle resizing and returns below the adjusted region. Official GitHub updates are enabled by default, available at startup, in Preferences, and from the tray menu, with SHA-256 installer verification.'
+    portableDownloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip'
+    releaseNotes = 'Portable SnapPin copies can now update themselves from GitHub with SHA-256 verification, rollback protection, and automatic restart. Preferences now shows a friendly GitHub link instead of the internal update manifest address.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 
