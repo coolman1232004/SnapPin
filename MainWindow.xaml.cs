@@ -310,6 +310,29 @@ public partial class MainWindow : Window
         dialog.ShowDialog();
     }
 
+    private async Task CheckForUpdatesAsync()
+    {
+        ShowDashboard();
+        try
+        {
+            var result = await UpdateService.CheckAsync(_settings.UpdateFeedUrl);
+            var canInstall = result.UpdateAvailable && !string.IsNullOrWhiteSpace(result.DownloadUrl);
+            var answer = MessageBox.Show(this, canInstall ? result.Message + "\n\nDownload and install it now?" : result.Message,
+                result.UpdateAvailable ? "SnapPin update available" : "SnapPin update",
+                canInstall ? MessageBoxButton.YesNo : MessageBoxButton.OK,
+                result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
+            if (answer != MessageBoxResult.Yes || !canInstall) return;
+            await UpdateService.DownloadAndLaunchAsync(result);
+            Application.Current.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            DiagnosticsService.Log("manual-update", ex.Message, ex);
+            MessageBox.Show(this, $"GitHub update check failed: {ex.Message}", "SnapPin update",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
     private void OpenHistory()
     {
         MoveDashboardToCurrentDesktop();
@@ -522,6 +545,7 @@ public partial class MainWindow : Window
         images.DropDownItems.Add("Solo selected", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleSolo));
         menu.Items.Add(images);
         menu.Items.Add("Capture history…", null, (_, _) => Dispatcher.Invoke(OpenHistory));
+        menu.Items.Add("Check for updates…", null, (_, _) => Dispatcher.Invoke(() => _ = CheckForUpdatesAsync()));
         menu.Items.Add("Preferences…", null, (_, _) => Dispatcher.Invoke(OpenPreferences));
         menu.Items.Add("Open SnapPin", null, (_, _) => Dispatcher.Invoke(ShowDashboard));
         menu.Items.Add(new Forms.ToolStripSeparator());

@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.2',
+    [string]$Version = '1.2.3',
     [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
 )
 
@@ -94,7 +94,7 @@ $manifest = [ordered]@{
     minimumWindowsBuild = 17763
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
-    releaseNotes = 'History favorites, tags and recycle bin; exact multi-monitor pin restoration; precision capture controls; richer object editing; English and Chinese UI support; verified updates; rollback-safe installation; and a smaller x64 package.'
+    releaseNotes = 'The capture toolbar now hides during eight-handle resizing and returns below the adjusted region. Official GitHub updates are enabled by default, available at startup, in Preferences, and from the tray menu, with SHA-256 installer verification.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

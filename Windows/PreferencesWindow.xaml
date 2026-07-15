@@ -317,11 +317,11 @@
                             </StackPanel>
                         </StackPanel>
                     </Border>
-                    <TextBlock Text="HTTPS update feed (JSON)" FontWeight="SemiBold"/>
+                    <TextBlock Text="GitHub updates" FontWeight="SemiBold"/>
                     <CheckBox x:Name="CheckUpdatesOnStartupBox" Content="Check for updates when SnapPin starts" Margin="0,8,0,0"/>
                     <DockPanel Margin="0,6,0,0">
                         <Button DockPanel.Dock="Right" Content="Check now" Style="{StaticResource AccentDialogButton}" Click="CheckUpdates_Click" Margin="8,0,0,0"/>
-                        <TextBox x:Name="UpdateFeedBox" Height="30" Padding="7,4" ToolTip="Manifest fields: version, downloadUrl, releaseNotes"/>
+                        <TextBox x:Name="UpdateFeedBox" Height="30" Padding="7,4" ToolTip="Official SnapPin GitHub release manifest. Custom HTTPS feeds are also supported."/>
                     </DockPanel>
                 </StackPanel>
             </TabItem>

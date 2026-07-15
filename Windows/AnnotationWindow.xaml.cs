@@ -406,6 +406,15 @@ public partial class AnnotationEditorControl : UserControl
         Dispatcher.BeginInvoke(LayoutCaptureOverlay);
     }
 
+    internal void SetCapturePropertiesToolbarVisible(bool visible)
+    {
+        if (!_captureOverlayMode) return;
+        PropertiesToolbarFrame.Visibility = visible && _tool != "Select"
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        if (visible) Dispatcher.BeginInvoke(LayoutCaptureOverlay);
+    }
+
     internal void UndoForCapture() => Undo();
     internal void RedoForCapture() => Redo();
 

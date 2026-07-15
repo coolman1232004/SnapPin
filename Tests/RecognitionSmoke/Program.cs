@@ -179,11 +179,18 @@ internal static class Program
             var pin = (Button)window.FindName("PinClipboardButton");
             var card = (Border)window.FindName("CaptureOverviewCard");
             var shortcutPanel = (Border)window.FindName("ShortcutPanel");
+            var tray = (System.Windows.Forms.NotifyIcon?)typeof(MainWindow)
+                .GetField("_trayIcon", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .GetValue(window);
+            var hasGitHubUpdateCommand = tray?.ContextMenuStrip?.Items
+                .OfType<System.Windows.Forms.ToolStripItem>()
+                .Any(item => item.Text == "Check for updates…") == true;
             var matches = IsColor(window.Background, 0xEB, 0xF2, 0xF5) &&
                 IsColor(capture.Background, 0x2C, 0x97, 0x8E) &&
                 IsColor(pin.Background, 0xC5, 0xE6, 0xF7) &&
                 IsColor(card.Background, 0xFE, 0xFE, 0xFE) &&
-                IsColor(shortcutPanel.BorderBrush, 0xBE, 0xD7, 0xE3);
+                IsColor(shortcutPanel.BorderBrush, 0xBE, 0xD7, 0xE3) &&
+                hasGitHubUpdateCommand;
             window.DisposeLayoutPreview();
             return matches;
         });
@@ -215,8 +222,13 @@ internal static class Program
             editor.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             editor.UpdateLayout();
             var after = toolbar.TranslatePoint(new Point(), editor);
+            editor.SetCapturePropertiesToolbarVisible(false);
+            var propertiesHideDuringResize = ((Border)editor.FindName("PropertiesToolbarFrame")).Visibility == Visibility.Collapsed;
+            editor.SetCapturePropertiesToolbarVisible(true);
+            var propertiesReturnAfterResize = ((Border)editor.FindName("PropertiesToolbarFrame")).Visibility == Visibility.Visible;
             return Math.Abs(before.X - expectedLeft) < 1 && Math.Abs(before.Y - expectedTop) < 1 &&
-                Math.Abs(after.X - before.X) < 1 && Math.Abs(after.Y - before.Y) < 1;
+                Math.Abs(after.X - before.X) < 1 && Math.Abs(after.Y - before.Y) < 1 &&
+                propertiesHideDuringResize && propertiesReturnAfterResize;
         });
         if (!stableToolbarAnchor) return 48;
         Console.WriteLine("ANNOTATION POSITION: primary toolbar anchor remains fixed when the property row changes");
@@ -684,6 +696,58 @@ internal static class Program
         });
         if (!captureAnnotationToolbarMatches) return 47;
         Console.WriteLine("CAPTURE ANNOTATION: direct first-row tools, movable review header, save path and recording icons verified");
+
+        var resizeToolbarLifecycleMatches = RunSta(() =>
+        {
+            var overlay = new CaptureOverlayWindow(CreatePatternImage(900, 600))
+            {
+                Width = 900,
+                Height = 600,
+                Left = -10000,
+                Top = -10000,
+                ShowActivated = false,
+                Opacity = 0
+            };
+            overlay.Show();
+            overlay.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            var overlayType = typeof(CaptureOverlayWindow);
+            var selection = new Rect(120, 90, 420, 260);
+            overlayType.GetField("_selection", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(overlay, selection);
+            overlayType.GetMethod("RenderSelection", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(overlay, null);
+            var actionBar = (Border)overlay.FindName("ActionBar");
+            actionBar.Visibility = Visibility.Visible;
+            overlayType.GetMethod("PositionActionBar", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(overlay, null);
+            var handle = (FrameworkElement)overlay.FindName("HandleSE");
+            var down = new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice,
+                Environment.TickCount, System.Windows.Input.MouseButton.Left)
+            {
+                RoutedEvent = UIElement.MouseLeftButtonDownEvent,
+                Source = handle
+            };
+            overlayType.GetMethod("Handle_MouseLeftButtonDown", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(overlay, [handle, down]);
+            var hiddenWhileDragging = actionBar.Visibility == Visibility.Collapsed;
+            var up = new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice,
+                Environment.TickCount, System.Windows.Input.MouseButton.Left)
+            {
+                RoutedEvent = UIElement.MouseLeftButtonUpEvent,
+                Source = overlay
+            };
+            overlayType.GetMethod("Window_MouseLeftButtonUp", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(overlay, [overlay, up]);
+            var toolbarTop = Canvas.GetTop(actionBar);
+            var adjustedSelection = overlay.CurrentSelection;
+            var returnedBelowSelection = actionBar.Visibility == Visibility.Visible &&
+                toolbarTop >= adjustedSelection.Bottom + 6 && toolbarTop <= adjustedSelection.Bottom + 10;
+            Console.WriteLine($"CAPTURE RESIZE TOOLBAR PROBE: hidden={hiddenWhileDragging}, visible={actionBar.Visibility}, top={toolbarTop:N1}, expected={adjustedSelection.Bottom + 8:N1}");
+            overlay.Close();
+            return hiddenWhileDragging && returnedBelowSelection;
+        });
+        if (!resizeToolbarLifecycleMatches) return 59;
+        Console.WriteLine("CAPTURE RESIZE TOOLBAR: hidden during handle drag and restored below the adjusted region");
 
         var recropShiftMatches =
             CaptureOverlayWindow.ShiftAnnotationsForRecrop(

@@ -239,7 +239,7 @@ public partial class CaptureOverlayWindow : Window
                 _resizing = false;
                 ReleaseMouseCapture();
                 RefreshInlineAnnotationAfterResize();
-                ActionBar.Visibility = Visibility.Visible;
+                SetResizeToolbarsVisible(true);
                 PositionActionBar();
                 e.Handled = true;
             }
@@ -256,6 +256,7 @@ public partial class CaptureOverlayWindow : Window
             _resizing = false;
             ReleaseMouseCapture();
             RenderSelection();
+            SetResizeToolbarsVisible(true);
             PositionActionBar();
             e.Handled = true;
             return;
@@ -475,9 +476,16 @@ public partial class CaptureOverlayWindow : Window
         _resizeHandle = handle;
         _resizeStart = e.GetPosition(OverlayCanvas);
         _resizeStartRect = _selection;
-        if (!_annotationMode) ActionBar.Visibility = Visibility.Collapsed;
+        SetResizeToolbarsVisible(false);
         CaptureMouse();
         e.Handled = true;
+    }
+
+    private void SetResizeToolbarsVisible(bool visible)
+    {
+        ActionBar.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        if (_annotationMode)
+            CaptureInlineEditor.SetCapturePropertiesToolbarVisible(visible);
     }
 
     private void RefreshInlineAnnotationAfterResize()
