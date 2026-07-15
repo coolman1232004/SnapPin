@@ -49,7 +49,7 @@ public partial class RecognitionControl : UserControl
         _cancellation = new CancellationTokenSource();
         ScanButton.IsEnabled = false;
         CopyButton.IsEnabled = SearchButton.IsEnabled = OpenButton.IsEnabled = false;
-        StatusText.Text = "Recognizing locally…";
+        StatusText.Text = L("Recognizing locally…");
         ResultBox.Text = string.Empty;
 
         try
@@ -63,16 +63,16 @@ public partial class RecognitionControl : UserControl
             OpenButton.IsEnabled = TryGetWebUri(_result, out _);
             StatusText.Text = content
                 ? BuildStatus(_result)
-                : string.IsNullOrWhiteSpace(_result.ErrorMessage) ? "No text or code was found." : _result.ErrorMessage;
+                : string.IsNullOrWhiteSpace(_result.ErrorMessage) ? L("No text or code was found.") : _result.ErrorMessage;
             RecognitionCompleted?.Invoke(this, new RecognitionCompletedEventArgs(_result));
         }
         catch (OperationCanceledException)
         {
-            StatusText.Text = "Recognition cancelled.";
+            StatusText.Text = L("Recognition cancelled.");
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Recognition failed: {DeepestMessage(ex)}";
+            StatusText.Text = LocalizationService.Format("Recognition failed: {0}", DeepestMessage(ex));
         }
         finally
         {
@@ -92,9 +92,9 @@ public partial class RecognitionControl : UserControl
     private static string BuildStatus(RecognitionResult result)
     {
         var pieces = new List<string>();
-        if (!string.IsNullOrWhiteSpace(result.Text)) pieces.Add($"{result.Text.Length:N0} text characters");
-        if (!string.IsNullOrWhiteSpace(result.BarcodeText)) pieces.Add(string.IsNullOrWhiteSpace(result.BarcodeFormat) ? "code found" : $"{result.BarcodeFormat} found");
-        pieces.Add("saved with capture history");
+        if (!string.IsNullOrWhiteSpace(result.Text)) pieces.Add(LocalizationService.Format("{0} text characters", result.Text.Length.ToString("N0")));
+        if (!string.IsNullOrWhiteSpace(result.BarcodeText)) pieces.Add(string.IsNullOrWhiteSpace(result.BarcodeFormat) ? L("code found") : LocalizationService.Format("{0} found", result.BarcodeFormat));
+        pieces.Add(L("saved with capture history"));
         return string.Join(" • ", pieces);
     }
 
@@ -103,6 +103,8 @@ public partial class RecognitionControl : UserControl
         while (exception.InnerException is not null) exception = exception.InnerException;
         return exception.Message;
     }
+
+    private static string L(string value) => LocalizationService.Current(value);
 
     private void Copy_Click(object sender, RoutedEventArgs e)
     {

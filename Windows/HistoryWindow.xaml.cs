@@ -41,8 +41,8 @@ public partial class HistoryWindow : Window
             TimeLabel = record.CreatedAt.ToString("MMM d  HH:mm:ss"),
             SourceLabel = SourceLabel(record),
             RecognitionLabel = RecognitionLabel(record),
-            EditLabel = record.IsRecording ? "Open" : "Edit",
-            ContextLabel = _contextPreviewIds.Contains(record.Id) ? "Show result" : "Show context",
+            EditLabel = L(record.IsRecording ? "Open" : "Edit"),
+            ContextLabel = L(_contextPreviewIds.Contains(record.Id) ? "Show result" : "Show context"),
             ContextVisibility = record.HasContext ? Visibility.Visible : Visibility.Collapsed,
             Title = string.IsNullOrWhiteSpace(record.Title) ? SourceLabel(record) : record.Title,
             FavoriteGlyph = record.IsFavorite ? "★" : "☆",
@@ -50,8 +50,8 @@ public partial class HistoryWindow : Window
             DeletedVisibility = record.IsDeleted ? Visibility.Visible : Visibility.Collapsed
         }).ToList();
         SummaryText.Text = filtered.Count == records.Count
-            ? records.Count == 1 ? "1 saved item" : $"{records.Count} saved items"
-            : $"{filtered.Count} of {records.Count} saved items";
+            ? records.Count == 1 ? L("1 saved item") : LocalizationService.Format("{0} saved items", records.Count)
+            : LocalizationService.Format("{0} of {1} saved items", filtered.Count, records.Count);
     }
 
     private bool MatchesFilters(CaptureRecord record)
@@ -148,7 +148,7 @@ public partial class HistoryWindow : Window
     private void Delete_Click(object sender, RoutedEventArgs e)
     {
         if (RecordFrom(sender) is not { } record) return;
-        if (MessageBox.Show(this, "Move this item to the recycle bin?", "SnapPin History", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Move this item to the recycle bin?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
         HistoryService.Delete(record.Id);
         Reload();
     }
@@ -163,9 +163,9 @@ public partial class HistoryWindow : Window
     private void Rename_Click(object sender, RoutedEventArgs e)
     {
         if (RecordFrom(sender) is not { } record) return;
-        var title = TextPromptWindow.Ask(this, "Rename history item", "Name", record.Title);
+        var title = TextPromptWindow.Ask(this, L("Rename history item"), L("Name"), record.Title);
         if (title is null) return;
-        var tagsText = TextPromptWindow.Ask(this, "Organize history item", "Tags (comma separated)", string.Join(", ", record.Tags));
+        var tagsText = TextPromptWindow.Ask(this, L("Organize history item"), L("Tags (comma separated)"), string.Join(", ", record.Tags));
         if (tagsText is null) return;
         var tags = tagsText.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
@@ -183,14 +183,14 @@ public partial class HistoryWindow : Window
     private void DeleteForever_Click(object sender, RoutedEventArgs e)
     {
         if (RecordFrom(sender) is not { } record) return;
-        if (MessageBox.Show(this, "Permanently delete this item and its files?", "SnapPin History", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Permanently delete this item and its files?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
         HistoryService.DeletePermanently(record.Id);
         Reload();
     }
 
     private void EmptyRecycle_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show(this, "Permanently delete every item in the recycle bin?", "SnapPin History", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Permanently delete every item in the recycle bin?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
         HistoryService.EmptyRecycleBin();
         Reload();
     }
@@ -217,7 +217,7 @@ public partial class HistoryWindow : Window
 
     private void Clear_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show(this, "Move every active item to the recycle bin?", "SnapPin History", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Move every active item to the recycle bin?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
         HistoryService.Clear();
         _contextPreviewIds.Clear();
         Reload();
@@ -237,21 +237,23 @@ public partial class HistoryWindow : Window
     private static string RecognitionLabel(CaptureRecord record)
     {
         var labels = new List<string>();
-        if (!string.IsNullOrWhiteSpace(record.RecognizedText)) labels.Add("OCR text");
-        if (!string.IsNullOrWhiteSpace(record.BarcodeText)) labels.Add(string.IsNullOrWhiteSpace(record.BarcodeFormat) ? "Code" : record.BarcodeFormat);
-        if (record.HasEditableAnnotations) labels.Add("Editable layers");
-        if (record.IsRecording) labels.Add($"{record.MediaKind} recording · {record.FrameCount} frames");
+        if (!string.IsNullOrWhiteSpace(record.RecognizedText)) labels.Add(L("OCR text"));
+        if (!string.IsNullOrWhiteSpace(record.BarcodeText)) labels.Add(string.IsNullOrWhiteSpace(record.BarcodeFormat) ? L("Code") : record.BarcodeFormat);
+        if (record.HasEditableAnnotations) labels.Add(L("Editable layers"));
+        if (record.IsRecording) labels.Add(LocalizationService.Format("{0} recording · {1} frames", record.MediaKind, record.FrameCount));
         return string.Join(" · ", labels);
     }
 
     private static string SourceLabel(CaptureRecord record)
     {
         if (!string.IsNullOrWhiteSpace(record.SourceKind)) return record.SourceKind;
-        if (record.IsRecording) return "Recording";
+        if (record.IsRecording) return L("Recording");
         if (!string.IsNullOrWhiteSpace(record.RecognizedText) || !string.IsNullOrWhiteSpace(record.BarcodeText)) return "OCR";
-        if (record.HasEditableAnnotations) return "Edited";
-        return "Capture";
+        if (record.HasEditableAnnotations) return L("Edited");
+        return L("Capture");
     }
+
+    private static string L(string value) => LocalizationService.Current(value);
 
     private sealed class HistoryViewItem
     {

@@ -14,7 +14,7 @@ internal sealed class LongCaptureProgressWindow : Window
 
     internal LongCaptureProgressWindow()
     {
-        Title = "SnapPin long capture";
+        Title = LocalizationService.Current("SnapPin long capture");
         Width = 310;
         Height = 58;
         WindowStyle = WindowStyle.None;
@@ -27,14 +27,14 @@ internal sealed class LongCaptureProgressWindow : Window
 
         _status = new TextBlock
         {
-            Text = "Preparing long capture...",
+            Text = LocalizationService.Current("Preparing long capture..."),
             Foreground = new SolidColorBrush(Color.FromRgb(17, 24, 29)),
             VerticalAlignment = VerticalAlignment.Center,
             TextTrimming = TextTrimming.CharacterEllipsis
         };
         var stop = new Button
         {
-            Content = "Stop",
+            Content = LocalizationService.Current("Stop"),
             Width = 62,
             Height = 30,
             Padding = new Thickness(8, 3, 8, 3),
@@ -72,6 +72,6 @@ internal sealed class LongCaptureProgressWindow : Window
             Dispatcher.BeginInvoke(() => Report(progress));
             return;
         }
-        _status.Text = $"{progress.Message}  |  kept {progress.FrameCount}, skipped {progress.RejectedFrames}";
+        _status.Text = LocalizationService.Format("{0}  |  kept {1}, skipped {2}", progress.Message, progress.FrameCount, progress.RejectedFrames);
     }
 }

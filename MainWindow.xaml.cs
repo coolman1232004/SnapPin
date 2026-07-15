@@ -131,8 +131,8 @@ public partial class MainWindow : Window
     {
         StatusDot.Fill = success ? (System.Windows.Media.Brush)FindResource("AccentBrush") : System.Windows.Media.Brushes.Orange;
         StatusText.Text = success
-            ? $"Capture: {_captureHotkey.DisplayName}  ·  Pin: {_pasteHotkey.DisplayName}"
-            : "One or more selected shortcuts are already used by Windows or another app";
+            ? $"{L("Capture")}: {_captureHotkey.DisplayName}  ·  {L("Pin")}: {_pasteHotkey.DisplayName}"
+            : L("One or more selected shortcuts are already used by Windows or another app");
     }
 
     private void RefreshDefinitions()
@@ -149,8 +149,8 @@ public partial class MainWindow : Window
     private void RefreshDashboard()
     {
         CaptureHotkeyCombo.SelectedValue = _captureHotkey.Name;
-        CaptureButton.Content = $"Capture region  ·  {_captureHotkey.DisplayName}";
-        DrawScreenButton.Content = $"Draw  ·  {_drawingHotkey.DisplayName}";
+        CaptureButton.Content = $"{L("Capture region")}  ·  {_captureHotkey.DisplayName}";
+        DrawScreenButton.Content = $"{L("Draw")}  ·  {_drawingHotkey.DisplayName}";
         RefreshPinManager();
     }
 
@@ -173,16 +173,16 @@ public partial class MainWindow : Window
                 .Where(pin => pin.Group.Equals(_settings.CurrentPinGroup, StringComparison.OrdinalIgnoreCase))
                 .ToList();
             PinManagerList.ItemsSource = pins;
-            PinManagerStatus.Text = pins.Count == 1 ? "1 pin" : $"{pins.Count} pins";
+            PinManagerStatus.Text = pins.Count == 1 ? L("1 pin") : LocalizationService.Format("{0} pins", pins.Count);
             var currentDesktop = VirtualDesktopService.CurrentDesktopId();
             var boundDesktop = VirtualDesktopService.BoundDesktop(_settings, _settings.CurrentPinGroup);
             PinDesktopStatus.Text = !VirtualDesktopService.IsSupported
-                ? "Virtual desktops unavailable"
+                ? L("Virtual desktops unavailable")
                 : boundDesktop is null
-                    ? $"{VirtualDesktopService.ShortLabel(currentDesktop)} · not bound"
+                    ? LocalizationService.Format("{0} · not bound", VirtualDesktopService.ShortLabel(currentDesktop))
                     : boundDesktop == currentDesktop
-                        ? $"{VirtualDesktopService.ShortLabel(boundDesktop)} · bound here"
-                        : $"Bound to {VirtualDesktopService.ShortLabel(boundDesktop)}";
+                        ? LocalizationService.Format("{0} · bound here", VirtualDesktopService.ShortLabel(boundDesktop))
+                        : LocalizationService.Format("Bound to {0}", VirtualDesktopService.ShortLabel(boundDesktop));
         }
         finally
         {
@@ -317,8 +317,8 @@ public partial class MainWindow : Window
         {
             var result = await UpdateService.CheckAsync(_settings.UpdateFeedUrl);
             var canInstall = result.UpdateAvailable && !string.IsNullOrWhiteSpace(result.DownloadUrl);
-            var answer = MessageBox.Show(this, canInstall ? result.Message + "\n\nDownload and install it now?" : result.Message,
-                result.UpdateAvailable ? "SnapPin update available" : "SnapPin update",
+            var answer = MessageBox.Show(this, canInstall ? result.Message + "\n\n" + L("Download and install it now?") : result.Message,
+                L(result.UpdateAvailable ? "SnapPin update available" : "SnapPin update"),
                 canInstall ? MessageBoxButton.YesNo : MessageBoxButton.OK,
                 result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
             if (answer != MessageBoxResult.Yes || !canInstall) return;
@@ -328,7 +328,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             DiagnosticsService.Log("manual-update", ex.Message, ex);
-            MessageBox.Show(this, $"GitHub update check failed: {ex.Message}", "SnapPin update",
+            MessageBox.Show(this, LocalizationService.Format("GitHub update check failed: {0}", ex.Message), L("SnapPin update"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
@@ -512,16 +512,16 @@ public partial class MainWindow : Window
     {
         if (_trayIcon?.ContextMenuStrip is not { } menu) return;
         menu.Items.Clear();
-        menu.Items.Add($"Capture ({_captureHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture()));
-        menu.Items.Add($"Draw on screen ({_drawingHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.FullScreenDraw)));
-        menu.Items.Add($"Capture and copy ({_captureAndCopyHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.CopyOnSelection)));
-        menu.Items.Add($"Custom capture ({_customCaptureHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(OpenCustomCapture));
-        menu.Items.Add($"Record region ({_recordingHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.RecordOnSelection)));
-        menu.Items.Add("Capture active window", null, (_, _) => Dispatcher.Invoke(CaptureActiveWindow));
-        menu.Items.Add($"Pin clipboard ({_pasteHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(PinClipboard));
-        menu.Items.Add($"Hide/show all pins ({_togglePinsHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleAllVisibility));
-        menu.Items.Add("Repeat last capture", null, (_, _) => Dispatcher.Invoke(RepeatLastRegion));
-        var disableItem = new Forms.ToolStripMenuItem("Disable hotkeys") { Checked = !_hotkeysEnabled, CheckOnClick = true };
+        menu.Items.Add($"{L("Capture")} ({_captureHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture()));
+        menu.Items.Add($"{L("Draw on screen")} ({_drawingHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.FullScreenDraw)));
+        menu.Items.Add($"{L("Capture and copy")} ({_captureAndCopyHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.CopyOnSelection)));
+        menu.Items.Add($"{L("Custom capture")} ({_customCaptureHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(OpenCustomCapture));
+        menu.Items.Add($"{L("Record region")} ({_recordingHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.RecordOnSelection)));
+        menu.Items.Add(L("Capture active window"), null, (_, _) => Dispatcher.Invoke(CaptureActiveWindow));
+        menu.Items.Add($"{L("Pin clipboard")} ({_pasteHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(PinClipboard));
+        menu.Items.Add($"{L("Hide/show all pins")} ({_togglePinsHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleAllVisibility));
+        menu.Items.Add(L("Repeat last region"), null, (_, _) => Dispatcher.Invoke(RepeatLastRegion));
+        var disableItem = new Forms.ToolStripMenuItem(L("Disable hotkeys")) { Checked = !_hotkeysEnabled, CheckOnClick = true };
         disableItem.Click += (_, _) => Dispatcher.Invoke(() =>
         {
             _hotkeysEnabled = !disableItem.Checked;
@@ -529,11 +529,11 @@ public partial class MainWindow : Window
         });
         menu.Items.Add(disableItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
-        var images = new Forms.ToolStripMenuItem("Pins");
-        images.DropDownItems.Add("Hide/show all", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleAllVisibility));
-        images.DropDownItems.Add("Restore click interaction", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.RestoreInteractions));
-        images.DropDownItems.Add("Close all", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.CloseAll));
-        var groups = new Forms.ToolStripMenuItem("Switch group");
+        var images = new Forms.ToolStripMenuItem(L("Pins"));
+        images.DropDownItems.Add(L("Hide/show all"), null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleAllVisibility));
+        images.DropDownItems.Add(L("Restore click interaction"), null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.RestoreInteractions));
+        images.DropDownItems.Add(L("Close all"), null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.CloseAll));
+        var groups = new Forms.ToolStripMenuItem(L("Switch group"));
         var currentGroup = SettingsService.Load().CurrentPinGroup;
         foreach (var groupName in SettingsService.Load().PinGroups)
         {
@@ -542,14 +542,14 @@ public partial class MainWindow : Window
             groups.DropDownItems.Add(item);
         }
         images.DropDownItems.Add(groups);
-        images.DropDownItems.Add("Solo selected", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleSolo));
+        images.DropDownItems.Add(L("Solo selected"), null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleSolo));
         menu.Items.Add(images);
-        menu.Items.Add("Capture history…", null, (_, _) => Dispatcher.Invoke(OpenHistory));
-        menu.Items.Add("Check for updates…", null, (_, _) => Dispatcher.Invoke(() => _ = CheckForUpdatesAsync()));
-        menu.Items.Add("Preferences…", null, (_, _) => Dispatcher.Invoke(OpenPreferences));
-        menu.Items.Add("Open SnapPin", null, (_, _) => Dispatcher.Invoke(ShowDashboard));
+        menu.Items.Add(L("Capture history…"), null, (_, _) => Dispatcher.Invoke(OpenHistory));
+        menu.Items.Add(L("Check for updates…"), null, (_, _) => Dispatcher.Invoke(() => _ = CheckForUpdatesAsync()));
+        menu.Items.Add(L("Preferences…"), null, (_, _) => Dispatcher.Invoke(OpenPreferences));
+        menu.Items.Add(L("Open SnapPin"), null, (_, _) => Dispatcher.Invoke(ShowDashboard));
         menu.Items.Add(new Forms.ToolStripSeparator());
-        menu.Items.Add("Exit", null, (_, _) => Dispatcher.Invoke(ExitApplication));
+        menu.Items.Add(L("Exit"), null, (_, _) => Dispatcher.Invoke(ExitApplication));
     }
 
     private void ShowDashboard()
@@ -591,6 +591,19 @@ public partial class MainWindow : Window
         _trayIcon = null;
     }
 
+    internal void PrepareForRestart()
+    {
+        _allowClose = true;
+        _exitStarted = true;
+        _sessionTimer.Stop();
+        _desktopTimer.Stop();
+        PinnedImageWindow.PinsChanged -= PinnedImageWindow_PinsChanged;
+        UnregisterAllHotkeys();
+        _source?.RemoveHook(WndProc);
+        _trayIcon?.Dispose();
+        _trayIcon = null;
+    }
+
     private async void ExitApplication()
     {
         if (_exitStarted) return;
@@ -607,5 +620,7 @@ public partial class MainWindow : Window
     }
 
     private static void ShowError(string title, string message) =>
-        System.Windows.MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+        System.Windows.MessageBox.Show(L(message), L(title), MessageBoxButton.OK, MessageBoxImage.Information);
+
+    private static string L(string value) => LocalizationService.Current(value);
 }

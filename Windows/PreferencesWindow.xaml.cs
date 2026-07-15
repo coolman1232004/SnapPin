@@ -103,7 +103,7 @@ public partial class PreferencesWindow : Window
         OcrLanguageBox.SelectedValue = _settings.OcrLanguage;
         if (OcrLanguageBox.SelectedIndex < 0) OcrLanguageBox.SelectedIndex = 3;
         ToolbarSizeBox.SelectedValue = ToolbarThemeService.Normalize(_settings.ToolbarSizeMode);
-        VersionText.Text = $"Version {DiagnosticsService.Version}";
+        VersionText.Text = LocalizationService.Format("Version {0}", DiagnosticsService.Version);
         PopulateCaptureToolbar(_settings.CaptureToolbarOrder, _settings.CaptureToolbarEnabled);
         PopulateToolbar(_settings.AnnotationToolbarOrder, _settings.AnnotationToolbarEnabled);
     }
@@ -192,8 +192,9 @@ public partial class PreferencesWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
+        var previousLanguage = LocalizationService.Normalize(_settings.UiLanguage);
         _settings.RunOnStartup = RunOnStartupBox.IsChecked == true;
-        _settings.UiLanguage = UiLanguageBox.SelectedValue as string ?? "English";
+        _settings.UiLanguage = LocalizationService.Normalize(UiLanguageBox.SelectedValue as string);
         _settings.CheckUpdatesOnStartup = CheckUpdatesOnStartupBox.IsChecked == true;
         _settings.RunAsAdministrator = RunAsAdministratorBox.IsChecked == true;
         _settings.AutoBackup = AutoBackupBox.IsChecked == true;
@@ -282,7 +283,11 @@ public partial class PreferencesWindow : Window
         ToolbarThemeService.Apply(_settings.ToolbarSizeMode);
         HistoryService.EnforceLimit(_settings.HistoryLimit);
         SettingsApplied?.Invoke(this, EventArgs.Empty);
+        var restartRequested = false;
+        if (!previousLanguage.Equals(_settings.UiLanguage, StringComparison.Ordinal))
+            restartRequested = LanguageRestartWindow.Ask(this, _settings.UiLanguage);
         DialogResult = true;
+        if (restartRequested) Dispatcher.BeginInvoke(RestartService.RestartApplication);
     }
 
     private void BrowseQuick_Click(object sender, RoutedEventArgs e) => BrowseInto(QuickFolderBox);
@@ -300,7 +305,7 @@ public partial class PreferencesWindow : Window
     private void CopyDiagnostics_Click(object sender, RoutedEventArgs e)
     {
         Clipboard.SetText(DiagnosticsService.Summary());
-        MessageBox.Show(this, "The diagnostic summary was copied.", "SnapPin diagnostics", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show(this, LocalizationService.Current("The diagnostic summary was copied."), LocalizationService.Current("SnapPin diagnostics"), MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private async void CheckUpdates_Click(object sender, RoutedEventArgs e)
@@ -309,7 +314,7 @@ public partial class PreferencesWindow : Window
         {
             var result = await UpdateService.CheckAsync(AppSettings.DefaultUpdateFeedUrl);
             var answer = MessageBox.Show(this, result.Message,
-                result.UpdateAvailable ? "SnapPin update available" : "SnapPin update",
+                LocalizationService.Current(result.UpdateAvailable ? "SnapPin update available" : "SnapPin update"),
                 result.UpdateAvailable && !string.IsNullOrWhiteSpace(result.DownloadUrl) ? MessageBoxButton.YesNo : MessageBoxButton.OK,
                 result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
             if (answer == MessageBoxResult.Yes)
@@ -321,7 +326,7 @@ public partial class PreferencesWindow : Window
         catch (Exception ex)
         {
             DiagnosticsService.Log("update", ex.Message, ex);
-            MessageBox.Show(this, $"Update check failed: {ex.Message}", "SnapPin update", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, LocalizationService.Format("Update check failed: {0}", ex.Message), LocalizationService.Current("SnapPin update"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 
@@ -368,7 +373,7 @@ public partial class PreferencesWindow : Window
 
     private static void BrowseInto(System.Windows.Controls.TextBox target)
     {
-        using var dialog = new Forms.FolderBrowserDialog { InitialDirectory = target.Text, UseDescriptionForTitle = true, Description = "Choose a SnapPin output folder" };
+        using var dialog = new Forms.FolderBrowserDialog { InitialDirectory = target.Text, UseDescriptionForTitle = true, Description = LocalizationService.Current("Choose a SnapPin output folder") };
         if (dialog.ShowDialog() == Forms.DialogResult.OK) target.Text = dialog.SelectedPath;
     }
 

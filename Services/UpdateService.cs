@@ -51,9 +51,9 @@ internal static class UpdateService
     {
         var current = Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0, 0);
         if (string.IsNullOrWhiteSpace(feedUrl))
-            return new UpdateCheckResult(false, $"SnapPin {current.ToString(3)} is installed. The official GitHub update source is unavailable.");
+            return new UpdateCheckResult(false, LocalizationService.Format("SnapPin {0} is installed. The official GitHub update source is unavailable.", current.ToString(3)));
         if (!Uri.TryCreate(feedUrl.Trim(), UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
-            return new UpdateCheckResult(false, "The official update source is not a valid HTTPS address.");
+            return new UpdateCheckResult(false, LocalizationService.Current("The official update source is not a valid HTTPS address."));
 
         using var request = new HttpRequestMessage(HttpMethod.Get, uri);
         request.Headers.UserAgent.ParseAdd($"SnapPin/{current.ToString(3)}");
@@ -62,9 +62,9 @@ internal static class UpdateService
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         var manifest = await JsonSerializer.DeserializeAsync<UpdateManifest>(stream, ManifestJsonOptions, cancellationToken);
         if (manifest is null || !Version.TryParse(manifest.Version, out var published))
-            return new UpdateCheckResult(false, "The GitHub release did not contain a valid version.");
+            return new UpdateCheckResult(false, LocalizationService.Current("The GitHub release did not contain a valid version."));
         if (published <= current)
-            return new UpdateCheckResult(false, $"SnapPin {current.ToString(3)} is up to date.");
+            return new UpdateCheckResult(false, LocalizationService.Format("SnapPin {0} is up to date.", current.ToString(3)));
 
         var portable = IsPortableInstallation();
         var packageKind = portable ? UpdatePackageKind.Portable : UpdatePackageKind.Installer;
@@ -72,10 +72,13 @@ internal static class UpdateService
             ? ResolvePackageUrl(uri, manifest.PortableDownloadUrl, manifest.PortableFile)
             : ResolvePackageUrl(uri, manifest.DownloadUrl, manifest.InstallerFile);
         var sha256 = portable ? manifest.PortableSha256 : manifest.InstallerSha256;
-        var edition = portable ? "portable copy" : "installed copy";
-        var message = $"SnapPin {published.ToString(3)} is available for this {edition}.\n\n{manifest.ReleaseNotes}".Trim();
+        var edition = LocalizationService.Current(portable ? "portable copy" : "installed copy");
+        var notes = LocalizationService.CurrentLanguage == LocalizationService.English
+            ? manifest.ReleaseNotes
+            : LocalizationService.Current("See the GitHub release page for full release notes.");
+        var message = $"{LocalizationService.Format("SnapPin {0} is available for this {1}.", published.ToString(3), edition)}\n\n{notes}".Trim();
         if (string.IsNullOrWhiteSpace(downloadUrl))
-            message += "\n\nThe required update package is not attached to this GitHub release.";
+            message += "\n\n" + LocalizationService.Current("The required update package is not attached to this GitHub release.");
         return new UpdateCheckResult(true, message, downloadUrl, published.ToString(3), sha256 ?? string.Empty, packageKind);
     }
 

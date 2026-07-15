@@ -389,7 +389,7 @@ public partial class CaptureOverlayWindow : Window
         DetectionRect.Width = _detectedSelection.Width;
         DetectionRect.Height = _detectedSelection.Height;
         DetectionRect.Visibility = Visibility.Visible;
-        DetectionModeText.Text = $"Mode: {(_detectElements ? "UI element" : "window")}   •   {_detectionIndex + 1}/{_detectionCandidates.Count}   •   {detected.Name}";
+        DetectionModeText.Text = $"{L("Mode")}: {L(_detectElements ? "UI element" : "window")}   •   {_detectionIndex + 1}/{_detectionCandidates.Count}   •   {detected.Name}";
     }
 
     private void PositionActionBar()
@@ -851,7 +851,7 @@ public partial class CaptureOverlayWindow : Window
         _recordingPaused = false;
         RecordingPauseIcon.Visibility = Visibility.Visible;
         RecordingResumeIcon.Visibility = Visibility.Collapsed;
-        RecordingPauseLabel.Text = "Pause";
+        RecordingPauseLabel.Text = L("Pause");
         RecordingPauseButton.ToolTip = "Pause recording (Space)";
         _recordingStopRequested = false;
         _recordingCancellation = new CancellationTokenSource();
@@ -892,7 +892,7 @@ public partial class CaptureOverlayWindow : Window
                     (elapsed, frames) => Dispatcher.BeginInvoke(() =>
                     {
                         RecordingTimerText.Text = elapsed.ToString(@"mm\:ss");
-                        RecordingFrameText.Text = _recordingPaused ? "Paused" : frames == 1 ? "1 frame" : $"{frames} frames";
+                        RecordingFrameText.Text = _recordingPaused ? L("Paused") : frames == 1 ? L("1 frame") : LocalizationService.Format("{0} frames", frames);
                     }),
                     _recordingCancellation.Token);
             if (_settings.RecordingFormat.Equals("MP4", StringComparison.OrdinalIgnoreCase))
@@ -905,7 +905,7 @@ public partial class CaptureOverlayWindow : Window
                 }
                 result = reviewed;
             }
-            RecordingTimerText.Text = "Saving…";
+            RecordingTimerText.Text = L("Saving…");
             HistoryService.AddRecording(result.Preview, result.FilePath, result.Duration, result.FrameCount);
             System.Media.SystemSounds.Asterisk.Play();
             Close();
@@ -917,7 +917,7 @@ public partial class CaptureOverlayWindow : Window
         catch (Exception ex)
         {
             RestoreCaptureAppearance();
-            MessageBox.Show(this, ex.Message, "Recording failed", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, ex.Message, L("Recording failed"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         finally
         {
@@ -943,7 +943,7 @@ public partial class CaptureOverlayWindow : Window
                 if (!_recordingPaused) RecordingFrameText.Text = $"MP4 · {_settings.RecordingCaptureMode} · {session.FrameCount}f";
                 await Task.Delay(100, cancellationToken);
             }
-            RecordingTimerText.Text = "Saving…";
+            RecordingTimerText.Text = L("Saving…");
             var result = await session.StopAsync(cancellationToken);
             return new ScreenRecordingResult(result.FilePath, result.Preview, result.Duration, result.FrameCount);
         }
@@ -1064,12 +1064,12 @@ public partial class CaptureOverlayWindow : Window
         TrimStartSlider.Value = 0;
         TrimEndSlider.Value = result.Duration.TotalSeconds;
         TrimDurationText.Text = result.Duration.ToString(@"mm\:ss");
-        RecordingSavePathText.Text = $"Will save to: {result.FilePath}";
+        RecordingSavePathText.Text = LocalizationService.Format("Will save to: {0}", result.FilePath);
         RecordingSavePathText.ToolTip = result.FilePath;
         _recordingPreviewPlaying = false;
         ReviewPlayIcon.Visibility = Visibility.Visible;
         ReviewPauseIcon.Visibility = Visibility.Collapsed;
-        ReviewPlayLabel.Text = "Play";
+        ReviewPlayLabel.Text = L("Play");
         _recordingReviewPositioned = false;
         RecordingPreviewMedia.Source = new Uri(result.FilePath);
         RecordingReviewPanel.Visibility = Visibility.Visible;
@@ -1102,7 +1102,7 @@ public partial class CaptureOverlayWindow : Window
         var start = TimeSpan.FromSeconds(TrimStartSlider.Value);
         var end = TimeSpan.FromSeconds(TrimEndSlider.Value);
         var endTrim = result.Duration - end;
-        RecordingTimerText.Text = "Trimming…";
+        RecordingTimerText.Text = L("Trimming…");
         var path = await MediaTrimService.TrimMp4Async(result.FilePath, start, endTrim, cancellationToken);
         return result with { FilePath = path, Duration = end - start };
     }
@@ -1135,7 +1135,7 @@ public partial class CaptureOverlayWindow : Window
         _recordingPreviewPlaying = !_recordingPreviewPlaying;
         ReviewPlayIcon.Visibility = _recordingPreviewPlaying ? Visibility.Collapsed : Visibility.Visible;
         ReviewPauseIcon.Visibility = _recordingPreviewPlaying ? Visibility.Visible : Visibility.Collapsed;
-        ReviewPlayLabel.Text = _recordingPreviewPlaying ? "Pause" : "Play";
+        ReviewPlayLabel.Text = L(_recordingPreviewPlaying ? "Pause" : "Play");
     }
 
     private void RecordingPreviewMedia_MediaEnded(object sender, RoutedEventArgs e)
@@ -1145,7 +1145,7 @@ public partial class CaptureOverlayWindow : Window
         RecordingPreviewMedia.Position = TimeSpan.FromSeconds(TrimStartSlider.Value);
         ReviewPlayIcon.Visibility = Visibility.Visible;
         ReviewPauseIcon.Visibility = Visibility.Collapsed;
-        ReviewPlayLabel.Text = "Play";
+        ReviewPlayLabel.Text = L("Play");
     }
 
     private void KeepFullRecording_Click(object sender, RoutedEventArgs e) =>
@@ -1156,7 +1156,7 @@ public partial class CaptureOverlayWindow : Window
 
     private void DiscardRecording_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show(this, "Discard this recording permanently?", "Discard recording",
+        if (MessageBox.Show(this, L("Discard this recording permanently?"), L("Discard recording"),
             MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             _recordingReviewChoice?.TrySetResult(RecordingReviewChoice.Discard);
     }
@@ -1171,9 +1171,9 @@ public partial class CaptureOverlayWindow : Window
         }
         RecordingPauseIcon.Visibility = _recordingPaused ? Visibility.Collapsed : Visibility.Visible;
         RecordingResumeIcon.Visibility = _recordingPaused ? Visibility.Visible : Visibility.Collapsed;
-        RecordingPauseLabel.Text = _recordingPaused ? "Resume" : "Pause";
+        RecordingPauseLabel.Text = L(_recordingPaused ? "Resume" : "Pause");
         RecordingPauseButton.ToolTip = _recordingPaused ? "Resume recording (Space)" : "Pause recording (Space)";
-        RecordingFrameText.Text = _recordingPaused ? "Paused" : "Resuming…";
+        RecordingFrameText.Text = L(_recordingPaused ? "Paused" : "Resuming…");
     }
 
     private void RecordingStop_Click(object sender, RoutedEventArgs e)
@@ -1239,7 +1239,7 @@ public partial class CaptureOverlayWindow : Window
         {
             NativeMethods.SetCursorPos(originalCursor.X, originalCursor.Y);
             Show(); Activate();
-            MessageBox.Show(this, ex.Message, "Long screenshot failed", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, ex.Message, L("Long screenshot failed"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         finally
         {
@@ -1254,7 +1254,7 @@ public partial class CaptureOverlayWindow : Window
         _ocrCancellation?.Cancel();
         _ocrCancellation = new CancellationTokenSource();
         OcrPanel.Visibility = Visibility.Visible;
-        CaptureOcrResultBox.Text = "Recognizing locally…";
+        CaptureOcrResultBox.Text = L("Recognizing locally…");
         CopyOcrButton.IsEnabled = false;
         RetryOcrButton.IsEnabled = false;
         ActionBar.Visibility = Visibility.Visible;
@@ -1273,7 +1273,7 @@ public partial class CaptureOverlayWindow : Window
             if (!string.IsNullOrWhiteSpace(result.Text)) sections.Add(result.Text.Trim());
             if (!string.IsNullOrWhiteSpace(result.BarcodeText))
                 sections.Add($"[{(string.IsNullOrWhiteSpace(result.BarcodeFormat) ? "CODE" : result.BarcodeFormat)}]{Environment.NewLine}{result.BarcodeText.Trim()}");
-            CaptureOcrResultBox.Text = sections.Count > 0 ? string.Join($"{Environment.NewLine}{Environment.NewLine}", sections) : "No text or code was found.";
+            CaptureOcrResultBox.Text = sections.Count > 0 ? string.Join($"{Environment.NewLine}{Environment.NewLine}", sections) : L("No text or code was found.");
             CopyOcrButton.IsEnabled = sections.Count > 0;
 
             if (sections.Count > 0)
@@ -1286,12 +1286,12 @@ public partial class CaptureOverlayWindow : Window
         }
         catch (OperationCanceledException)
         {
-            CaptureOcrResultBox.Text = "Recognition cancelled.";
+            CaptureOcrResultBox.Text = L("Recognition cancelled.");
         }
         catch (Exception ex)
         {
             while (ex.InnerException is not null) ex = ex.InnerException;
-            CaptureOcrResultBox.Text = $"Recognition failed: {ex.Message}";
+            CaptureOcrResultBox.Text = LocalizationService.Format("Recognition failed: {0}", ex.Message);
         }
         finally
         {
@@ -1344,7 +1344,7 @@ public partial class CaptureOverlayWindow : Window
         {
             _ocrAreaSelection = Rect.Empty;
             OcrAreaRect.Visibility = Visibility.Collapsed;
-            CaptureOcrResultBox.Text = "The recognition area was too small. Select an area and try again.";
+            CaptureOcrResultBox.Text = L("The recognition area was too small. Select an area and try again.");
             return;
         }
         _ocrHistoryRecordId = null;
@@ -1558,7 +1558,7 @@ public partial class CaptureOverlayWindow : Window
                 _detectionIndex = _detectElements ? _detectionCandidates.Count - 1 : 0;
                 RenderDetectedCandidate();
             }
-            DetectionModeText.Text = $"Mode: {(_detectElements ? "UI element" : "window")}";
+            DetectionModeText.Text = $"{L("Mode")}: {L(_detectElements ? "UI element" : "window")}";
             e.Handled = true;
             return;
         }
@@ -1658,4 +1658,6 @@ public partial class CaptureOverlayWindow : Window
         ActionBar.Visibility = Visibility.Collapsed;
         DetectionRect.Visibility = Visibility.Collapsed;
     }
+
+    private static string L(string value) => LocalizationService.Current(value);
 }

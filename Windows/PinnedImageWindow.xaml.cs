@@ -737,12 +737,12 @@ public partial class PinnedImageWindow : Window
         }));
         menu.Items.Add(CheckItem("Shadow", _shadowEnabled, (_, _) => { _shadowEnabled = !_shadowEnabled; ApplyShadow(); }));
 
-        var zoom = new MenuItem { Header = "Zoom" };
+        var zoom = new MenuItem { Header = L("Zoom") };
         foreach (var percent in new[] { 25, 33, 50, 67, 75, 100, 125, 150, 200 })
             zoom.Items.Add(Item($"{percent}%", (_, _) => SetZoom(percent / 100.0)));
         menu.Items.Add(zoom);
 
-        var processing = new MenuItem { Header = "Image processing" };
+        var processing = new MenuItem { Header = L("Image processing") };
         processing.Items.Add(Item("Rotate left", (_, _) => { _rotation -= 90; ApplyTransform(); }));
         processing.Items.Add(Item("Rotate right", (_, _) => { _rotation += 90; ApplyTransform(); }));
         processing.Items.Add(Item("Flip horizontally", (_, _) => { _flipX *= -1; ApplyTransform(); }));
@@ -756,14 +756,14 @@ public partial class PinnedImageWindow : Window
         menu.Items.Add(Item("Paste", (_, _) => ReplaceFromClipboard()));
         menu.Items.Add(Item("Replace by file…", (_, _) => ReplaceByFile()));
 
-        var groups = new MenuItem { Header = "Move to group" };
+        var groups = new MenuItem { Header = L("Move to group") };
         foreach (var group in SettingsService.Load().PinGroups)
             groups.Items.Add(CheckItem(group, _groupName.Equals(group, StringComparison.OrdinalIgnoreCase), (_, _) => MoveTargetsToGroup(group)));
         menu.Items.Add(groups);
         if (!string.IsNullOrWhiteSpace(_sourceFilePath))
             menu.Items.Add(Item("View in folder", (_, _) => Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_sourceFilePath}\"") { UseShellExecute = true })));
 
-        var tools = new MenuItem { Header = "More tools" };
+        var tools = new MenuItem { Header = L("More tools") };
         tools.Items.Add(Item("Recognize text / QR…", (_, _) => BeginRecognitionMode()));
         tools.Items.Add(CheckItem("Fixed thumbnail", _thumbnail, (_, _) => ToggleThumbnail()));
         tools.Items.Add(CheckItem("Always on top", Topmost, (_, _) => { foreach (var pin in Targets()) pin.Topmost = !Topmost; }));
@@ -775,16 +775,16 @@ public partial class PinnedImageWindow : Window
         if (CanRefreshScreenshot)
         {
             tools.Items.Add(Item("Refresh screenshot    F5", (_, _) => RefreshScreenshot()));
-            var automaticRefresh = new MenuItem { Header = "Auto refresh" };
+            var automaticRefresh = new MenuItem { Header = L("Auto refresh") };
             automaticRefresh.Items.Add(CheckItem("Off", !_refreshTimer.IsEnabled, (_, _) => SetAutoRefresh(null)));
             foreach (var seconds in new[] { 1, 2, 5 })
                 automaticRefresh.Items.Add(CheckItem(
-                    $"Every {seconds} second{(seconds == 1 ? string.Empty : "s")}",
+                    LocalizationService.Format(seconds == 1 ? "Every {0} second" : "Every {0} seconds", seconds),
                     _refreshTimer.IsEnabled && Math.Abs(_refreshTimer.Interval.TotalSeconds - seconds) < 0.1,
                     (_, _) => SetAutoRefresh(TimeSpan.FromSeconds(seconds))));
             tools.Items.Add(automaticRefresh);
         }
-        var backgrounds = new MenuItem { Header = "Transparent background" };
+        var backgrounds = new MenuItem { Header = L("Transparent background") };
         foreach (var mode in new[] { "Transparent", "Pseudo", "DarkChecker", "LightChecker" })
         {
             var label = mode switch { "Pseudo" => "Pseudo-transparent", "DarkChecker" => "Dark checkerboard", "LightChecker" => "Light checkerboard", _ => "Transparent" };
@@ -799,7 +799,7 @@ public partial class PinnedImageWindow : Window
         menu.Items.Add(Item("Destroy", (_, _) => { foreach (var pin in Targets().ToArray()) pin.Close(); }));
         var dimensions = new MenuItem { Header = $"{Math.Round(Width)} × {Math.Round(_inlineMode == "None" ? Height : _normalHeight)}" };
         foreach (var percent in new[] { 50, 100, 150, 200 })
-            dimensions.Items.Add(Item($"Zoom to {percent}%", (_, _) => SetZoom(percent / 100.0)));
+            dimensions.Items.Add(Item(LocalizationService.Format("Zoom to {0}%", percent), (_, _) => SetZoom(percent / 100.0)));
         menu.Items.Add(dimensions);
         menu.IsOpen = true;
         e.Handled = true;
@@ -977,7 +977,7 @@ public partial class PinnedImageWindow : Window
         {
             _refreshTimer.Stop();
             if (!silent)
-                MessageBox.Show(ex.Message, "Refresh screenshot", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(ex.Message, L("Refresh screenshot"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 
@@ -1093,10 +1093,12 @@ public partial class PinnedImageWindow : Window
 
     private static MenuItem Item(string header, RoutedEventHandler action)
     {
-        var item = new MenuItem { Header = header };
+        var item = new MenuItem { Header = L(header) };
         item.Click += action;
         return item;
     }
+
+    private static string L(string value) => LocalizationService.Current(value);
 
     private static MenuItem CheckItem(string header, bool isChecked, RoutedEventHandler action)
     {

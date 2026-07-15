@@ -2,6 +2,25 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.5] - 2026-07-15
+
+### Added
+
+- Application-wide Simplified Chinese and Traditional Chinese interfaces
+- Localized tray menus, pin context menus, capture/annotation tools, OCR, recording, history, and update messages
+- A localized **Restart now** / **Later** dialog after changing the interface language
+
+### Fixed
+
+- Preferences no longer translates only its tabs while leaving the page content in English
+- Traditional Chinese conversion no longer risks an extra character at the end of a window title
+- Language changes restart through the single-instance handoff without racing the previous process
+
+### Validation
+
+- Every visible static XAML label is covered by the localization dictionary
+- Simplified and Traditional Chinese control tests, visual dashboard/Preferences checks, release build, and full x64 smoke-test suite pass
+
 ## [1.2.4] - 2026-07-15
 
 ### Added

@@ -28,7 +28,7 @@ internal static class ScrollingCaptureService
         var delay = Math.Clamp(settings.ScrollCaptureDelayMs, 150, 3000);
         var wheelDelta = (uint)unchecked(-120 * Math.Clamp(settings.ScrollCaptureWheelClicks, 1, 20));
 
-        progress?.Report(new ScrollingCaptureProgress(1, 0, "Captured first frame"));
+        progress?.Report(new ScrollingCaptureProgress(1, 0, LocalizationService.Current("Captured first frame")));
         for (var attempt = 1; frames.Count < maxFrames && attempt < maxFrames * 2; attempt++)
         {
             if (cancellationToken.IsCancellationRequested || stopRequested?.Invoke() == true ||
@@ -47,7 +47,7 @@ internal static class ScrollingCaptureService
             {
                 rejectedFrames++;
                 consecutiveDuplicates++;
-                progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, "Duplicate frame ignored"));
+                progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, LocalizationService.Current("Duplicate frame ignored")));
                 if (consecutiveDuplicates >= 2)
                 {
                     stopReason = "Reached the end of the scrollable content";
@@ -61,7 +61,7 @@ internal static class ScrollingCaptureService
             {
                 rejectedFrames++;
                 consecutiveAlignmentFailures++;
-                progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, "Unmatched frame ignored; retrying"));
+                progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, LocalizationService.Current("Unmatched frame ignored; retrying")));
                 if (consecutiveAlignmentFailures >= 2)
                 {
                     stopReason = "Could not find a reliable overlap";
@@ -71,7 +71,7 @@ internal static class ScrollingCaptureService
             }
             consecutiveAlignmentFailures = 0;
             frames.Add(current);
-            progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, $"Captured {frames.Count} frames"));
+            progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, LocalizationService.Format("Captured {0} frames", frames.Count)));
             if (frames[0].PixelHeight + EstimateAddedHeight(frames) >= 50000)
             {
                 stopReason = "Reached the 50,000 pixel height limit";

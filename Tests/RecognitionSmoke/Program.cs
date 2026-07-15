@@ -547,8 +547,24 @@ internal static class Program
             if (recoveredSession.Count != 1 || recoveredSession[0].Item.Group != "First" || recoveredSession[0].Item.HistoryRecordId != "refreshable-record" ||
                 recoveredSession[0].Item.PhysicalLeft != -1280 || recoveredSession[0].Item.LongScrollOffset != 245 ||
                 !recoveredSession[0].Item.ClickThrough || recoveredSession[0].Item.IsVisible) return 15;
-            if (LocalizationService.Translate("Capture", "简体中文") != "截图" || LocalizationService.Normalize("invalid") != "English") return 56;
-            Console.WriteLine("PIN SESSION: verified generation, physical monitor state and localization recovered");
+            if (LocalizationService.Translate("Capture", "简体中文") != "截图" ||
+                LocalizationService.Translate("General", "繁體中文") != "一般" ||
+                LocalizationService.Translate("Restart required", "繁體中文") != "需要重新啟動" ||
+                LocalizationService.Translate("Run SnapPin on system startup", "简体中文") != "系统启动时运行 SnapPin" ||
+                LocalizationService.Normalize("invalid") != "English") return 56;
+            var localizedControls = RunSta(() =>
+            {
+                var text = new TextBlock { Text = "Configuration storage" };
+                var check = new CheckBox { Content = "Run SnapPin on system startup" };
+                var panel = new StackPanel();
+                panel.Children.Add(text);
+                panel.Children.Add(check);
+                LocalizationService.Apply(panel, "简体中文");
+                return (text.Text, check.Content as string);
+            });
+            Console.WriteLine($"LOCALIZATION: text='{localizedControls.Item1}', checkbox='{localizedControls.Item2}'");
+            if (localizedControls.Item1 != "配置存储" || localizedControls.Item2 != "系统启动时运行 SnapPin") return 63;
+            Console.WriteLine("PIN SESSION: verified generation, physical monitor state and application-wide localization recovered");
         }
         finally
         {

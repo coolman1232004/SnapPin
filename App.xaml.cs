@@ -11,6 +11,10 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        var startupArguments = RestartService.PrepareStartupArguments(e.Args);
+        var settings = SettingsService.Load();
+        LocalizationService.Configure(settings.UiLanguage);
+        LocalizationService.EnableAutomaticLocalization();
         var recoveredPreviousCrash = DiagnosticsService.Start();
         DispatcherUnhandledException += (_, args) =>
         {
@@ -26,17 +30,16 @@ public partial class App : System.Windows.Application
             DiagnosticsService.Log("background-error", args.Exception.Message, args.Exception);
             args.SetObserved();
         };
-        if (!AppCommand.TryParse(e.Args, out var startupCommand, out var commandError))
+        if (!AppCommand.TryParse(startupArguments, out var startupCommand, out var commandError))
         {
             MessageBox.Show(commandError, "SnapPin command", MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown(2);
             return;
         }
-        var settings = SettingsService.Load();
         ToolbarThemeService.Apply(settings.ToolbarSizeMode);
         if (ElevationService.NeedsElevation(settings.RunAsAdministrator, ElevationService.IsCurrentProcessElevated()))
         {
-            if (ElevationService.TryRelaunchElevated(e.Args, out var elevationError))
+            if (ElevationService.TryRelaunchElevated(startupArguments, out var elevationError))
             {
                 Shutdown();
                 return;
@@ -81,7 +84,7 @@ public partial class App : System.Windows.Application
         {
             var update = await UpdateService.CheckAsync(settings.UpdateFeedUrl);
             if (!update.UpdateAvailable || string.IsNullOrWhiteSpace(update.DownloadUrl)) return;
-            if (MessageBox.Show(owner, update.Message + "\n\nDownload and install it now?", "SnapPin update available",
+            if (MessageBox.Show(owner, update.Message + "\n\n" + LocalizationService.Current("Download and install it now?"), LocalizationService.Current("SnapPin update available"),
                 MessageBoxButton.YesNo, MessageBoxImage.Information) != MessageBoxResult.Yes) return;
             await UpdateService.DownloadAndLaunchAsync(update);
             Current.Shutdown();

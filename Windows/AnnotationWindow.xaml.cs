@@ -251,13 +251,13 @@ public partial class AnnotationEditorControl : UserControl
         _selectedId = null;
         StatusText.Text = tool switch
         {
-            "Select" => "Click an annotation to select it, then drag to move it.",
-            "Text" => "Click to place text. Enter adds a line; Ctrl+Enter finishes.",
-            "Callout" => "Click the image, type the callout, then press Ctrl+Enter.",
-            "Number" => "Click the image to add the next numbered marker.",
-            "Eraser" => "Drag the eraser over only the pixels you want to remove.",
-            "Blur" => "Drag to paint blur directly where the brush passes.",
-            _ => $"Drag on the image to add {tool.ToLowerInvariant()}."
+            "Select" => L("Click an annotation to select it, then drag to move it."),
+            "Text" => L("Click to place text. Enter adds a line; Ctrl+Enter finishes."),
+            "Callout" => L("Click the image, type the callout, then press Ctrl+Enter."),
+            "Number" => L("Click the image to add the next numbered marker."),
+            "Eraser" => L("Drag the eraser over only the pixels you want to remove."),
+            "Blur" => L("Drag to paint blur directly where the brush passes."),
+            _ => LocalizationService.Format("Drag on the image to add {0}.", L(tool))
         };
         UpdateSurfaceCursor(tool);
         UpdateToolOptions(tool);
@@ -617,10 +617,12 @@ public partial class AnnotationEditorControl : UserControl
 
     private static void AddAnnotationMenuItem(ContextMenu menu, string label, Action action)
     {
-        var item = new MenuItem { Header = label };
+        var item = new MenuItem { Header = L(label) };
         item.Click += (_, _) => action();
         menu.Items.Add(item);
     }
+
+    private static string L(string value) => LocalizationService.Current(value);
 
     private void DeleteSelected()
     {
