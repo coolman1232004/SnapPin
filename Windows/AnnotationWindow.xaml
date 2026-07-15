@@ -1,0 +1,102 @@
+<UserControl x:Class="SnapPin.Controls.AnnotationEditorControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Background="Transparent" Foreground="#101828" Focusable="True"
+        KeyDown="Window_KeyDown">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SnapPin;component/Resources/ToolbarResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource SnapPinToolbarButtonStyle}"/>
+            <Style x:Key="ActionIconButton" TargetType="Button" BasedOn="{StaticResource IconButton}"/>
+            <Style x:Key="PropertyButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+                <Setter Property="Width" Value="30"/><Setter Property="Height" Value="27"/><Setter Property="Padding" Value="3"/><Setter Property="FontSize" Value="14"/>
+            </Style>
+            <Style x:Key="PaletteButton" TargetType="Button">
+                <Setter Property="Width" Value="13"/><Setter Property="Height" Value="13"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0"/>
+                <Setter Property="BorderBrush" Value="#7B8492"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Focusable" Value="False"/><Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock x:Name="StatusText" Visibility="Collapsed"/>
+
+        <Grid x:Name="ToolbarHost" Grid.Row="1" HorizontalAlignment="Center" Margin="0,2,0,0" Panel.ZIndex="20">
+            <Grid.Effect><DropShadowEffect Color="#38000000" BlurRadius="8" ShadowDepth="2" Opacity="0.30"/></Grid.Effect>
+            <StackPanel>
+                <Border x:Name="PrimaryToolbarFrame" HorizontalAlignment="Left" Background="{DynamicResource ToolbarSurfaceBrush}" BorderBrush="{DynamicResource ToolbarBorderBrush}" BorderThickness="1" CornerRadius="3" Padding="{DynamicResource ToolbarFramePadding}">
+                    <StackPanel Orientation="Horizontal">
+                        <WrapPanel x:Name="ToolPanel">
+                            <Button x:Name="RectangleToolButton" Style="{StaticResource IconButton}" Tag="Rectangle" ToolTip="Rectangle or ellipse" Click="Tool_Click"><Grid Width="18" Height="16"><Rectangle Width="13" Height="10" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.7" HorizontalAlignment="Left" VerticalAlignment="Top"/><Ellipse Width="8" Height="8" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.5" Fill="#F8F9FA" HorizontalAlignment="Right" VerticalAlignment="Bottom"/></Grid></Button>
+                            <Button x:Name="EllipseToolButton" Style="{StaticResource IconButton}" Tag="Ellipse" ToolTip="Ellipse" Click="Tool_Click"><Ellipse Width="18" Height="14" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Fill="Transparent" StrokeThickness="1.8"/></Button>
+                            <Button x:Name="ArrowToolButton" Style="{StaticResource IconButton}" Tag="Arrow" ToolTip="Arrow or line" Click="Tool_Click"><Path Data="{StaticResource ToolbarArrowIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="2" Fill="Transparent" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                            <Button x:Name="LineToolButton" Style="{StaticResource IconButton}" Tag="Line" ToolTip="Straight line" Click="Tool_Click"><Path Data="{StaticResource ToolbarLineIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform"/></Button>
+                            <Button x:Name="PencilToolButton" Style="{StaticResource IconButton}" Tag="Pencil" ToolTip="Pencil" Click="Tool_Click"><Path Data="{StaticResource ToolbarPencilIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Fill="Transparent" StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                            <Button x:Name="MarkerToolButton" Style="{StaticResource IconButton}" Tag="Marker" ToolTip="Marker" Click="Tool_Click"><Path Data="{StaticResource ToolbarMarkerIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Fill="Transparent" StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                            <Button x:Name="BlurToolButton" Style="{StaticResource IconButton}" Tag="Blur" ToolTip="Blur brush" Click="Tool_Click"><Path Data="{StaticResource ToolbarBlurIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Fill="Transparent" StrokeThickness="1.8" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                            <Button x:Name="TextToolButton" Style="{StaticResource IconButton}" Tag="Text" ToolTip="Text" Click="Tool_Click"><Path Data="{StaticResource ToolbarTextIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="2.1" Fill="Transparent" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform"/></Button>
+                            <Button x:Name="EraserToolButton" Style="{StaticResource IconButton}" Tag="Eraser" ToolTip="Eraser" Click="Tool_Click"><Path Data="{StaticResource ToolbarEraserIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Fill="Transparent" StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                            <Button x:Name="MagnifyToolButton" Style="{StaticResource IconButton}" Tag="Magnify" ToolTip="Magnifier" Click="Tool_Click"><Path Data="{StaticResource ToolbarMagnifyIcon}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Fill="Transparent" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform"/></Button>
+                        </WrapPanel>
+                        <Border Width="1" Height="{DynamicResource ToolbarSeparatorHeight}" Background="{DynamicResource ToolbarSeparatorBrush}" Margin="{DynamicResource ToolbarSeparatorMargin}"/>
+                        <Button Style="{StaticResource IconButton}" ToolTip="Undo (Ctrl+Z)" Click="Undo_Click"><Path Data="{StaticResource ToolbarUndoIcon}" Stroke="#475467" StrokeThickness="2.1" Fill="Transparent" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                        <Button Style="{StaticResource IconButton}" ToolTip="Redo (Ctrl+Y)" Click="Redo_Click"><Path Data="{StaticResource ToolbarRedoIcon}" Stroke="#475467" StrokeThickness="2.1" Fill="Transparent" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                        <Border x:Name="ActionSeparator" Width="1" Height="{DynamicResource ToolbarSeparatorHeight}" Background="{DynamicResource ToolbarSeparatorBrush}" Margin="{DynamicResource ToolbarSeparatorMargin}"/>
+                        <Button x:Name="SaveActionButton" Style="{StaticResource ActionIconButton}" ToolTip="Save image" Click="Save_Click"><Path Data="{StaticResource ToolbarSaveIcon}" Stroke="#101828" StrokeThickness="2" Fill="Transparent" StrokeLineJoin="Round" Stretch="Uniform"/></Button>
+                        <Button x:Name="CopyActionButton" Style="{StaticResource ActionIconButton}" ToolTip="Copy image" Click="Copy_Click"><Path Data="{StaticResource ToolbarCopyIcon}" Stroke="#101828" StrokeThickness="2" Fill="Transparent" Stretch="Uniform"/></Button>
+                        <Button x:Name="ApplyActionButton" Style="{StaticResource ActionIconButton}" ToolTip="Finish" Click="Apply_Click"><Path Data="{StaticResource ToolbarApplyIcon}" Stroke="#101828" StrokeThickness="2.4" Fill="Transparent" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform"/></Button>
+                        <Button x:Name="CancelActionButton" Visibility="Collapsed" Click="Cancel_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="PropertiesToolbarFrame" Background="#FCFFFFFF" BorderBrush="#2F80ED" BorderThickness="1" HorizontalAlignment="Left" Margin="0,2,0,0">
+                    <StackPanel x:Name="StyleOptionsRow" Orientation="Horizontal">
+                        <StackPanel x:Name="ShapeOptionsPanel" Orientation="Horizontal">
+                            <Button x:Name="ShapeSizeButton" Style="{StaticResource PropertyButton}" Content="•" ToolTip="Stroke size" Click="SizeCycle_Click"/>
+                            <Button x:Name="DashToggleButton" Style="{StaticResource PropertyButton}" ToolTip="Solid or dashed outline" Click="DashToggle_Click"><Path Data="M2,12 H7 M10,12 H15 M18,12 H23" Stroke="#101828" StrokeThickness="2" Stretch="Uniform"/></Button>
+                        </StackPanel>
+                        <StackPanel x:Name="ArrowOptionsPanel" Orientation="Horizontal" Visibility="Collapsed">
+                            <Button x:Name="ArrowSizeButton" Style="{StaticResource PropertyButton}" Content="•" ToolTip="Stroke size" Click="SizeCycle_Click"/>
+                            <ComboBox x:Name="ArrowHeadsBox" Width="47" Height="27" SelectedValuePath="Tag" Margin="1,0" ToolTip="Arrow heads" SelectionChanged="StyleControl_Changed"><ComboBoxItem Content="→" Tag="End"/><ComboBoxItem Content="↔" Tag="Both"/><ComboBoxItem Content="—" Tag="None"/></ComboBox>
+                        </StackPanel>
+                        <StackPanel x:Name="PencilOptionsPanel" Orientation="Horizontal" Visibility="Collapsed"><Button x:Name="PencilSizeButton" Style="{StaticResource PropertyButton}" Content="•" ToolTip="Pencil size" Click="SizeCycle_Click"/></StackPanel>
+                        <StackPanel x:Name="MarkerOptionsPanel" Orientation="Horizontal" Visibility="Collapsed"><Button x:Name="MarkerSizeButton" Style="{StaticResource PropertyButton}" Content="21" ToolTip="Marker size" Click="SizeCycle_Click"/><Button Style="{StaticResource PropertyButton}" IsHitTestVisible="False"><Rectangle Width="18" Height="13" Fill="#66101828"/></Button></StackPanel>
+                        <Slider x:Name="ThicknessSlider" Width="86" Minimum="1" Maximum="24" Value="4" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="4,0" ToolTip="Tool size" ValueChanged="StyleControl_Changed" Visibility="Collapsed"/>
+                        <StackPanel x:Name="BlurOptionsPanel" Orientation="Horizontal" Visibility="Collapsed"><Button x:Name="BlurSizeButton" Style="{StaticResource PropertyButton}" Content="21" ToolTip="Blur brush size" Click="SizeCycle_Click"/><Button Style="{StaticResource PropertyButton}" IsHitTestVisible="False"><Ellipse Width="17" Height="17" Fill="#667B8492" Stroke="#475467" StrokeThickness="1"/></Button></StackPanel>
+                        <StackPanel x:Name="BasicOptionsPanel" Orientation="Horizontal" Visibility="Collapsed"><Button x:Name="BasicSizeButton" Style="{StaticResource PropertyButton}" Content="3" ToolTip="Tool size" Click="SizeCycle_Click"/></StackPanel>
+                        <StackPanel x:Name="TextOptionsPanel" Orientation="Horizontal" Visibility="Collapsed">
+                            <ComboBox x:Name="TextFontBox" Width="140" Height="27" SelectedValuePath="Tag" SelectionChanged="TextFont_Changed"><ComboBoxItem Content="Calibri" Tag="Calibri"/><ComboBoxItem Content="Segoe UI" Tag="Segoe UI"/><ComboBoxItem Content="Arial" Tag="Arial"/><ComboBoxItem Content="Microsoft YaHei UI" Tag="Microsoft YaHei UI"/></ComboBox>
+                            <ComboBox x:Name="TextSizeBox" Width="58" Height="27" SelectedValuePath="Tag" SelectionChanged="TextSize_Changed"><ComboBoxItem Content="9" Tag="9"/><ComboBoxItem Content="10" Tag="10"/><ComboBoxItem Content="11" Tag="11"/><ComboBoxItem Content="12" Tag="12"/><ComboBoxItem Content="14" Tag="14"/><ComboBoxItem Content="16" Tag="16"/><ComboBoxItem Content="18" Tag="18"/><ComboBoxItem Content="20" Tag="20"/><ComboBoxItem Content="24" Tag="24"/><ComboBoxItem Content="28" Tag="28"/><ComboBoxItem Content="36" Tag="36"/><ComboBoxItem Content="48" Tag="48"/><ComboBoxItem Content="72" Tag="72"/></ComboBox>
+                            <Button x:Name="TextBoldButton" Style="{StaticResource PropertyButton}" Content="B" FontWeight="Bold" Click="TextStyle_Click"/>
+                            <Button x:Name="TextItalicButton" Style="{StaticResource PropertyButton}" Content="I" FontStyle="Italic" Click="TextStyle_Click"/>
+                            <Button x:Name="TextUnderlineButton" Style="{StaticResource PropertyButton}" ToolTip="Underline" Click="TextStyle_Click"><TextBlock Text="U" TextDecorations="Underline"/></Button>
+                            <Button x:Name="TextStrikeButton" Style="{StaticResource PropertyButton}" Content="S" ToolTip="Strikethrough" Click="TextStyle_Click"/>
+                            <Button x:Name="TextAlignButton" Style="{StaticResource PropertyButton}" Content="☰" ToolTip="Text alignment" Click="TextStyle_Click"/>
+                            <Button x:Name="TextOutlineButton" Style="{StaticResource PropertyButton}" Content="A" ToolTip="Text outline" Click="TextStyle_Click"/>
+                        </StackPanel>
+                        <StackPanel x:Name="EraserOptionsPanel" Orientation="Horizontal" Visibility="Collapsed"><Button x:Name="EraserSizeButton" Style="{StaticResource PropertyButton}" Content="21" ToolTip="Eraser size" Click="SizeCycle_Click"/><Button Style="{StaticResource PropertyButton}" IsHitTestVisible="False"><Rectangle Width="18" Height="13" Fill="#101828" Opacity="0.65"/></Button></StackPanel>
+
+                        <StackPanel x:Name="ColorPalettePanel" Orientation="Horizontal" Margin="2,0,0,0">
+                            <Button x:Name="SelectedColorPreview" Width="27" Height="27" Padding="0" Margin="0,0,2,0" BorderBrush="#101828" BorderThickness="1" Click="SelectedColorPreview_Click"><Grid><Border x:Name="SelectedColorFill" Background="#EF4444"/><Path Data="M2,25 L25,2" Stroke="#101828" StrokeThickness="1"/></Grid></Button>
+                            <UniformGrid Rows="2" Columns="10" Width="130" Height="26">
+                                <Button Style="{StaticResource PaletteButton}" Background="#111827" Tag="#FF111827" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#4B5563" Tag="#FF4B5563" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#9CA3AF" Tag="#FF9CA3AF" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#DC2626" Tag="#FFDC2626" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#F97316" Tag="#FFF97316" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#FACC15" Tag="#FFFACC15" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#22C55E" Tag="#FF22C55E" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#06B6D4" Tag="#FF06B6D4" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#3B82F6" Tag="#FF3B82F6" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#8B5CF6" Tag="#FF8B5CF6" Click="PaletteColor_Click"/>
+                                <Button Style="{StaticResource PaletteButton}" Background="#FFFFFF" Tag="#FFFFFFFF" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#D1D5DB" Tag="#FFD1D5DB" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#FCA5A5" Tag="#FFFCA5A5" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#FDBA74" Tag="#FFFDBA74" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#FEF08A" Tag="#FFFEF08A" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#86EFAC" Tag="#FF86EFAC" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#A5F3FC" Tag="#FFA5F3FC" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#93C5FD" Tag="#FF93C5FD" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#C4B5FD" Tag="#FFC4B5FD" Click="PaletteColor_Click"/><Button Style="{StaticResource PaletteButton}" Background="#F0ABFC" Tag="#FFF0ABFC" Click="PaletteColor_Click"/>
+                            </UniformGrid>
+                        </StackPanel>
+
+                        <ComboBox x:Name="ColorBox" Visibility="Collapsed" SelectedValuePath="Tag" SelectedIndex="0" SelectionChanged="StyleControl_Changed"><ComboBoxItem Tag="#FFEF4444"/><ComboBoxItem Tag="#FF111827"/><ComboBoxItem Tag="#FF4B5563"/><ComboBoxItem Tag="#FF9CA3AF"/><ComboBoxItem Tag="#FFDC2626"/><ComboBoxItem Tag="#FFF97316"/><ComboBoxItem Tag="#FFFACC15"/><ComboBoxItem Tag="#FF22C55E"/><ComboBoxItem Tag="#FF06B6D4"/><ComboBoxItem Tag="#FF3B82F6"/><ComboBoxItem Tag="#FF8B5CF6"/><ComboBoxItem Tag="#FFFFFFFF"/><ComboBoxItem Tag="#FFD1D5DB"/><ComboBoxItem Tag="#FFFCA5A5"/><ComboBoxItem Tag="#FFFDBA74"/><ComboBoxItem Tag="#FFFEF08A"/><ComboBoxItem Tag="#FF86EFAC"/><ComboBoxItem Tag="#FFA5F3FC"/><ComboBoxItem Tag="#FF93C5FD"/><ComboBoxItem Tag="#FFC4B5FD"/><ComboBoxItem Tag="#FFF0ABFC"/></ComboBox>
+                        <Button x:Name="FillToggleButton" Visibility="Collapsed" Click="FillToggle_Click"/><ComboBox x:Name="FillOpacityBox" Visibility="Collapsed" SelectedValuePath="Tag" SelectionChanged="StyleControl_Changed"><ComboBoxItem Tag="0"/><ComboBoxItem Tag="20"/><ComboBoxItem Tag="40"/><ComboBoxItem Tag="65"/></ComboBox><ComboBox x:Name="EffectShapeBox" Visibility="Collapsed" SelectedValuePath="Tag"><ComboBoxItem Tag="Rectangle"/><ComboBoxItem Tag="Ellipse"/></ComboBox><Slider x:Name="ObjectOpacitySlider" Visibility="Collapsed" Minimum="20" Maximum="100" Value="100"/><ComboBox x:Name="StylePresetBox" Visibility="Collapsed" SelectedValuePath="Tag" SelectionChanged="StylePreset_Changed"><ComboBoxItem Tag="Outline"/><ComboBoxItem Tag="Filled"/><ComboBoxItem Tag="Dashed"/><ComboBoxItem Tag="Emphasis"/></ComboBox>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <Border x:Name="SurfaceHost" Grid.Row="0" Background="Transparent" BorderBrush="#D0D5DD" BorderThickness="1" ClipToBounds="True">
+            <Viewbox Stretch="Uniform"><Grid x:Name="Surface" MouseLeftButtonDown="Surface_MouseLeftButtonDown" MouseRightButtonDown="Surface_MouseRightButtonDown" MouseMove="Surface_MouseMove" MouseLeftButtonUp="Surface_MouseLeftButtonUp" MouseEnter="Surface_MouseEnter" MouseLeave="Surface_MouseLeave"><Image x:Name="BackgroundImage" Stretch="Fill" IsHitTestVisible="False" RenderOptions.BitmapScalingMode="NearestNeighbor"/><Canvas x:Name="AnnotationCanvas" Background="Transparent"/><Canvas x:Name="ToolCursorLayer" IsHitTestVisible="False" Panel.ZIndex="2000"/></Grid></Viewbox>
+        </Border>
+    </Grid>
+</UserControl>

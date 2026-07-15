@@ -1,0 +1,50 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Security.Principal;
+
+namespace SnapPin.Services;
+
+internal static class ElevationService
+{
+    internal static bool NeedsElevation(bool requested, bool isElevated) => requested && !isElevated;
+
+    public static bool IsCurrentProcessElevated()
+    {
+        using var identity = WindowsIdentity.GetCurrent();
+        return new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+    }
+
+    public static bool TryRelaunchElevated(IEnumerable<string> arguments, out string? errorMessage)
+    {
+        errorMessage = null;
+        var executable = Environment.ProcessPath;
+        if (string.IsNullOrWhiteSpace(executable))
+        {
+            errorMessage = "SnapPin could not determine its executable path.";
+            return false;
+        }
+
+        try
+        {
+            var startInfo = new ProcessStartInfo(executable)
+            {
+                UseShellExecute = true,
+                Verb = "runas",
+                WorkingDirectory = AppContext.BaseDirectory
+            };
+            foreach (var argument in arguments) startInfo.ArgumentList.Add(argument);
+            Process.Start(startInfo);
+            return true;
+        }
+        catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
+        {
+            errorMessage = "Administrator launch was cancelled. SnapPin will continue with normal permissions for this session.";
+            return false;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = $"SnapPin could not restart as administrator: {exception.Message}";
+            return false;
+        }
+    }
+}

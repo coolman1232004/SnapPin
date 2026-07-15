@@ -1,0 +1,34 @@
+<Window x:Class="SnapPin.Windows.CustomCaptureWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Custom Capture" Width="430" Height="400" MinWidth="360" MinHeight="330" ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterOwner" Background="#F6F7F9" Foreground="#101216">
+    <Grid Margin="22">
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock Text="Custom capture" FontSize="23" FontWeight="SemiBold" />
+            <TextBlock Text="Set optional dimensions, ratio, delay, and cursor capture." Foreground="#667085" Margin="0,5,0,20" />
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <TextBlock Text="Width (pixels)" VerticalAlignment="Center" Margin="0,8"/>
+                <TextBox x:Name="WidthBox" Grid.Column="1" Height="34" Padding="8,5" Margin="0,5" Text="0" ToolTip="Use 0 for a freely drawn width"/>
+                <TextBlock Grid.Row="1" Text="Height (pixels)" VerticalAlignment="Center" Margin="0,8"/>
+                <TextBox x:Name="HeightBox" Grid.Row="1" Grid.Column="1" Height="34" Padding="8,5" Margin="0,5" Text="0" ToolTip="Use 0 for a freely drawn height"/>
+                <TextBlock Grid.Row="2" Text="Aspect ratio" VerticalAlignment="Center" Margin="0,8"/>
+                <ComboBox x:Name="RatioBox" Grid.Row="2" Grid.Column="1" Height="34" Margin="0,5" SelectedValuePath="Tag" SelectedIndex="0">
+                    <ComboBoxItem Content="Free" Tag="0"/><ComboBoxItem Content="1 : 1" Tag="1"/><ComboBoxItem Content="4 : 3" Tag="1.3333333333"/>
+                    <ComboBoxItem Content="3 : 2" Tag="1.5"/><ComboBoxItem Content="16 : 9" Tag="1.7777777778"/><ComboBoxItem Content="21 : 9" Tag="2.3333333333"/>
+                </ComboBox>
+                <TextBlock Grid.Row="3" Text="Delay (seconds)" VerticalAlignment="Center" Margin="0,8"/>
+                <TextBox x:Name="DelayBox" Grid.Row="3" Grid.Column="1" Height="34" Padding="8,5" Margin="0,5" Text="0"/>
+            </Grid>
+            <CheckBox x:Name="CursorBox" Content="Include the mouse cursor" Margin="0,17,0,0" />
+            <TextBlock Text="Tip: leave width and height at 0 to constrain only the aspect ratio." Foreground="#667085" TextWrapping="Wrap" Margin="0,17,0,0" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancel" Click="Cancel_Click" Background="#D0D5DD" Margin="0,0,9,0"/>
+            <Button Content="Start capture" Click="Start_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

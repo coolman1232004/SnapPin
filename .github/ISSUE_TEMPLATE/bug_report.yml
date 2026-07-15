@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible SnapPin problem
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Do not attach private captures, recordings, OCR text, configuration, or logs without redacting them.
+  - type: input
+    id: version
+    attributes:
+      label: SnapPin version
+      placeholder: "1.2.2"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 24H2, x64"
+    validations:
+      required: true
+  - type: input
+    id: displays
+    attributes:
+      label: Display setup
+      description: Monitor count, resolutions, and scaling percentages
+      placeholder: "Two monitors: 2560x1440 at 125%, 1920x1080 at 100%"
+  - type: dropdown
+    id: package
+    attributes:
+      label: Installation type
+      options:
+        - Windows installer
+        - Portable ZIP
+        - Built from source
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Start a region capture
+        2. Select ...
+        3. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Use only redacted, non-sensitive screenshots or logs.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety check
+      options:
+        - label: I tested the latest release and searched existing issues.
+          required: true
+        - label: I removed private or sensitive information from attachments.
+          required: true

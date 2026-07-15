@@ -1,0 +1,37 @@
+<UserControl x:Class="SnapPin.Controls.CropEditorControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Background="#101216">
+    <UserControl.Resources>
+        <Style x:Key="CropAction" TargetType="Button">
+            <Setter Property="Width" Value="38"/><Setter Property="Height" Value="36"/><Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="2"/><Setter Property="Background" Value="#2B3440"/><Setter Property="BorderThickness" Value="0"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid x:Name="ImageArea" Background="#222831" MouseLeftButtonDown="Area_MouseLeftButtonDown" MouseMove="Area_MouseMove" MouseLeftButtonUp="Area_MouseLeftButtonUp">
+            <Image x:Name="SourceImage" Stretch="Fill" IsHitTestVisible="False" />
+            <Rectangle Fill="#55000000" IsHitTestVisible="False" />
+            <Canvas IsHitTestVisible="False">
+                <Rectangle x:Name="CropRect" Stroke="#63E6BE" StrokeThickness="2" Fill="#18FFFFFF" />
+                <Border x:Name="SizeBadge" Background="#DD191D24" CornerRadius="4" Padding="7,3">
+                    <TextBlock x:Name="SizeText" Foreground="White" FontSize="11" />
+                </Border>
+            </Canvas>
+        </Grid>
+        <Border Grid.Row="1" Background="#191D24" Padding="6">
+            <DockPanel>
+                <TextBlock Text="Drag to choose the crop area" Foreground="#98A2B3" VerticalAlignment="Center" Margin="7,0" />
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Style="{StaticResource CropAction}" ToolTip="Apply crop" Click="Apply_Click">
+                        <Path Data="M3,13 L9,20 L23,4" Stroke="#D9F99D" StrokeThickness="2.5" Fill="Transparent" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform" />
+                    </Button>
+                    <Button Style="{StaticResource CropAction}" ToolTip="Cancel crop" Click="Cancel_Click">
+                        <Path Data="M4,4 L21,21 M21,4 L4,21" Stroke="#F97066" StrokeThickness="2.5" StrokeStartLineCap="Round" Stretch="Uniform" />
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

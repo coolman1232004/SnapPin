@@ -1,0 +1,62 @@
+# Build outputs
+bin/
+obj/
+dist/
+dist-*/
+package-smoke/
+packaging/staging/
+packaging/RecognitionSmokeOut/
+packaging/setup-previews/
+packaging/SnapPin.Setup/bin/
+packaging/SnapPin.Setup/obj/
+packaging/SnapPin.Setup/Payload.zip
+Tests/**/bin/
+Tests/**/obj/
+
+# Local rollback archives. Keep these outside Git/GitHub.
+backups/
+PRODUCT_NOTES.md
+*.bak
+*.backup
+
+# User-specific SnapPin data and diagnostics
+config.json
+settings.json
+history/
+sessions/
+logs/
+crash-*.txt
+*.log
+
+# IDE and operating-system files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Test coverage and temporary files
+TestResults/
+coverage/
+coverage.*
+*.tmp
+*.temp
+*.dmp
+
+# Local signing material must never be committed
+*.pfx
+*.p12
+*.snk
+*.cer
+*.key
+*.pem
+
+# NuGet packages are restored during build
+packages/
+*.nupkg
+*.snupkg

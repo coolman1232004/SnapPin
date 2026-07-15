@@ -1,0 +1,101 @@
+param(
+    [string]$DistDirectory = 'dist',
+    [string]$Version = '1.2.2',
+    [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
+)
+
+$ErrorActionPreference = 'Stop'
+
+$workspace = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$dist = [System.IO.Path]::GetFullPath((Join-Path $workspace $DistDirectory))
+$staging = [System.IO.Path]::GetFullPath((Join-Path $workspace 'packaging\staging'))
+$setupProject = Join-Path $workspace 'packaging\SnapPin.Setup\SnapPin.Setup.csproj'
+$payload = Join-Path $workspace 'packaging\SnapPin.Setup\Payload.zip'
+
+function Invoke-CodeSign([string]$Path) {
+    if ([string]::IsNullOrWhiteSpace($CertificateThumbprint)) { return }
+    $signTool = Get-Command signtool.exe -ErrorAction SilentlyContinue
+    if (-not $signTool) { throw 'SNAPPIN_CERT_THUMBPRINT was provided, but signtool.exe was not found.' }
+    & $signTool.Source sign /sha1 $CertificateThumbprint /fd SHA256 /td SHA256 /tr 'http://timestamp.digicert.com' $Path
+    if ($LASTEXITCODE -ne 0) { throw "Code signing failed for $Path" }
+}
+
+foreach ($target in @($dist, $staging)) {
+    if (-not $target.StartsWith($workspace, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to clean a directory outside the workspace: $target"
+    }
+    if (Test-Path -LiteralPath $target) {
+        Remove-Item -LiteralPath $target -Recurse -Force
+    }
+}
+
+New-Item -ItemType Directory -Path $dist, $staging -Force | Out-Null
+$portableDirectory = Join-Path $staging 'SnapPin-Portable'
+$setupDirectory = Join-Path $staging 'Setup'
+
+dotnet publish (Join-Path $workspace 'SnapPin.csproj') `
+    -c Release -r win-x64 --self-contained true `
+    -p:Platform=x64 `
+    -p:Version=$Version -p:AssemblyVersion="$Version.0" -p:FileVersion="$Version.0" `
+    -p:PublishSingleFile=false `
+    -p:DebugType=None -p:DebugSymbols=false `
+    -o $portableDirectory
+if ($LASTEXITCODE -ne 0) { throw 'Portable publish failed.' }
+
+# The x64 product does not load the NuGet packages' x86 native payload. Keep
+# only English/Chinese satellite resources used by SnapPin's supported UI.
+$unusedDirectories = @('x86','ar','cs','da','de','el','es','fi','fr','he','hu','it','ja','ko','nb','nl','pl','pt-BR','pt-PT','ro','ru','sk','sv','th','tr','uk','vi')
+foreach ($name in $unusedDirectories) {
+    $candidate = Join-Path $portableDirectory $name
+    if ((Test-Path -LiteralPath $candidate) -and $candidate.StartsWith($portableDirectory, [System.StringComparison]::OrdinalIgnoreCase)) {
+        Remove-Item -LiteralPath $candidate -Recurse -Force
+    }
+}
+foreach ($diagnostic in @('createdump.exe','mscordaccore.dll','mscordbi.dll')) {
+    $candidate = Join-Path $portableDirectory $diagnostic
+    if (Test-Path -LiteralPath $candidate) { Remove-Item -LiteralPath $candidate -Force }
+}
+Get-ChildItem -LiteralPath $portableDirectory -Filter 'mscordaccore*.dll' -File -ErrorAction SilentlyContinue |
+    Remove-Item -Force
+foreach ($runtime in @('osx','linux-arm','linux-arm64','linux-musl-x64','linux-x64','win-arm64','win-x86')) {
+    $candidate = Join-Path (Join-Path $portableDirectory 'runtimes') $runtime
+    if ((Test-Path -LiteralPath $candidate) -and $candidate.StartsWith($portableDirectory, [System.StringComparison]::OrdinalIgnoreCase)) {
+        Remove-Item -LiteralPath $candidate -Recurse -Force
+    }
+}
+
+Invoke-CodeSign (Join-Path $portableDirectory 'SnapPin.exe')
+
+Compress-Archive -Path (Join-Path $portableDirectory '*') -DestinationPath $payload -CompressionLevel Optimal -Force
+Copy-Item -LiteralPath $payload -Destination (Join-Path $dist 'SnapPin-Portable-win-x64.zip') -Force
+
+dotnet publish $setupProject `
+    -c Release -r win-x64 --self-contained true `
+    -p:Version=$Version -p:AssemblyVersion="$Version.0" -p:FileVersion="$Version.0" `
+    -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
+    -p:EnableCompressionInSingleFile=true `
+    -p:DebugType=None -p:DebugSymbols=false `
+    -o $setupDirectory
+if ($LASTEXITCODE -ne 0) { throw 'Installer publish failed.' }
+
+Copy-Item -LiteralPath (Join-Path $setupDirectory 'SnapPin.Setup.exe') -Destination (Join-Path $dist 'SnapPin-Setup-win-x64.exe') -Force
+Invoke-CodeSign (Join-Path $dist 'SnapPin-Setup-win-x64.exe')
+Copy-Item -LiteralPath $portableDirectory -Destination (Join-Path $dist 'SnapPin-Portable') -Recurse -Force
+
+$manifest = [ordered]@{
+    version = $Version
+    publishedUtc = [DateTime]::UtcNow.ToString('O')
+    portableFile = 'SnapPin-Portable-win-x64.zip'
+    portableSha256 = (Get-FileHash (Join-Path $dist 'SnapPin-Portable-win-x64.zip') -Algorithm SHA256).Hash
+    installerFile = 'SnapPin-Setup-win-x64.exe'
+    installerSha256 = (Get-FileHash (Join-Path $dist 'SnapPin-Setup-win-x64.exe') -Algorithm SHA256).Hash
+    portableSize = (Get-Item (Join-Path $dist 'SnapPin-Portable-win-x64.zip')).Length
+    installerSize = (Get-Item (Join-Path $dist 'SnapPin-Setup-win-x64.exe')).Length
+    minimumWindowsBuild = 17763
+    signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
+    downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
+    releaseNotes = 'History favorites, tags and recycle bin; exact multi-monitor pin restoration; precision capture controls; richer object editing; English and Chinese UI support; verified updates; rollback-safe installation; and a smaller x64 package.'
+}
+$manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
+
+Get-ChildItem -LiteralPath $dist -File -Recurse | Select-Object FullName, Length | Format-Table -AutoSize
