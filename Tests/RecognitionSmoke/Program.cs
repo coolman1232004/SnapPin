@@ -24,6 +24,10 @@ internal static class Program
         if ((Path.GetFileNameWithoutExtension(Environment.ProcessPath) ?? string.Empty).Contains("AnnotationQa", StringComparison.OrdinalIgnoreCase))
             return RunAnnotationQa();
 
+        LocalizationSmoke.Run();
+        CompatibilitySmoke.Run(CreatePatternImage);
+        UpdateUiSmoke.Run();
+
         var textImage = CreateTextImage("SNAPPIN OCR TEST 2026");
         var textResult = await RecognitionService.RecognizeAsync(textImage, "eng");
         Console.WriteLine($"OCR: {textResult.Text.Replace(Environment.NewLine, " | ")} ERROR: {textResult.ErrorMessage}");
@@ -1236,7 +1240,7 @@ internal static class Program
         return a.AsSpan().SequenceEqual(b);
     }
 
-    private static T RunSta<T>(Func<T> action)
+    internal static T RunSta<T>(Func<T> action)
     {
         T result = default!;
         Exception? failure = null;

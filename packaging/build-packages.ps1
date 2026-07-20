@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.5',
+    [string]$Version = '1.2.6',
     [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
 )
 
@@ -95,7 +95,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip'
-    releaseNotes = 'Simplified and Traditional Chinese now apply throughout SnapPin, including the dashboard, capture and annotation tools, pins, OCR, recording, history, menus, and update dialogs. Changing the interface language now offers a localized Restart now or Later choice.'
+    releaseNotes = 'Completes rare-message localization through maintainable resource files, adds cancellable update download progress, improves mixed-DPI and remote-session compatibility, and expands automated regression coverage.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

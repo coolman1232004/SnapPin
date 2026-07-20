@@ -24,6 +24,14 @@ internal sealed record UpdateCheckResult(
     string Sha256 = "",
     UpdatePackageKind PackageKind = UpdatePackageKind.Installer);
 
+internal enum UpdateProgressStage
+{
+    Downloading,
+    Preparing
+}
+
+internal sealed record UpdateProgressInfo(UpdateProgressStage Stage, double Fraction);
+
 internal static class UpdateService
 {
     private const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\SnapPin";
@@ -86,7 +94,7 @@ internal static class UpdateService
         CancellationToken cancellationToken = default)
     {
         if (!Uri.TryCreate(update.DownloadUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
-            throw new InvalidOperationException("The GitHub update package must use HTTPS.");
+            throw new InvalidOperationException(LocalizationService.Current("The GitHub update package must use HTTPS."));
         var root = UpdateRoot();
         Directory.CreateDirectory(root);
         var version = string.IsNullOrWhiteSpace(update.Version) ? "update" : update.Version;
@@ -118,16 +126,21 @@ internal static class UpdateService
             if (!actual.Equals(update.Sha256.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 File.Delete(temporaryPath);
-                throw new InvalidDataException("The downloaded GitHub package failed its SHA-256 integrity check.");
+                throw new InvalidDataException(LocalizationService.Current("The downloaded GitHub package failed its SHA-256 integrity check."));
             }
         }
         File.Move(temporaryPath, finalPath, true);
         return finalPath;
     }
 
-    internal static async Task DownloadAndLaunchAsync(UpdateCheckResult update, CancellationToken cancellationToken = default)
+    internal static async Task DownloadAndLaunchAsync(UpdateCheckResult update,
+        IProgress<UpdateProgressInfo>? progress = null, CancellationToken cancellationToken = default)
     {
-        var package = await DownloadPackageAsync(update, cancellationToken: cancellationToken);
+        IProgress<double>? downloadProgress = progress is null
+            ? null
+            : new Progress<double>(fraction => progress.Report(new UpdateProgressInfo(UpdateProgressStage.Downloading, fraction)));
+        var package = await DownloadPackageAsync(update, downloadProgress, cancellationToken);
+        progress?.Report(new UpdateProgressInfo(UpdateProgressStage.Preparing, 1));
         if (update.PackageKind == UpdatePackageKind.Portable)
         {
             await LaunchPortableUpdaterAsync(package, update.Version, cancellationToken);
@@ -150,7 +163,7 @@ internal static class UpdateService
         var targetDirectory = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd(Path.DirectorySeparatorChar);
         var root = Path.GetPathRoot(targetDirectory)?.TrimEnd(Path.DirectorySeparatorChar);
         if (targetDirectory.Equals(root, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("A portable update cannot replace files in a drive root.");
+            throw new InvalidOperationException(LocalizationService.Current("A portable update cannot replace files in a drive root."));
 
         var updateRoot = UpdateRoot();
         var stagingDirectory = Path.Combine(updateRoot, $"Portable-{expectedVersion}-{Guid.NewGuid():N}");
@@ -160,7 +173,7 @@ internal static class UpdateService
             await ExtractArchiveSafelyAsync(archivePath, stagingDirectory, cancellationToken);
             var stagedExecutable = Path.Combine(stagingDirectory, "SnapPin.exe");
             if (!File.Exists(stagedExecutable))
-                throw new InvalidDataException("The portable GitHub package did not contain SnapPin.exe.");
+                throw new InvalidDataException(LocalizationService.Current("The portable GitHub package did not contain SnapPin.exe."));
 
             var backupDirectory = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -194,7 +207,7 @@ internal static class UpdateService
             startInfo.ArgumentList.Add("-ExpectedVersion");
             startInfo.ArgumentList.Add(expectedVersion);
             if (Process.Start(startInfo) is null)
-                throw new InvalidOperationException("Windows could not start the portable update helper.");
+                throw new InvalidOperationException(LocalizationService.Current("Windows could not start the portable update helper."));
         }
         catch
         {
@@ -214,7 +227,7 @@ internal static class UpdateService
             cancellationToken.ThrowIfCancellationRequested();
             var path = Path.GetFullPath(Path.Combine(root, entry.FullName.Replace('/', Path.DirectorySeparatorChar)));
             if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("The portable update contained an unsafe path.");
+                throw new InvalidDataException(LocalizationService.Current("The portable update contained an unsafe path."));
             if (string.IsNullOrEmpty(entry.Name))
             {
                 Directory.CreateDirectory(path);

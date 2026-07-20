@@ -7,6 +7,8 @@ $ErrorActionPreference = 'Stop'
 $workspace = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $project = Join-Path $PSScriptRoot 'RecognitionSmoke\SnapPin.RecognitionSmoke.csproj'
 
+& (Join-Path $PSScriptRoot 'Test-LocalizationResources.ps1')
+
 dotnet build $project -c $Configuration -p:Platform=x64
 if ($LASTEXITCODE -ne 0) { throw 'Smoke-test build failed.' }
 

@@ -319,8 +319,7 @@ public partial class PreferencesWindow : Window
                 result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
             if (answer == MessageBoxResult.Yes)
             {
-                await UpdateService.DownloadAndLaunchAsync(result);
-                Application.Current.Shutdown();
+                if (UpdateProgressWindow.Run(this, result)) Application.Current.Shutdown();
             }
         }
         catch (Exception ex)

@@ -27,7 +27,7 @@ internal static class MediaTrimService
             };
             var prepared = await transcoder.PrepareFileTranscodeAsync(input, output, MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto));
             if (!prepared.CanTranscode)
-                throw new InvalidOperationException($"Windows could not trim this recording ({prepared.FailureReason}).");
+                throw new InvalidOperationException(LocalizationService.Format("Windows could not trim this recording ({0}).", prepared.FailureReason));
             cancellationToken.ThrowIfCancellationRequested();
             await prepared.TranscodeAsync();
             cancellationToken.ThrowIfCancellationRequested();

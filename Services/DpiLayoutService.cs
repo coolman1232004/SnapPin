@@ -60,6 +60,6 @@ internal static class DpiLayoutService
     }
 
     internal static Size AvailableLogicalSize(Size workingAreaPixels, double scaleX, double scaleY) => new(
-        Math.Max(360, workingAreaPixels.Width / Math.Max(0.1, scaleX) - 24),
-        Math.Max(300, workingAreaPixels.Height / Math.Max(0.1, scaleY) - 24));
+        Math.Max(1, workingAreaPixels.Width / Math.Max(0.1, scaleX) - 24),
+        Math.Max(1, workingAreaPixels.Height / Math.Max(0.1, scaleY) - 24));
 }

@@ -59,8 +59,8 @@ internal sealed class AdvancedRecordingSession : IDisposable
                 IsAudioEnabled = settings.RecordingSystemAudio || settings.RecordingMicrophone,
                 IsOutputDeviceEnabled = settings.RecordingSystemAudio,
                 IsInputDeviceEnabled = settings.RecordingMicrophone,
-                AudioOutputDevice = string.IsNullOrWhiteSpace(settings.RecordingOutputDevice) ? null : settings.RecordingOutputDevice,
-                AudioInputDevice = string.IsNullOrWhiteSpace(settings.RecordingInputDevice) ? null : settings.RecordingInputDevice,
+                AudioOutputDevice = ResolveAudioDevice(settings.RecordingOutputDevice, OutputDevices()),
+                AudioInputDevice = ResolveAudioDevice(settings.RecordingInputDevice, InputDevices()),
                 OutputVolume = 1,
                 InputVolume = 1
             },
@@ -124,6 +124,14 @@ internal sealed class AdvancedRecordingSession : IDisposable
     {
         try { return [new(string.Empty, "System default"), .. Recorder.GetSystemAudioDevices(AudioDeviceSource.OutputDevices).Select(device => new RecordingDeviceOption(device.DeviceName, device.FriendlyName))]; }
         catch { return [new(string.Empty, "System default")]; }
+    }
+
+    internal static string? ResolveAudioDevice(string? configured, IReadOnlyList<RecordingDeviceOption> available)
+    {
+        if (string.IsNullOrWhiteSpace(configured)) return null;
+        return available.Any(device => device.DeviceName.Equals(configured, StringComparison.OrdinalIgnoreCase))
+            ? configured
+            : null;
     }
 
     private static RecordingSourceBase CreateSource(Rect bounds, string mode, bool cursor, IntPtr targetWindowHandle, out Rect previewBounds)

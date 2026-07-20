@@ -20,7 +20,7 @@ internal static class ElevationService
         var executable = Environment.ProcessPath;
         if (string.IsNullOrWhiteSpace(executable))
         {
-            errorMessage = "SnapPin could not determine its executable path.";
+            errorMessage = LocalizationService.Current("SnapPin could not determine its executable path.");
             return false;
         }
 
@@ -38,12 +38,12 @@ internal static class ElevationService
         }
         catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
         {
-            errorMessage = "Administrator launch was cancelled. SnapPin will continue with normal permissions for this session.";
+            errorMessage = LocalizationService.Current("Administrator launch was cancelled. SnapPin will continue with normal permissions for this session.");
             return false;
         }
         catch (Exception exception)
         {
-            errorMessage = $"SnapPin could not restart as administrator: {exception.Message}";
+            errorMessage = LocalizationService.Format("SnapPin could not restart as administrator: {0}", exception.Message);
             return false;
         }
     }

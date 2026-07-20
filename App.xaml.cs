@@ -2,6 +2,7 @@ using System.Windows;
 using System.IO;
 using SnapPin.Services;
 using SnapPin.Models;
+using SnapPin.Windows;
 
 namespace SnapPin;
 
@@ -19,8 +20,9 @@ public partial class App : System.Windows.Application
         DispatcherUnhandledException += (_, args) =>
         {
             DiagnosticsService.Log("ui-error", args.Exception.Message, args.Exception);
-            MessageBox.Show($"SnapPin recovered from an unexpected error.\n\n{args.Exception.Message}\n\nA diagnostic log was saved locally.",
-                "SnapPin recovered", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(LocalizationService.Format(
+                    "SnapPin recovered from an unexpected error.\n\n{0}\n\nA diagnostic log was saved locally.", args.Exception.Message),
+                LocalizationService.Current("SnapPin recovered"), MessageBoxButton.OK, MessageBoxImage.Warning);
             args.Handled = true;
         };
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
@@ -32,7 +34,7 @@ public partial class App : System.Windows.Application
         };
         if (!AppCommand.TryParse(startupArguments, out var startupCommand, out var commandError))
         {
-            MessageBox.Show(commandError, "SnapPin command", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(commandError, LocalizationService.Current("SnapPin command"), MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown(2);
             return;
         }
@@ -45,7 +47,7 @@ public partial class App : System.Windows.Application
                 return;
             }
             if (!string.IsNullOrWhiteSpace(elevationError))
-                MessageBox.Show(elevationError, "SnapPin administrator mode", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(elevationError, LocalizationService.Current("SnapPin administrator mode"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         var executablePath = Environment.ProcessPath ?? string.Empty;
         var developmentBuild = executablePath.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase);
@@ -72,8 +74,8 @@ public partial class App : System.Windows.Application
             Dispatcher.BeginInvoke(async () => await CheckForUpdatesOnStartupAsync(window, settings));
         if (recoveredPreviousCrash)
             Dispatcher.BeginInvoke(() => MessageBox.Show(window,
-                "SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.\n\nYou can review the local diagnostic log in Preferences > About.",
-                "SnapPin recovery", MessageBoxButton.OK, MessageBoxImage.Information));
+                LocalizationService.Current("SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.\n\nYou can review the local diagnostic log in Preferences > About."),
+                LocalizationService.Current("SnapPin recovery"), MessageBoxButton.OK, MessageBoxImage.Information));
         if (startupCommand.Kind != AppCommandKind.Activate)
             Dispatcher.BeginInvoke(() => window.ExecuteCommand(startupCommand));
     }
@@ -86,8 +88,7 @@ public partial class App : System.Windows.Application
             if (!update.UpdateAvailable || string.IsNullOrWhiteSpace(update.DownloadUrl)) return;
             if (MessageBox.Show(owner, update.Message + "\n\n" + LocalizationService.Current("Download and install it now?"), LocalizationService.Current("SnapPin update available"),
                 MessageBoxButton.YesNo, MessageBoxImage.Information) != MessageBoxResult.Yes) return;
-            await UpdateService.DownloadAndLaunchAsync(update);
-            Current.Shutdown();
+            if (UpdateProgressWindow.Run(owner, update)) Current.Shutdown();
         }
         catch (Exception ex)
         {

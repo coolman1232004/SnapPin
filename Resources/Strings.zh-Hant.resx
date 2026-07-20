@@ -1,0 +1,1410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SnapPin Preferences" xml:space="preserve">
+    <value>SnapPin 偏好設定</value>
+  </data>
+  <data name="SnapPin History" xml:space="preserve">
+    <value>SnapPin 歷史記錄</value>
+  </data>
+  <data name="SnapPin Capture" xml:space="preserve">
+    <value>SnapPin 截圖</value>
+  </data>
+  <data name="SnapPin Pin" xml:space="preserve">
+    <value>SnapPin 貼圖</value>
+  </data>
+  <data name="SnapPin Whiteboard" xml:space="preserve">
+    <value>SnapPin 白板</value>
+  </data>
+  <data name="Capture it. Keep it in sight." xml:space="preserve">
+    <value>擷取並置頂，隨時查看。</value>
+  </data>
+  <data name="A local-first screenshot and floating-reference tool for Windows." xml:space="preserve">
+    <value>本機優先的 Windows 擷取與浮動參考工具。</value>
+  </data>
+  <data name="Capture region  ·  Print Screen" xml:space="preserve">
+    <value>區域截圖  ·  Print Screen</value>
+  </data>
+  <data name="Pin clipboard  ·  F3" xml:space="preserve">
+    <value>貼出剪貼板  ·  F3</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>概覽</value>
+  </data>
+  <data name="Pins" xml:space="preserve">
+    <value>釘選</value>
+  </data>
+  <data name="Capture" xml:space="preserve">
+    <value>擷取</value>
+  </data>
+  <data name="Pin" xml:space="preserve">
+    <value>釘選</value>
+  </data>
+  <data name="Control" xml:space="preserve">
+    <value>控制</value>
+  </data>
+  <data name="Drag any region across one or more displays. Copy, save, or pin the result." xml:space="preserve">
+    <value>在一個或多個顯示器上拖動選擇區域，然后復制、保存或貼出結果。</value>
+  </data>
+  <data name="Keep images, image files, text, or hex colors in borderless topmost windows." xml:space="preserve">
+    <value>將圖片、圖片文件、文字或十六進制顏色保留在無邊框置頂窗口中。</value>
+  </data>
+  <data name="Drag to move, scroll to resize, Ctrl+scroll for opacity, and right-click for tools." xml:space="preserve">
+    <value>拖動可移動，滾輪可縮放，Ctrl+滾輪調整透明度，右鍵打開工具。</value>
+  </data>
+  <data name="Capture shortcut" xml:space="preserve">
+    <value>截圖快捷鍵</value>
+  </data>
+  <data name="Choose the key that starts region capture." xml:space="preserve">
+    <value>選擇啟動區域截圖的按鍵。</value>
+  </data>
+  <data name="Save shortcut" xml:space="preserve">
+    <value>保存快捷鍵</value>
+  </data>
+  <data name="More settings" xml:space="preserve">
+    <value>更多設置</value>
+  </data>
+  <data name="Alt+Shift+P restores click-through pins" xml:space="preserve">
+    <value>Alt+Shift+P 可恢復鼠標穿透的貼圖</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>歷史記錄</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>分組</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>默認</value>
+  </data>
+  <data name="Add group" xml:space="preserve">
+    <value>添加分組</value>
+  </data>
+  <data name="New group name" xml:space="preserve">
+    <value>新分組名稱</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Delete current group" xml:space="preserve">
+    <value>刪除當前分組</value>
+  </data>
+  <data name="Close group" xml:space="preserve">
+    <value>關閉分組</value>
+  </data>
+  <data name="Hide / show" xml:space="preserve">
+    <value>隱藏 / 顯示</value>
+  </data>
+  <data name="Link desktop" xml:space="preserve">
+    <value>關聯桌面</value>
+  </data>
+  <data name="Remove link" xml:space="preserve">
+    <value>取消關聯</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>一般</value>
+  </data>
+  <data name="Toolbar" xml:space="preserve">
+    <value>工具列</value>
+  </data>
+  <data name="Recording" xml:space="preserve">
+    <value>錄制</value>
+  </data>
+  <data name="Output" xml:space="preserve">
+    <value>輸出</value>
+  </data>
+  <data name="Hotkeys" xml:space="preserve">
+    <value>快速鍵</value>
+  </data>
+  <data name="OCR" xml:space="preserve">
+    <value>文字辨識</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>關于</value>
+  </data>
+  <data name="Application" xml:space="preserve">
+    <value>應用程序</value>
+  </data>
+  <data name="Interface language" xml:space="preserve">
+    <value>介面語言</value>
+  </data>
+  <data name="Run SnapPin on system startup" xml:space="preserve">
+    <value>系統啟動時運行 SnapPin</value>
+  </data>
+  <data name="Always launch SnapPin as administrator" xml:space="preserve">
+    <value>始終以管理員身份啟動 SnapPin</value>
+  </data>
+  <data name="Applies the next time SnapPin starts. Windows will show a UAC confirmation prompt." xml:space="preserve">
+    <value>下次啟動 SnapPin 時生效。Windows 將顯示用戶賬戶控制確認提示。</value>
+  </data>
+  <data name="Back up open pins and settings automatically" xml:space="preserve">
+    <value>自動備份打開的貼圖和設置</value>
+  </data>
+  <data name="Keep SnapPin running in the notification area when the dashboard closes" xml:space="preserve">
+    <value>關閉主界面后仍在通知區域運行 SnapPin</value>
+  </data>
+  <data name="Configuration storage" xml:space="preserve">
+    <value>配置存儲</value>
+  </data>
+  <data name="Settings are stored locally under your Windows user profile. No account or cloud connection is used." xml:space="preserve">
+    <value>設置保存在本機 Windows 用戶配置中，不需要賬戶或云端連接。</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Save changes" xml:space="preserve">
+    <value>儲存變更</value>
+  </data>
+  <data name="Selection border width" xml:space="preserve">
+    <value>選擇框邊框寬度</value>
+  </data>
+  <data name="Selection border color" xml:space="preserve">
+    <value>選擇框邊框顏色</value>
+  </data>
+  <data name="Screen mask color (ARGB)" xml:space="preserve">
+    <value>屏幕遮罩顏色 (ARGB)</value>
+  </data>
+  <data name="Show full-screen cross lines at the cursor" xml:space="preserve">
+    <value>在光標處顯示全屏十字線</value>
+  </data>
+  <data name="Show coordinate and size badge above the selection" xml:space="preserve">
+    <value>在選擇區域上方顯示坐標和尺寸</value>
+  </data>
+  <data name="Show automatic window and UI-element detection outline" xml:space="preserve">
+    <value>顯示自動窗口和界面元素檢測輪廓</value>
+  </data>
+  <data name="Show capture shortcut hints" xml:space="preserve">
+    <value>顯示截圖快捷鍵提示</value>
+  </data>
+  <data name="Long capture frames" xml:space="preserve">
+    <value>長截圖最大幀數</value>
+  </data>
+  <data name="Scroll pause (ms)" xml:space="preserve">
+    <value>滾動暫停（毫秒）</value>
+  </data>
+  <data name="Wheel clicks per frame" xml:space="preserve">
+    <value>每幀滾輪格數</value>
+  </data>
+  <data name="Exclude SnapPin pins and controls from screenshots and recordings" xml:space="preserve">
+    <value>在截圖和錄屏中排除 SnapPin 貼圖及控件</value>
+  </data>
+  <data name="Excluded apps" xml:space="preserve">
+    <value>排除的應用</value>
+  </data>
+  <data name="Exclude a running app" xml:space="preserve">
+    <value>排除正在運行的應用</value>
+  </data>
+  <data name="Capture shortcuts" xml:space="preserve">
+    <value>截圖快捷鍵提示</value>
+  </data>
+  <data name="W / A / S / D     Move cursor precisely" xml:space="preserve">
+    <value>W / A / S / D     精確移動光標</value>
+  </data>
+  <data name="Mouse wheel      Parent / child UI element" xml:space="preserve">
+    <value>鼠標滾輪      父級 / 子級界面元素</value>
+  </data>
+  <data name="Shift + C            Recognize and copy text" xml:space="preserve">
+    <value>Shift + C            識別并復制文字</value>
+  </data>
+  <data name="Tab                    Window / element mode" xml:space="preserve">
+    <value>Tab                    窗口 / 元素模式</value>
+  </data>
+  <data name="L                        Long scrolling screenshot" xml:space="preserve">
+    <value>L                        長滾動截圖</value>
+  </data>
+  <data name="R                        Record selected region" xml:space="preserve">
+    <value>R                        錄制選定區域</value>
+  </data>
+  <data name="Tool size" xml:space="preserve">
+    <value>工具尺寸</value>
+  </data>
+  <data name="Compact" xml:space="preserve">
+    <value>緊湊</value>
+  </data>
+  <data name="Standard" xml:space="preserve">
+    <value>標準</value>
+  </data>
+  <data name="Large" xml:space="preserve">
+    <value>大</value>
+  </data>
+  <data name="Automatically follows Windows display scaling." xml:space="preserve">
+    <value>自動適配 Windows 顯示縮放。</value>
+  </data>
+  <data name="Capture toolbar" xml:space="preserve">
+    <value>截圖工具欄</value>
+  </data>
+  <data name="Drawing tools shown directly in the first capture row." xml:space="preserve">
+    <value>繪圖工具直接顯示在截圖工具欄第一行。</value>
+  </data>
+  <data name="Annotation toolbar" xml:space="preserve">
+    <value>標注工具欄</value>
+  </data>
+  <data name="Output actions shown after the drawing tools." xml:space="preserve">
+    <value>輸出操作顯示在繪圖工具之后。</value>
+  </data>
+  <data name="Enable all" xml:space="preserve">
+    <value>全部啟用</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>上移</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>下移</value>
+  </data>
+  <data name="MP4 video (H.264)" xml:space="preserve">
+    <value>MP4 視頻 (H.264)</value>
+  </data>
+  <data name="Animated GIF" xml:space="preserve">
+    <value>動態 GIF</value>
+  </data>
+  <data name="Capture mode" xml:space="preserve">
+    <value>錄制模式</value>
+  </data>
+  <data name="Selected region" xml:space="preserve">
+    <value>選定區域</value>
+  </data>
+  <data name="Full screen" xml:space="preserve">
+    <value>全屏</value>
+  </data>
+  <data name="MP4 quality" xml:space="preserve">
+    <value>MP4 質量</value>
+  </data>
+  <data name="Compact · 24 fps · 3 Mbps" xml:space="preserve">
+    <value>緊湊 · 24 幀/秒 · 3 Mbps</value>
+  </data>
+  <data name="Standard · 30 fps · 6 Mbps" xml:space="preserve">
+    <value>標準 · 30 幀/秒 · 6 Mbps</value>
+  </data>
+  <data name="High · 60 fps · 10 Mbps" xml:space="preserve">
+    <value>高 · 60 幀/秒 · 10 Mbps</value>
+  </data>
+  <data name="GIF frames per second" xml:space="preserve">
+    <value>GIF 每秒幀數</value>
+  </data>
+  <data name="Countdown / max duration" xml:space="preserve">
+    <value>倒計時 / 最長時長</value>
+  </data>
+  <data name="Countdown seconds" xml:space="preserve">
+    <value>倒計時秒數</value>
+  </data>
+  <data name="Maximum duration seconds" xml:space="preserve">
+    <value>最長時長（秒）</value>
+  </data>
+  <data name="GIF maximum width" xml:space="preserve">
+    <value>GIF 最大寬度</value>
+  </data>
+  <data name="Include the mouse cursor" xml:space="preserve">
+    <value>包含鼠標光標</value>
+  </data>
+  <data name="Highlight clicks" xml:space="preserve">
+    <value>突出顯示點擊位置</value>
+  </data>
+  <data name="System audio" xml:space="preserve">
+    <value>系統聲音</value>
+  </data>
+  <data name="Microphone" xml:space="preserve">
+    <value>麥克風</value>
+  </data>
+  <data name="System audio device" xml:space="preserve">
+    <value>系統聲音設備</value>
+  </data>
+  <data name="Microphone device" xml:space="preserve">
+    <value>麥克風設備</value>
+  </data>
+  <data name="Recording folder" xml:space="preserve">
+    <value>錄屏保存文件夾</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>瀏覽</value>
+  </data>
+  <data name="MP4 uses Windows Media Foundation and stays entirely on this computer." xml:space="preserve">
+    <value>MP4 使用 Windows Media Foundation，所有處理均在本機完成。</value>
+  </data>
+  <data name="Show a shadow around pinned windows" xml:space="preserve">
+    <value>在貼圖窗口周圍顯示陰影</value>
+  </data>
+  <data name="Make new pinned images text-selectable by default (local OCR)" xml:space="preserve">
+    <value>新貼圖默認可選擇文字（本地 OCR）</value>
+  </data>
+  <data name="Default opacity (%)" xml:space="preserve">
+    <value>默認不透明度 (%)</value>
+  </data>
+  <data name="Maximum window size" xml:space="preserve">
+    <value>最大窗口尺寸</value>
+  </data>
+  <data name="Fast thumbnail size" xml:space="preserve">
+    <value>快速縮略圖尺寸</value>
+  </data>
+  <data name="Pin groups" xml:space="preserve">
+    <value>貼圖分組</value>
+  </data>
+  <data name="Manage named groups from the Pins tab on the SnapPin dashboard" xml:space="preserve">
+    <value>在 SnapPin 主界面的“貼圖”選項卡中管理命名分組</value>
+  </data>
+  <data name="Default image format" xml:space="preserve">
+    <value>默認圖片格式</value>
+  </data>
+  <data name="Transparent" xml:space="preserve">
+    <value>透明</value>
+  </data>
+  <data name="Light checkerboard" xml:space="preserve">
+    <value>淺色棋盤格</value>
+  </data>
+  <data name="Dark checkerboard" xml:space="preserve">
+    <value>深色棋盤格</value>
+  </data>
+  <data name="Pseudo-transparent" xml:space="preserve">
+    <value>偽透明</value>
+  </data>
+  <data name="Switch bound pin groups automatically with Windows virtual desktops" xml:space="preserve">
+    <value>隨 Windows 虛擬桌面自動切換已關聯的貼圖分組</value>
+  </data>
+  <data name="Organize floating references into groups. A group can follow a Windows virtual desktop automatically." xml:space="preserve">
+    <value>將浮動參考內容整理到分組中，分組可自動跟隨 Windows 虛擬桌面。</value>
+  </data>
+  <data name="Maximum saved captures" xml:space="preserve">
+    <value>最多保存的截圖數</value>
+  </data>
+  <data name="Completed captures are stored locally. When the limit is reached, the oldest captures are removed automatically." xml:space="preserve">
+    <value>已完成的截圖保存在本機。達到上限時會自動移除最舊的截圖。</value>
+  </data>
+  <data name="Naming and saving" xml:space="preserve">
+    <value>命名與保存</value>
+  </data>
+  <data name="File name template" xml:space="preserve">
+    <value>文件名模板</value>
+  </data>
+  <data name="Tokens: $yyyy  $MM  $dd  $HH  $mm  $ss" xml:space="preserve">
+    <value>變量：$yyyy  $MM  $dd  $HH  $mm  $ss</value>
+  </data>
+  <data name="Output format" xml:space="preserve">
+    <value>輸出格式</value>
+  </data>
+  <data name="PNG (lossless)" xml:space="preserve">
+    <value>PNG（無損）</value>
+  </data>
+  <data name="JPEG / WebP quality" xml:space="preserve">
+    <value>JPEG / WebP 質量</value>
+  </data>
+  <data name="Export appearance" xml:space="preserve">
+    <value>導出外觀</value>
+  </data>
+  <data name="Border width" xml:space="preserve">
+    <value>邊框寬度</value>
+  </data>
+  <data name="Border color (ARGB)" xml:space="preserve">
+    <value>邊框顏色 (ARGB)</value>
+  </data>
+  <data name="Include a shadow when saving or copying as files" xml:space="preserve">
+    <value>保存或復制為文件時包含陰影</value>
+  </data>
+  <data name="Shadow size" xml:space="preserve">
+    <value>陰影大小</value>
+  </data>
+  <data name="Shadow color" xml:space="preserve">
+    <value>陰影顏色</value>
+  </data>
+  <data name="Quick-save folder" xml:space="preserve">
+    <value>快速保存文件夾</value>
+  </data>
+  <data name="Show a notification after quick save" xml:space="preserve">
+    <value>快速保存后顯示通知</value>
+  </data>
+  <data name="Automatically save every completed capture" xml:space="preserve">
+    <value>自動保存每次完成的截圖</value>
+  </data>
+  <data name="Automatic-save folder" xml:space="preserve">
+    <value>自動保存文件夾</value>
+  </data>
+  <data name="Capture and copy" xml:space="preserve">
+    <value>截圖并復制</value>
+  </data>
+  <data name="Custom capture" xml:space="preserve">
+    <value>自定義截圖</value>
+  </data>
+  <data name="Draw on screen" xml:space="preserve">
+    <value>屏幕繪圖</value>
+  </data>
+  <data name="Pin clipboard" xml:space="preserve">
+    <value>貼出剪貼板</value>
+  </data>
+  <data name="Hide/show all pins" xml:space="preserve">
+    <value>隱藏/顯示全部貼圖</value>
+  </data>
+  <data name="Record region" xml:space="preserve">
+    <value>錄制區域</value>
+  </data>
+  <data name="Ignore shortcuts in app" xml:space="preserve">
+    <value>在應用中忽略快捷鍵</value>
+  </data>
+  <data name="The emergency Alt+Shift+P shortcut always remains available so click-through pins can be recovered." xml:space="preserve">
+    <value>緊急快捷鍵 Alt+Shift+P 始終可用，以便恢復鼠標穿透的貼圖。</value>
+  </data>
+  <data name="OCR language" xml:space="preserve">
+    <value>文字識別語言</value>
+  </data>
+  <data name="English + Chinese + Japanese" xml:space="preserve">
+    <value>英語 + 中文 + 日語</value>
+  </data>
+  <data name="English + 简体 + 繁體" xml:space="preserve">
+    <value>英語 + 簡體中文 + 繁體中文</value>
+  </data>
+  <data name="English + 简体中文" xml:space="preserve">
+    <value>英語 + 簡體中文</value>
+  </data>
+  <data name="English + 繁體中文" xml:space="preserve">
+    <value>英語 + 繁體中文</value>
+  </data>
+  <data name="English + Japanese" xml:space="preserve">
+    <value>英語 + 日語</value>
+  </data>
+  <data name="Japanese" xml:space="preserve">
+    <value>日語</value>
+  </data>
+  <data name="Private by design" xml:space="preserve">
+    <value>隱私優先設計</value>
+  </data>
+  <data name="Text and QR/barcode recognition runs on this computer. Images are not uploaded to a cloud service." xml:space="preserve">
+    <value>文字與二維碼/條碼識別均在本機運行，圖片不會上傳到云端。</value>
+  </data>
+  <data name="Local recognition" xml:space="preserve">
+    <value>本地識別</value>
+  </data>
+  <data name="Automatically recognizes positioned text when a new pin opens. Each pin can still override this from its right-click menu." xml:space="preserve">
+    <value>打開新貼圖時自動識別文字。每個貼圖仍可在右鍵菜單中單獨切換。</value>
+  </data>
+  <data name="Local-first capture and floating visual references" xml:space="preserve">
+    <value>本地優先的截圖與浮動視覺參考工具</value>
+  </data>
+  <data name="This is an independent implementation built with documented Windows APIs. It contains no Snipaste code, branding, or assets." xml:space="preserve">
+    <value>這是使用公開 Windows API 構建的獨立實現，不包含 Snipaste 的代碼、品牌或資源。</value>
+  </data>
+  <data name="Diagnostics and recovery" xml:space="preserve">
+    <value>診斷與恢復</value>
+  </data>
+  <data name="Unexpected errors are logged locally. Logs are retained for 14 days and open pins use verified generation backups." xml:space="preserve">
+    <value>意外錯誤會記錄在本機，日志保留 14 天；打開的貼圖使用經過驗證的多版本備份。</value>
+  </data>
+  <data name="Open diagnostics folder" xml:space="preserve">
+    <value>打開診斷文件夾</value>
+  </data>
+  <data name="Copy system summary" xml:space="preserve">
+    <value>復制系統摘要</value>
+  </data>
+  <data name="GitHub updates" xml:space="preserve">
+    <value>GitHub 更新</value>
+  </data>
+  <data name="Check for updates when SnapPin starts" xml:space="preserve">
+    <value>SnapPin 啟動時檢查更新</value>
+  </data>
+  <data name="Updates are published on " xml:space="preserve">
+    <value>更新發布在 </value>
+  </data>
+  <data name="Check now" xml:space="preserve">
+    <value>立即檢查</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="Toolbar size" xml:space="preserve">
+    <value>工具欄尺寸</value>
+  </data>
+  <data name="Covered in still screenshots" xml:space="preserve">
+    <value>在靜態截圖中覆蓋</value>
+  </data>
+  <data name="Windows lets SnapPin hide its own windows from video capture. Other applications are securely covered in still screenshots; video exclusion also requires privacy support from that application." xml:space="preserve">
+    <value>Windows 可讓 SnapPin 在錄屏中隱藏自己的窗口。其他應用會在靜態截圖中被安全覆蓋；若要在錄屏中排除，還需要該應用支持隱私保護。</value>
+  </data>
+  <data name="Windows will display a User Account Control prompt when SnapPin starts" xml:space="preserve">
+    <value>SnapPin 啟動時 Windows 將顯示用戶賬戶控制提示</value>
+  </data>
+  <data name="Global shortcuts are ready" xml:space="preserve">
+    <value>全局快捷鍵已就緒</value>
+  </data>
+  <data name="Repeat last region" xml:space="preserve">
+    <value>重復上次區域</value>
+  </data>
+  <data name="Save as image" xml:space="preserve">
+    <value>另存為圖片</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>已保存</value>
+  </data>
+  <data name="Rectangle or ellipse" xml:space="preserve">
+    <value>矩形或橢圓</value>
+  </data>
+  <data name="Rectangle" xml:space="preserve">
+    <value>矩形</value>
+  </data>
+  <data name="Arrow or line" xml:space="preserve">
+    <value>箭頭或直線</value>
+  </data>
+  <data name="Arrow" xml:space="preserve">
+    <value>箭頭</value>
+  </data>
+  <data name="Pencil" xml:space="preserve">
+    <value>鉛筆</value>
+  </data>
+  <data name="Marker" xml:space="preserve">
+    <value>標記筆</value>
+  </data>
+  <data name="Blur brush" xml:space="preserve">
+    <value>模糊畫筆</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>文字</value>
+  </data>
+  <data name="Eraser" xml:space="preserve">
+    <value>橡皮擦</value>
+  </data>
+  <data name="Eraser brush" xml:space="preserve">
+    <value>橡皮擦畫筆</value>
+  </data>
+  <data name="Magnifier" xml:space="preserve">
+    <value>放大鏡</value>
+  </data>
+  <data name="Undo (Ctrl+Z)" xml:space="preserve">
+    <value>撤銷 (Ctrl+Z)</value>
+  </data>
+  <data name="Redo (Ctrl+Y)" xml:space="preserve">
+    <value>重做 (Ctrl+Y)</value>
+  </data>
+  <data name="Copy image" xml:space="preserve">
+    <value>復制圖片</value>
+  </data>
+  <data name="Save image" xml:space="preserve">
+    <value>保存圖片</value>
+  </data>
+  <data name="Quick save" xml:space="preserve">
+    <value>快速保存</value>
+  </data>
+  <data name="Long scrolling capture" xml:space="preserve">
+    <value>長滾動截圖</value>
+  </data>
+  <data name="Screen recording" xml:space="preserve">
+    <value>屏幕錄制</value>
+  </data>
+  <data name="OCR / QR recognition" xml:space="preserve">
+    <value>文字 / 二維碼識別</value>
+  </data>
+  <data name="Cancel capture" xml:space="preserve">
+    <value>取消截圖</value>
+  </data>
+  <data name="Recognize text and QR/barcodes" xml:space="preserve">
+    <value>識別文字和二維碼/條碼</value>
+  </data>
+  <data name="Record selected region (R)" xml:space="preserve">
+    <value>錄制選定區域 (R)</value>
+  </data>
+  <data name="Long scrolling screenshot (L)" xml:space="preserve">
+    <value>長滾動截圖 (L)</value>
+  </data>
+  <data name="Capture another area" xml:space="preserve">
+    <value>重新選擇截圖區域</value>
+  </data>
+  <data name="Finish" xml:space="preserve">
+    <value>完成</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="Start capture" xml:space="preserve">
+    <value>開始截圖</value>
+  </data>
+  <data name="Set optional dimensions, ratio, delay, and cursor capture." xml:space="preserve">
+    <value>可設置尺寸、比例、延遲和是否包含光標。</value>
+  </data>
+  <data name="Width (pixels)" xml:space="preserve">
+    <value>寬度（像素）</value>
+  </data>
+  <data name="Height (pixels)" xml:space="preserve">
+    <value>高度（像素）</value>
+  </data>
+  <data name="Use 0 for a freely drawn width" xml:space="preserve">
+    <value>設為 0 可自由繪制寬度</value>
+  </data>
+  <data name="Use 0 for a freely drawn height" xml:space="preserve">
+    <value>設為 0 可自由繪制高度</value>
+  </data>
+  <data name="Aspect ratio" xml:space="preserve">
+    <value>寬高比</value>
+  </data>
+  <data name="Tip: leave width and height at 0 to constrain only the aspect ratio." xml:space="preserve">
+    <value>提示：寬度和高度都設為 0 時僅限制寬高比。</value>
+  </data>
+  <data name="Delay (seconds)" xml:space="preserve">
+    <value>延遲（秒）</value>
+  </data>
+  <data name="Mouse cursor" xml:space="preserve">
+    <value>鼠標光標</value>
+  </data>
+  <data name="Cursor" xml:space="preserve">
+    <value>光標</value>
+  </data>
+  <data name="Window" xml:space="preserve">
+    <value>視窗</value>
+  </data>
+  <data name="Detected window" xml:space="preserve">
+    <value>檢測到的窗口</value>
+  </data>
+  <data name="Mode: UI element" xml:space="preserve">
+    <value>模式：界面元素</value>
+  </data>
+  <data name="Mode" xml:space="preserve">
+    <value>模式</value>
+  </data>
+  <data name="UI element" xml:space="preserve">
+    <value>界面元素</value>
+  </data>
+  <data name="Select area" xml:space="preserve">
+    <value>選擇區域</value>
+  </data>
+  <data name="Ellipse" xml:space="preserve">
+    <value>橢圓</value>
+  </data>
+  <data name="Straight line" xml:space="preserve">
+    <value>直線</value>
+  </data>
+  <data name="Arrow heads" xml:space="preserve">
+    <value>箭頭樣式</value>
+  </data>
+  <data name="Solid or dashed outline" xml:space="preserve">
+    <value>實線或虛線輪廓</value>
+  </data>
+  <data name="Stroke size" xml:space="preserve">
+    <value>線條粗細</value>
+  </data>
+  <data name="Pencil size" xml:space="preserve">
+    <value>鉛筆粗細</value>
+  </data>
+  <data name="Marker size" xml:space="preserve">
+    <value>標記筆粗細</value>
+  </data>
+  <data name="Blur brush size" xml:space="preserve">
+    <value>模糊畫筆大小</value>
+  </data>
+  <data name="Eraser size" xml:space="preserve">
+    <value>橡皮擦大小</value>
+  </data>
+  <data name="Text outline" xml:space="preserve">
+    <value>文字輪廓</value>
+  </data>
+  <data name="Text alignment" xml:space="preserve">
+    <value>文字對齊</value>
+  </data>
+  <data name="Underline" xml:space="preserve">
+    <value>下劃線</value>
+  </data>
+  <data name="Strikethrough" xml:space="preserve">
+    <value>刪除線</value>
+  </data>
+  <data name="Apply crop" xml:space="preserve">
+    <value>應用裁剪</value>
+  </data>
+  <data name="Cancel crop" xml:space="preserve">
+    <value>取消裁剪</value>
+  </data>
+  <data name="Drag to choose the crop area" xml:space="preserve">
+    <value>拖動選擇裁剪區域</value>
+  </data>
+  <data name="Transparent background" xml:space="preserve">
+    <value>透明背景</value>
+  </data>
+  <data name="Recognize text" xml:space="preserve">
+    <value>識別文字</value>
+  </data>
+  <data name="Recognize text and scan QR/barcodes" xml:space="preserve">
+    <value>識別文字并掃描二維碼/條碼</value>
+  </data>
+  <data name="Drag the smaller area to recognize" xml:space="preserve">
+    <value>拖動選擇較小的識別區域</value>
+  </data>
+  <data name="OCR results" xml:space="preserve">
+    <value>識別結果</value>
+  </data>
+  <data name="Search recognized text" xml:space="preserve">
+    <value>搜索識別到的文字</value>
+  </data>
+  <data name="Copy selected text" xml:space="preserve">
+    <value>復制所選文字</value>
+  </data>
+  <data name="Copy all recognized text" xml:space="preserve">
+    <value>復制全部識別文字</value>
+  </data>
+  <data name="Copy results" xml:space="preserve">
+    <value>復制結果</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>復制</value>
+  </data>
+  <data name="All text" xml:space="preserve">
+    <value>全部文字</value>
+  </data>
+  <data name="Open recognized web link" xml:space="preserve">
+    <value>打開識別到的網頁鏈接</value>
+  </data>
+  <data name="Close recognition panel" xml:space="preserve">
+    <value>關閉識別面板</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>就緒</value>
+  </data>
+  <data name="Copied" xml:space="preserve">
+    <value>已復制</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>暫停</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="Pause recording (Space)" xml:space="preserve">
+    <value>暫停錄制（空格）</value>
+  </data>
+  <data name="Stop and review recording (R or Esc)" xml:space="preserve">
+    <value>停止并檢查錄制（R 或 Esc）</value>
+  </data>
+  <data name="Review and trim recording" xml:space="preserve">
+    <value>檢查并裁剪錄屏</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>開始</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>結束</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="Play or pause preview (Space)" xml:space="preserve">
+    <value>播放或暫停預覽（空格）</value>
+  </data>
+  <data name="Save trimmed" xml:space="preserve">
+    <value>保存裁剪后視頻</value>
+  </data>
+  <data name="Keep full" xml:space="preserve">
+    <value>保留完整視頻</value>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>丟棄</value>
+  </data>
+  <data name="Recordings" xml:space="preserve">
+    <value>錄屏</value>
+  </data>
+  <data name="Images" xml:space="preserve">
+    <value>圖片</value>
+  </data>
+  <data name="Capture history" xml:space="preserve">
+    <value>截圖歷史記錄</value>
+  </data>
+  <data name="Search title, tag, text, or barcode" xml:space="preserve">
+    <value>搜索標題、標簽、文字或條碼</value>
+  </data>
+  <data name="Search OCR text, barcode content, source, dimensions, or date" xml:space="preserve">
+    <value>搜索識別文字、條碼內容、來源、尺寸或日期</value>
+  </data>
+  <data name="Favourites only" xml:space="preserve">
+    <value>僅收藏</value>
+  </data>
+  <data name="All sources" xml:space="preserve">
+    <value>所有來源</value>
+  </data>
+  <data name="All types" xml:space="preserve">
+    <value>所有類型</value>
+  </data>
+  <data name="Any date" xml:space="preserve">
+    <value>不限日期</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>今天</value>
+  </data>
+  <data name="Last 7 days" xml:space="preserve">
+    <value>最近 7 天</value>
+  </data>
+  <data name="Last 30 days" xml:space="preserve">
+    <value>最近 30 天</value>
+  </data>
+  <data name="Show recycle bin" xml:space="preserve">
+    <value>顯示回收站</value>
+  </data>
+  <data name="Clear history" xml:space="preserve">
+    <value>清空歷史記錄</value>
+  </data>
+  <data name="Recycle bin" xml:space="preserve">
+    <value>回收站</value>
+  </data>
+  <data name="Empty recycle bin" xml:space="preserve">
+    <value>清空回收站</value>
+  </data>
+  <data name="Pinned" xml:space="preserve">
+    <value>已貼出</value>
+  </data>
+  <data name="Annotated" xml:space="preserve">
+    <value>已標注</value>
+  </data>
+  <data name="Edited" xml:space="preserve">
+    <value>已編輯</value>
+  </data>
+  <data name="With context" xml:space="preserve">
+    <value>包含上下文</value>
+  </data>
+  <data name="Add or remove favourite" xml:space="preserve">
+    <value>添加或移除收藏</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>恢復</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>刪除</value>
+  </data>
+  <data name="Delete forever" xml:space="preserve">
+    <value>永久刪除</value>
+  </data>
+  <data name="Open folder" xml:space="preserve">
+    <value>打開文件夾</value>
+  </data>
+  <data name="Name / tags" xml:space="preserve">
+    <value>名稱 / 標簽</value>
+  </data>
+  <data name="Auto-copy" xml:space="preserve">
+    <value>自動復制</value>
+  </data>
+  <data name="Layout" xml:space="preserve">
+    <value>版面</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>重試</value>
+  </data>
+  <data name="Pinned image" xml:space="preserve">
+    <value>釘選</value>
+  </data>
+  <data name="Pin as thumbnail" xml:space="preserve">
+    <value>貼為縮略圖</value>
+  </data>
+  <data name="Show this pin" xml:space="preserve">
+    <value>顯示此貼圖</value>
+  </data>
+  <data name="Close this pin" xml:space="preserve">
+    <value>關閉此貼圖</value>
+  </data>
+  <data name="click-through" xml:space="preserve">
+    <value>鼠標穿透</value>
+  </data>
+  <data name="Free" xml:space="preserve">
+    <value>自由</value>
+  </data>
+  <data name="Scrolling" xml:space="preserve">
+    <value>滾動中</value>
+  </data>
+  <data name="Capture active window" xml:space="preserve">
+    <value>截取當前窗口</value>
+  </data>
+  <data name="Disable hotkeys" xml:space="preserve">
+    <value>禁用快捷鍵</value>
+  </data>
+  <data name="Hide/show all" xml:space="preserve">
+    <value>隱藏/顯示全部</value>
+  </data>
+  <data name="Restore click interaction" xml:space="preserve">
+    <value>恢復鼠標交互</value>
+  </data>
+  <data name="Close all" xml:space="preserve">
+    <value>關閉全部</value>
+  </data>
+  <data name="Switch group" xml:space="preserve">
+    <value>切換分組</value>
+  </data>
+  <data name="Solo selected" xml:space="preserve">
+    <value>僅顯示所選貼圖</value>
+  </data>
+  <data name="Capture history…" xml:space="preserve">
+    <value>截圖歷史記錄…</value>
+  </data>
+  <data name="Check for updates…" xml:space="preserve">
+    <value>檢查更新…</value>
+  </data>
+  <data name="Preferences…" xml:space="preserve">
+    <value>首選項…</value>
+  </data>
+  <data name="Open SnapPin" xml:space="preserve">
+    <value>打開 SnapPin</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>退出</value>
+  </data>
+  <data name="One or more selected shortcuts are already used by Windows or another app" xml:space="preserve">
+    <value>一個或多個所選快捷鍵已被 Windows 或其他應用占用</value>
+  </data>
+  <data name="{0} pins" xml:space="preserve">
+    <value>{0} 個貼圖</value>
+  </data>
+  <data name="1 pin" xml:space="preserve">
+    <value>1 個貼圖</value>
+  </data>
+  <data name="Virtual desktops unavailable" xml:space="preserve">
+    <value>虛擬桌面不可用</value>
+  </data>
+  <data name="{0} · not bound" xml:space="preserve">
+    <value>{0} · 未關聯</value>
+  </data>
+  <data name="{0} · bound here" xml:space="preserve">
+    <value>{0} · 已關聯到此處</value>
+  </data>
+  <data name="Bound to {0}" xml:space="preserve">
+    <value>已關聯到 {0}</value>
+  </data>
+  <data name="Restart required" xml:space="preserve">
+    <value>需要重新啟動</value>
+  </data>
+  <data name="The interface language has changed. Restart SnapPin now to apply it throughout the app?&#xA;&#xA;Choose No to apply it the next time SnapPin starts." xml:space="preserve">
+    <value>界面語言已更改。是否立即重新啟動 SnapPin，以在整個應用中應用新語言？
+
+選擇“否”將在下次啟動 SnapPin 時應用。</value>
+  </data>
+  <data name="SnapPin could not restart automatically. Please close and open it again." xml:space="preserve">
+    <value>SnapPin 無法自動重新啟動，請關閉后再次打開。</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>打開</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>編輯</value>
+  </data>
+  <data name="Show result" xml:space="preserve">
+    <value>顯示結果</value>
+  </data>
+  <data name="Show context" xml:space="preserve">
+    <value>顯示上下文</value>
+  </data>
+  <data name="1 saved item" xml:space="preserve">
+    <value>已保存 1 項</value>
+  </data>
+  <data name="{0} saved items" xml:space="preserve">
+    <value>已保存 {0} 項</value>
+  </data>
+  <data name="{0} of {1} saved items" xml:space="preserve">
+    <value>顯示 {1} 項中的 {0} 項</value>
+  </data>
+  <data name="Move this item to the recycle bin?" xml:space="preserve">
+    <value>將此項目移到回收站？</value>
+  </data>
+  <data name="Permanently delete this item and its files?" xml:space="preserve">
+    <value>永久刪除此項目及其文件？</value>
+  </data>
+  <data name="Permanently delete every item in the recycle bin?" xml:space="preserve">
+    <value>永久刪除回收站中的所有項目？</value>
+  </data>
+  <data name="Move every active item to the recycle bin?" xml:space="preserve">
+    <value>將所有有效項目移到回收站？</value>
+  </data>
+  <data name="Rename history item" xml:space="preserve">
+    <value>重命名歷史項目</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>名稱</value>
+  </data>
+  <data name="Organize history item" xml:space="preserve">
+    <value>整理歷史項目</value>
+  </data>
+  <data name="Tags (comma separated)" xml:space="preserve">
+    <value>標簽（用逗號分隔）</value>
+  </data>
+  <data name="OCR text" xml:space="preserve">
+    <value>識別文字</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>代碼</value>
+  </data>
+  <data name="Editable layers" xml:space="preserve">
+    <value>可編輯圖層</value>
+  </data>
+  <data name="{0} recording · {1} frames" xml:space="preserve">
+    <value>{0} 錄屏 · {1} 幀</value>
+  </data>
+  <data name="Recognizing locally…" xml:space="preserve">
+    <value>正在本地識別…</value>
+  </data>
+  <data name="No text or code was found." xml:space="preserve">
+    <value>未找到文字或代碼。</value>
+  </data>
+  <data name="Recognition cancelled." xml:space="preserve">
+    <value>已取消識別。</value>
+  </data>
+  <data name="Recognition failed: {0}" xml:space="preserve">
+    <value>識別失敗：{0}</value>
+  </data>
+  <data name="{0} text characters" xml:space="preserve">
+    <value>{0} 個文字字符</value>
+  </data>
+  <data name="code found" xml:space="preserve">
+    <value>已找到代碼</value>
+  </data>
+  <data name="{0} found" xml:space="preserve">
+    <value>已找到 {0}</value>
+  </data>
+  <data name="saved with capture history" xml:space="preserve">
+    <value>已隨截圖歷史記錄保存</value>
+  </data>
+  <data name="Paused" xml:space="preserve">
+    <value>已暫停</value>
+  </data>
+  <data name="Saving…" xml:space="preserve">
+    <value>正在保存…</value>
+  </data>
+  <data name="Trimming…" xml:space="preserve">
+    <value>正在裁剪…</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>繼續</value>
+  </data>
+  <data name="Resuming…" xml:space="preserve">
+    <value>正在繼續…</value>
+  </data>
+  <data name="Discard this recording permanently?" xml:space="preserve">
+    <value>永久丟棄此錄屏？</value>
+  </data>
+  <data name="Discard recording" xml:space="preserve">
+    <value>丟棄錄屏</value>
+  </data>
+  <data name="Recording failed" xml:space="preserve">
+    <value>錄屏失敗</value>
+  </data>
+  <data name="Long screenshot failed" xml:space="preserve">
+    <value>長截圖失敗</value>
+  </data>
+  <data name="The recognition area was too small. Select an area and try again." xml:space="preserve">
+    <value>識別區域太小，請選擇一個區域后重試。</value>
+  </data>
+  <data name="Will save to: {0}" xml:space="preserve">
+    <value>將保存到：{0}</value>
+  </data>
+  <data name="{0} frames" xml:space="preserve">
+    <value>{0} 幀</value>
+  </data>
+  <data name="1 frame" xml:space="preserve">
+    <value>1 幀</value>
+  </data>
+  <data name="Text selectable (OCR)" xml:space="preserve">
+    <value>文字可選擇（OCR）</value>
+  </data>
+  <data name="Copy unscaled image" xml:space="preserve">
+    <value>復制原始尺寸圖片</value>
+  </data>
+  <data name="Save image as…" xml:space="preserve">
+    <value>圖片另存為…</value>
+  </data>
+  <data name="Save unscaled image as…" xml:space="preserve">
+    <value>原始尺寸圖片另存為…</value>
+  </data>
+  <data name="Show toolbar" xml:space="preserve">
+    <value>顯示工具欄</value>
+  </data>
+  <data name="Set title...    F2" xml:space="preserve">
+    <value>設置標題...    F2</value>
+  </data>
+  <data name="Lock position    L" xml:space="preserve">
+    <value>鎖定位置    L</value>
+  </data>
+  <data name="Window shade    Y" xml:space="preserve">
+    <value>窗口卷起    Y</value>
+  </data>
+  <data name="Snap to screen edges" xml:space="preserve">
+    <value>吸附到屏幕邊緣</value>
+  </data>
+  <data name="Shadow" xml:space="preserve">
+    <value>陰影</value>
+  </data>
+  <data name="Zoom" xml:space="preserve">
+    <value>縮放</value>
+  </data>
+  <data name="Image processing" xml:space="preserve">
+    <value>圖片處理</value>
+  </data>
+  <data name="Rotate left" xml:space="preserve">
+    <value>向左旋轉</value>
+  </data>
+  <data name="Rotate right" xml:space="preserve">
+    <value>向右旋轉</value>
+  </data>
+  <data name="Flip horizontally" xml:space="preserve">
+    <value>水平翻轉</value>
+  </data>
+  <data name="Flip vertically" xml:space="preserve">
+    <value>垂直翻轉</value>
+  </data>
+  <data name="Grayscale" xml:space="preserve">
+    <value>灰度</value>
+  </data>
+  <data name="Invert colors" xml:space="preserve">
+    <value>反轉顏色</value>
+  </data>
+  <data name="Crop…" xml:space="preserve">
+    <value>裁剪…</value>
+  </data>
+  <data name="Paste" xml:space="preserve">
+    <value>粘貼</value>
+  </data>
+  <data name="Replace by file…" xml:space="preserve">
+    <value>用文件替換…</value>
+  </data>
+  <data name="Move to group" xml:space="preserve">
+    <value>移至分組</value>
+  </data>
+  <data name="View in folder" xml:space="preserve">
+    <value>在文件夾中查看</value>
+  </data>
+  <data name="More tools" xml:space="preserve">
+    <value>更多工具</value>
+  </data>
+  <data name="Recognize text / QR…" xml:space="preserve">
+    <value>識別文字 / 二維碼…</value>
+  </data>
+  <data name="Fixed thumbnail" xml:space="preserve">
+    <value>固定縮略圖</value>
+  </data>
+  <data name="Always on top" xml:space="preserve">
+    <value>始終置頂</value>
+  </data>
+  <data name="Make interactive" xml:space="preserve">
+    <value>恢復交互</value>
+  </data>
+  <data name="Enable click-through" xml:space="preserve">
+    <value>啟用鼠標穿透</value>
+  </data>
+  <data name="Solo selected pins" xml:space="preserve">
+    <value>僅顯示所選貼圖</value>
+  </data>
+  <data name="Copy image as file" xml:space="preserve">
+    <value>復制圖片文件</value>
+  </data>
+  <data name="Export selected images…" xml:space="preserve">
+    <value>導出所選圖片…</value>
+  </data>
+  <data name="Print…    Ctrl+P" xml:space="preserve">
+    <value>打印…    Ctrl+P</value>
+  </data>
+  <data name="Refresh screenshot    F5" xml:space="preserve">
+    <value>刷新截圖    F5</value>
+  </data>
+  <data name="Auto refresh" xml:space="preserve">
+    <value>自動刷新</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="Every {0} second" xml:space="preserve">
+    <value>每 {0} 秒</value>
+  </data>
+  <data name="Every {0} seconds" xml:space="preserve">
+    <value>每 {0} 秒</value>
+  </data>
+  <data name="Reset selected" xml:space="preserve">
+    <value>重置所選</value>
+  </data>
+  <data name="Close selected" xml:space="preserve">
+    <value>關閉所選</value>
+  </data>
+  <data name="Destroy" xml:space="preserve">
+    <value>銷毀</value>
+  </data>
+  <data name="Zoom to {0}%" xml:space="preserve">
+    <value>縮放至 {0}%</value>
+  </data>
+  <data name="Refresh screenshot" xml:space="preserve">
+    <value>刷新截圖</value>
+  </data>
+  <data name="Download and install it now?" xml:space="preserve">
+    <value>是否立即下載并安裝？</value>
+  </data>
+  <data name="SnapPin update available" xml:space="preserve">
+    <value>SnapPin 有可用更新</value>
+  </data>
+  <data name="SnapPin update" xml:space="preserve">
+    <value>SnapPin 更新</value>
+  </data>
+  <data name="SnapPin {0} is installed. The official GitHub update source is unavailable." xml:space="preserve">
+    <value>已安裝 SnapPin {0}，但官方 GitHub 更新源當前不可用。</value>
+  </data>
+  <data name="The official update source is not a valid HTTPS address." xml:space="preserve">
+    <value>官方更新源不是有效的 HTTPS 地址。</value>
+  </data>
+  <data name="The GitHub release did not contain a valid version." xml:space="preserve">
+    <value>GitHub 版本中沒有有效的版本號。</value>
+  </data>
+  <data name="SnapPin {0} is up to date." xml:space="preserve">
+    <value>SnapPin {0} 已是最新版本。</value>
+  </data>
+  <data name="SnapPin {0} is available for this {1}." xml:space="preserve">
+    <value>此{1}可更新至 SnapPin {0}。</value>
+  </data>
+  <data name="portable copy" xml:space="preserve">
+    <value>便攜版</value>
+  </data>
+  <data name="installed copy" xml:space="preserve">
+    <value>安裝版</value>
+  </data>
+  <data name="See the GitHub release page for full release notes." xml:space="preserve">
+    <value>完整更新說明請查看 GitHub 發布頁面。</value>
+  </data>
+  <data name="The required update package is not attached to this GitHub release." xml:space="preserve">
+    <value>此 GitHub 版本未附加所需的更新包。</value>
+  </data>
+  <data name="The diagnostic summary was copied." xml:space="preserve">
+    <value>診斷摘要已復制。</value>
+  </data>
+  <data name="SnapPin diagnostics" xml:space="preserve">
+    <value>SnapPin 診斷</value>
+  </data>
+  <data name="Update check failed: {0}" xml:space="preserve">
+    <value>檢查更新失敗：{0}</value>
+  </data>
+  <data name="GitHub update check failed: {0}" xml:space="preserve">
+    <value>GitHub 更新檢查失敗：{0}</value>
+  </data>
+  <data name="Version {0}" xml:space="preserve">
+    <value>版本 {0}</value>
+  </data>
+  <data name="Choose a SnapPin output folder" xml:space="preserve">
+    <value>選擇 SnapPin 輸出文件夾</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>選擇</value>
+  </data>
+  <data name="Callout" xml:space="preserve">
+    <value>標注框</value>
+  </data>
+  <data name="Number" xml:space="preserve">
+    <value>編號</value>
+  </data>
+  <data name="Blur" xml:space="preserve">
+    <value>模糊</value>
+  </data>
+  <data name="Click an annotation to select it, then drag to move it." xml:space="preserve">
+    <value>單擊標注以選擇，然后拖動進行移動。</value>
+  </data>
+  <data name="Click to place text. Enter adds a line; Ctrl+Enter finishes." xml:space="preserve">
+    <value>單擊放置文字。Enter 換行；Ctrl+Enter 完成。</value>
+  </data>
+  <data name="Click the image, type the callout, then press Ctrl+Enter." xml:space="preserve">
+    <value>單擊圖片并輸入標注內容，然后按 Ctrl+Enter 完成。</value>
+  </data>
+  <data name="Click the image to add the next numbered marker." xml:space="preserve">
+    <value>單擊圖片以添加下一個編號標記。</value>
+  </data>
+  <data name="Drag the eraser over only the pixels you want to remove." xml:space="preserve">
+    <value>用橡皮擦拖過需要移除的像素。</value>
+  </data>
+  <data name="Drag to paint blur directly where the brush passes." xml:space="preserve">
+    <value>拖動畫筆，直接模糊經過的位置。</value>
+  </data>
+  <data name="Drag on the image to add {0}." xml:space="preserve">
+    <value>在圖片上拖動以添加{0}。</value>
+  </data>
+  <data name="Bring to front" xml:space="preserve">
+    <value>置于頂層</value>
+  </data>
+  <data name="Bring forward" xml:space="preserve">
+    <value>上移一層</value>
+  </data>
+  <data name="Send backward" xml:space="preserve">
+    <value>下移一層</value>
+  </data>
+  <data name="Send to back" xml:space="preserve">
+    <value>置于底層</value>
+  </data>
+  <data name="Duplicate" xml:space="preserve">
+    <value>復制標注</value>
+  </data>
+  <data name="Capture region" xml:space="preserve">
+    <value>區域截圖</value>
+  </data>
+  <data name="Draw" xml:space="preserve">
+    <value>繪圖</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="SnapPin long capture" xml:space="preserve">
+    <value>SnapPin 長截圖</value>
+  </data>
+  <data name="Preparing long capture..." xml:space="preserve">
+    <value>正在準備長截圖...</value>
+  </data>
+  <data name="Captured first frame" xml:space="preserve">
+    <value>已截取第一幀</value>
+  </data>
+  <data name="Duplicate frame ignored" xml:space="preserve">
+    <value>已忽略重復幀</value>
+  </data>
+  <data name="Unmatched frame ignored; retrying" xml:space="preserve">
+    <value>已忽略無法匹配的幀，正在重試</value>
+  </data>
+  <data name="Captured {0} frames" xml:space="preserve">
+    <value>已截取 {0} 幀</value>
+  </data>
+  <data name="{0}  |  kept {1}, skipped {2}" xml:space="preserve">
+    <value>{0}  |  保留 {1}，跳過 {2}</value>
+  </data>
+  <data name="Restart now" xml:space="preserve">
+    <value>立即重新啟動</value>
+  </data>
+  <data name="Later" xml:space="preserve">
+    <value>稍后</value>
+  </data>
+  <data name="The interface language has changed. Restart SnapPin now to apply it throughout the app?&#xA;&#xA;Choose Later to apply it the next time SnapPin starts." xml:space="preserve">
+    <value>界面語言已更改。是否立即重新啟動 SnapPin，以在整個應用中應用新語言？
+
+選擇“稍后”將在下次啟動 SnapPin 時應用。</value>
+  </data>
+  <data name="SnapPin recovered from an unexpected error.&#xA;&#xA;{0}&#xA;&#xA;A diagnostic log was saved locally." xml:space="preserve"><value>SnapPin 已從意外錯誤中復原。
+
+{0}
+
+診斷記錄已儲存在本機。</value></data>
+  <data name="SnapPin recovered" xml:space="preserve"><value>SnapPin 已復原</value></data>
+  <data name="SnapPin command" xml:space="preserve"><value>SnapPin 指令</value></data>
+  <data name="Unknown SnapPin command: {0}" xml:space="preserve"><value>未知的 SnapPin 指令：{0}</value></data>
+  <data name="Invalid or incomplete option: {0}" xml:space="preserve"><value>無效或不完整的選項：{0}</value></data>
+  <data name="SnapPin administrator mode" xml:space="preserve"><value>SnapPin 系統管理員模式</value></data>
+  <data name="SnapPin could not determine its executable path." xml:space="preserve"><value>SnapPin 無法判斷其執行檔路徑。</value></data>
+  <data name="Administrator launch was cancelled. SnapPin will continue with normal permissions for this session." xml:space="preserve"><value>已取消以系統管理員身分啟動。SnapPin 將在本次工作階段中以一般權限繼續執行。</value></data>
+  <data name="SnapPin could not restart as administrator: {0}" xml:space="preserve"><value>SnapPin 無法以系統管理員身分重新啟動：{0}</value></data>
+  <data name="SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.&#xA;&#xA;You can review the local diagnostic log in Preferences &gt; About." xml:space="preserve"><value>SnapPin 已從上次意外關閉中復原。開啟的釘選已從最近驗證的備份中還原。
+
+您可以在「偏好設定 &gt; 關於」中檢視本機診斷記錄。</value></data>
+  <data name="SnapPin recovery" xml:space="preserve"><value>SnapPin 復原</value></data>
+  <data name="The recording was not added to history, but Windows kept the temporary file open:&#xA;&#xA;{0}" xml:space="preserve"><value>錄製未加入歷史記錄，但 Windows 仍占用該暫存檔：
+
+{0}</value></data>
+  <data name="Recording discarded" xml:space="preserve"><value>錄製已捨棄</value></data>
+  <data name="The GitHub update package must use HTTPS." xml:space="preserve"><value>GitHub 更新套件必須使用 HTTPS。</value></data>
+  <data name="The downloaded GitHub package failed its SHA-256 integrity check." xml:space="preserve"><value>下載的 GitHub 更新套件未通過 SHA-256 完整性檢查。</value></data>
+  <data name="A portable update cannot replace files in a drive root." xml:space="preserve"><value>可攜版更新不能取代磁碟根目錄中的檔案。</value></data>
+  <data name="The portable GitHub package did not contain SnapPin.exe." xml:space="preserve"><value>GitHub 可攜版更新套件中不包含 SnapPin.exe。</value></data>
+  <data name="Windows could not start the portable update helper." xml:space="preserve"><value>Windows 無法啟動可攜版更新助手。</value></data>
+  <data name="The portable update contained an unsafe path." xml:space="preserve"><value>可攜版更新包含不安全的路徑。</value></data>
+  <data name="Unsupported image format: {0}" xml:space="preserve"><value>不支援的影像格式：{0}</value></data>
+  <data name="The image could not be prepared for WebP export." xml:space="preserve"><value>無法準備影像以匯出為 WebP。</value></data>
+  <data name="WebP encoding failed." xml:space="preserve"><value>WebP 編碼失敗。</value></data>
+  <data name="Windows could not trim this recording ({0})." xml:space="preserve"><value>Windows 無法裁剪此錄製（{0}）。</value></data>
+  <data name="OCR language files are missing." xml:space="preserve"><value>缺少 OCR 語言檔案。</value></data>
+  <data name="Downloading SnapPin update…" xml:space="preserve"><value>正在下載 SnapPin 更新…</value></data>
+  <data name="Downloading {0}" xml:space="preserve"><value>正在下載 {0}</value></data>
+  <data name="{0}% downloaded" xml:space="preserve"><value>已下載 {0}%</value></data>
+  <data name="Preparing update…" xml:space="preserve"><value>正在準備更新…</value></data>
+  <data name="Cancel update" xml:space="preserve"><value>取消更新</value></data>
+  <data name="The update was cancelled." xml:space="preserve"><value>更新已取消。</value></data>
+</root>

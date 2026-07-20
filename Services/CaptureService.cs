@@ -173,7 +173,7 @@ internal static partial class CaptureService
                 SaveWebP(source, path, quality);
                 return;
             default:
-                throw new NotSupportedException($"Unsupported image format: {extension}");
+                throw new NotSupportedException(LocalizationService.Format("Unsupported image format: {0}", extension));
         }
     }
 
@@ -233,10 +233,10 @@ internal static partial class CaptureService
         png.Frames.Add(BitmapFrame.Create(source));
         png.Save(pngStream);
         pngStream.Position = 0;
-        using var bitmap = SKBitmap.Decode(pngStream) ?? throw new InvalidOperationException("The image could not be prepared for WebP export.");
+        using var bitmap = SKBitmap.Decode(pngStream) ?? throw new InvalidOperationException(LocalizationService.Current("The image could not be prepared for WebP export."));
         using var image = SKImage.FromBitmap(bitmap);
         using var data = image.Encode(SKEncodedImageFormat.Webp, Math.Clamp(quality, 1, 100))
-            ?? throw new InvalidOperationException("WebP encoding failed.");
+            ?? throw new InvalidOperationException(LocalizationService.Current("WebP encoding failed."));
         using var output = File.Create(path);
         data.SaveTo(output);
     }

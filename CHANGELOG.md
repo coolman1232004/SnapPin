@@ -2,6 +2,31 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.6] - 2026-07-20
+
+### Added
+
+- Cancellable update-download window with percentage, progress status, and a protected preparation phase
+- Automated localization-resource, update-dialog, mixed-DPI, portrait-display, remote-session, audio-device, and long-capture tests
+- Display/session compatibility details in copied diagnostics
+
+### Changed
+
+- English, Simplified Chinese, and Traditional Chinese text now lives in standard `.resx` resource files
+- Capture, annotation, and pinned-image window logic is split into focused partial classes for safer maintenance
+- Stale recording-device selections now fall back to the Windows default device
+
+### Fixed
+
+- Remaining rare error and recovery messages are localized
+- Tiny or heavily scaled monitor work areas no longer inherit an oversized artificial minimum
+- Update downloads can be cancelled safely before installation or portable replacement begins
+
+### Validation
+
+- 481 resource keys aligned across all three interface languages and 425 UI strings audited
+- Full x64 release build and smoke-test suite pass with zero warnings or errors
+
 ## [1.2.5] - 2026-07-15
 
 ### Added

@@ -29,7 +29,7 @@ internal static class RecognitionService
         {
             var dataPath = Path.Combine(AppContext.BaseDirectory, "tessdata");
             if (!Directory.Exists(dataPath))
-                throw new DirectoryNotFoundException("OCR language files are missing.");
+                throw new DirectoryNotFoundException(LocalizationService.Current("OCR language files are missing."));
 
             var png = ToPngBytes(image);
             using var engine = new TesseractEngine(dataPath, NormalizeLanguage(language), EngineMode.LstmOnly);

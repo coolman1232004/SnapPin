@@ -1,4 +1,5 @@
 using System.Text.Json;
+using SnapPin.Services;
 
 namespace SnapPin.Models;
 
@@ -64,7 +65,7 @@ internal sealed record AppCommand(
         };
         if ((int)kind < 0)
         {
-            error = $"Unknown SnapPin command: {arguments[0]}";
+            error = LocalizationService.Format("Unknown SnapPin command: {0}", arguments[0]);
             return false;
         }
 
@@ -85,7 +86,7 @@ internal sealed record AppCommand(
                 case "--ratio" when index + 1 < arguments.Count && TryRatio(arguments[++index], out var parsedRatio):
                     ratio = parsedRatio; break;
                 default:
-                    error = $"Invalid or incomplete option: {arguments[index]}";
+                    error = LocalizationService.Format("Invalid or incomplete option: {0}", arguments[index]);
                     return false;
             }
         }

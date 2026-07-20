@@ -78,6 +78,7 @@ internal static class DiagnosticsService
         builder.AppendLine($".NET: {RuntimeInformation.FrameworkDescription}");
         builder.AppendLine($"Process elevated: {ElevationService.IsCurrentProcessElevated()}");
         builder.AppendLine($"Recovered previous crash: {RecoveredPreviousCrash}");
+        builder.AppendLine(RuntimeCompatibilityService.Describe(RuntimeCompatibilityService.Snapshot()));
         builder.AppendLine($"Diagnostics folder: {Root}");
         return builder.ToString().TrimEnd();
     }

@@ -322,8 +322,7 @@ public partial class MainWindow : Window
                 canInstall ? MessageBoxButton.YesNo : MessageBoxButton.OK,
                 result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
             if (answer != MessageBoxResult.Yes || !canInstall) return;
-            await UpdateService.DownloadAndLaunchAsync(result);
-            Application.Current.Shutdown();
+            if (UpdateProgressWindow.Run(this, result)) Application.Current.Shutdown();
         }
         catch (Exception ex)
         {
