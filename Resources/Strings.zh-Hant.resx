@@ -1407,4 +1407,51 @@
   <data name="Preparing update…" xml:space="preserve"><value>正在準備更新…</value></data>
   <data name="Cancel update" xml:space="preserve"><value>取消更新</value></data>
   <data name="The update was cancelled." xml:space="preserve"><value>更新已取消。</value></data>
+  <data name="{0} update - Download size: {1}" xml:space="preserve"><value>{0}更新 - 下載大小：{1}</value></data>
+  <data name="about {0} remaining" xml:space="preserve"><value>約剩餘 {0}</value></data>
+  <data name="Applying portable update" xml:space="preserve"><value>正在套用可攜版更新</value></data>
+  <data name="Checking the package integrity before any files are changed." xml:space="preserve"><value>正在檢查套件完整性，尚未變更任何檔案。</value></data>
+  <data name="Creating rollback backup..." xml:space="preserve"><value>正在建立復原備份...</value></data>
+  <data name="Do not close this window while the portable files are being replaced." xml:space="preserve"><value>取代可攜版檔案時請勿關閉此視窗。</value></data>
+  <data name="Download size: {0}" xml:space="preserve"><value>下載大小：{0}</value></data>
+  <data name="Download SnapPin {0} update..." xml:space="preserve"><value>下載 SnapPin {0} 更新...</value></data>
+  <data name="Download update" xml:space="preserve"><value>下載更新</value></data>
+  <data name="Downloading SnapPin {0}..." xml:space="preserve"><value>正在下載 SnapPin {0}...</value></data>
+  <data name="Extracting and validating the update in a temporary folder." xml:space="preserve"><value>正在暫存資料夾中解壓縮並驗證更新。</value></data>
+  <data name="Installing updated files..." xml:space="preserve"><value>正在安裝更新檔案...</value></data>
+  <data name="Open update log" xml:space="preserve"><value>開啟更新記錄</value></data>
+  <data name="Portable update failed" xml:space="preserve"><value>可攜版更新失敗</value></data>
+  <data name="Preparing portable update..." xml:space="preserve"><value>正在準備可攜版更新...</value></data>
+  <data name="Restart and update to SnapPin {0}..." xml:space="preserve"><value>重新啟動並更新至 SnapPin {0}...</value></data>
+  <data name="SnapPin {0} is available" xml:space="preserve"><value>SnapPin {0} 已發布</value></data>
+  <data name="SnapPin {0} is available. Click to review and download it." xml:space="preserve"><value>SnapPin {0} 已發布。按一下以檢視並下載。</value></data>
+  <data name="SnapPin {0} is downloaded and ready. Click to choose when to restart." xml:space="preserve"><value>SnapPin {0} 已下載並準備就緒。按一下以選擇重新啟動時間。</value></data>
+  <data name="SnapPin {0} is ready" xml:space="preserve"><value>SnapPin {0} 已準備就緒</value></data>
+  <data name="SnapPin could not apply update {0}. The previous version was restored.&#xA;&#xA;{1}" xml:space="preserve"><value>SnapPin 無法套用更新 {0}。已還原先前版本。
+
+{1}</value></data>
+  <data name="SnapPin updated successfully" xml:space="preserve"><value>SnapPin 更新成功</value></data>
+  <data name="SnapPin was updated from {0} to {1}." xml:space="preserve"><value>SnapPin 已從 {0} 更新至 {1}。</value></data>
+  <data name="The downloaded SnapPin version ({0}) did not match the expected version ({1})." xml:space="preserve"><value>下載的 SnapPin 版本（{0}）與預期版本（{1}）不相符。</value></data>
+  <data name="The installer is downloaded and verified. Install it now, or choose Later to keep using this version." xml:space="preserve"><value>安裝程式已下載並通過驗證。立即安裝，或選擇「稍後」繼續使用此版本。</value></data>
+  <data name="The portable SnapPin folder is not writable." xml:space="preserve"><value>可攜版 SnapPin 資料夾無法寫入。</value></data>
+  <data name="The portable update needs at least {0} of free space." xml:space="preserve"><value>可攜版更新至少需要 {0} 可用空間。</value></data>
+  <data name="The portable update request is incomplete." xml:space="preserve"><value>可攜版更新要求不完整。</value></data>
+  <data name="The portable update request is invalid: {0}" xml:space="preserve"><value>可攜版更新要求無效：{0}</value></data>
+  <data name="The portable update request is not safe to apply." xml:space="preserve"><value>此可攜版更新要求無法安全套用。</value></data>
+  <data name="The prepared portable update is no longer available. Download it again." xml:space="preserve"><value>已準備的可攜版更新已無法使用。請重新下載。</value></data>
+  <data name="The previous version was restored. Reopening SnapPin..." xml:space="preserve"><value>已還原先前版本。正在重新開啟 SnapPin...</value></data>
+  <data name="The staged SnapPin executable is missing." xml:space="preserve"><value>暫存的 SnapPin 執行檔遺失。</value></data>
+  <data name="The update helper is not running from the verified staging folder." xml:space="preserve"><value>更新助手未從已驗證的暫存資料夾執行。</value></data>
+  <data name="The update is downloaded, verified, and prepared. Restart SnapPin now to replace the portable files, or choose Later to keep using this version." xml:space="preserve"><value>更新已下載、驗證並準備完成。立即重新啟動 SnapPin 以取代可攜版檔案，或選擇「稍後」繼續使用此版本。</value></data>
+  <data name="Unknown size" xml:space="preserve"><value>大小未知</value></data>
+  <data name="Update completed. Restarting SnapPin..." xml:space="preserve"><value>更新完成。正在重新啟動 SnapPin...</value></data>
+  <data name="Update failed. Restoring the previous version..." xml:space="preserve"><value>更新失敗。正在還原先前版本...</value></data>
+  <data name="Update log: {0}" xml:space="preserve"><value>更新記錄：{0}</value></data>
+  <data name="Update ready" xml:space="preserve"><value>更新已準備就緒</value></data>
+  <data name="Verifying download..." xml:space="preserve"><value>正在驗證下載內容...</value></data>
+  <data name="Verifying the updated version..." xml:space="preserve"><value>正在驗證更新後的版本...</value></data>
+  <data name="View release on GitHub" xml:space="preserve"><value>在 GitHub 檢視版本</value></data>
+  <data name="Waiting for SnapPin to close..." xml:space="preserve"><value>正在等待 SnapPin 關閉...</value></data>
+  <data name="What's new" xml:space="preserve"><value>更新內容</value></data>
 </root>

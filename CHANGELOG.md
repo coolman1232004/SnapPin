@@ -2,6 +2,34 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.7] - 2026-07-20
+
+### Added
+
+- Quiet startup update notification with a persistent tray action
+- Release-details window showing version, edition, download size, notes, and GitHub link
+- Downloaded-size, speed, and estimated-time progress
+- Separate **Restart and update** / **Later** decision after verification and extraction
+- Visible portable updater with replacement progress and post-update confirmation
+- Managed portable-package manifest for safe removal of obsolete application files
+
+### Changed
+
+- Verified downloads and staged portable files are reused after choosing **Later**
+- Portable replacement is performed by SnapPin's verified staged executable instead of a hidden PowerShell script
+- Only the two newest portable rollback copies are retained
+
+### Fixed
+
+- Portable update failures now restore overwritten, deleted, and newly created managed files transactionally
+- User-created files beside the portable application are excluded from managed-file cleanup
+- Read-only folders trigger elevation before replacement, and insufficient disk space is detected before files change
+
+### Validation
+
+- Successful portable replacement and deliberately failed version validation both covered by real filesystem tests
+- Complete x64 release build, localization audit, and smoke-test suite pass with zero warnings or errors
+
 ## [1.2.6] - 2026-07-20
 
 ### Added

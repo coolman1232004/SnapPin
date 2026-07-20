@@ -38,6 +38,7 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _desktopTimer;
     private bool _refreshingPinManager;
     private Guid? _lastDesktopId;
+    private UpdateCheckResult? _availableUpdate;
 
     public MainWindow()
     {
@@ -315,14 +316,8 @@ public partial class MainWindow : Window
         ShowDashboard();
         try
         {
-            var result = await UpdateService.CheckAsync(_settings.UpdateFeedUrl);
-            var canInstall = result.UpdateAvailable && !string.IsNullOrWhiteSpace(result.DownloadUrl);
-            var answer = MessageBox.Show(this, canInstall ? result.Message + "\n\n" + L("Download and install it now?") : result.Message,
-                L(result.UpdateAvailable ? "SnapPin update available" : "SnapPin update"),
-                canInstall ? MessageBoxButton.YesNo : MessageBoxButton.OK,
-                result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
-            if (answer != MessageBoxResult.Yes || !canInstall) return;
-            if (UpdateProgressWindow.Run(this, result)) Application.Current.Shutdown();
+            if (await UpdateWorkflowService.CheckAndRunAsync(this, _settings.UpdateFeedUrl, automatic: false))
+                Application.Current.Shutdown();
         }
         catch (Exception ex)
         {
@@ -505,12 +500,24 @@ public partial class MainWindow : Window
         };
         RefreshTrayMenu();
         _trayIcon.DoubleClick += (_, _) => Dispatcher.Invoke(ShowDashboard);
+        _trayIcon.BalloonTipClicked += (_, _) => Dispatcher.Invoke(RunAvailableUpdate);
     }
 
     private void RefreshTrayMenu()
     {
         if (_trayIcon?.ContextMenuStrip is not { } menu) return;
         menu.Items.Clear();
+        if (_availableUpdate is not null)
+        {
+            var ready = UpdateService.TryLoadPending(_availableUpdate, out _);
+            var label = ready
+                ? LocalizationService.Format("Restart and update to SnapPin {0}...", _availableUpdate.Version)
+                : LocalizationService.Format("Download SnapPin {0} update...", _availableUpdate.Version);
+            var updateItem = new Forms.ToolStripMenuItem(label) { Font = new Font(menu.Font, System.Drawing.FontStyle.Bold) };
+            updateItem.Click += (_, _) => Dispatcher.Invoke(RunAvailableUpdate);
+            menu.Items.Add(updateItem);
+            menu.Items.Add(new Forms.ToolStripSeparator());
+        }
         menu.Items.Add($"{L("Capture")} ({_captureHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture()));
         menu.Items.Add($"{L("Draw on screen")} ({_drawingHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.FullScreenDraw)));
         menu.Items.Add($"{L("Capture and copy")} ({_captureAndCopyHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.CopyOnSelection)));
@@ -549,6 +556,37 @@ public partial class MainWindow : Window
         menu.Items.Add(L("Open SnapPin"), null, (_, _) => Dispatcher.Invoke(ShowDashboard));
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(L("Exit"), null, (_, _) => Dispatcher.Invoke(ExitApplication));
+    }
+
+    internal void NotifyUpdateAvailable(UpdateCheckResult update)
+    {
+        _availableUpdate = update;
+        RefreshTrayMenu();
+        if (_trayIcon is null) return;
+        var ready = UpdateService.TryLoadPending(update, out _);
+        _trayIcon.ShowBalloonTip(7000,
+            L(ready ? "SnapPin update ready" : "SnapPin update available"),
+            ready
+                ? LocalizationService.Format("SnapPin {0} is downloaded and ready. Click to choose when to restart.", update.Version)
+                : LocalizationService.Format("SnapPin {0} is available. Click to review and download it.", update.Version),
+            Forms.ToolTipIcon.Info);
+    }
+
+    private void RunAvailableUpdate()
+    {
+        if (_availableUpdate is null) return;
+        ShowDashboard();
+        try
+        {
+            if (UpdateWorkflowService.RunAvailable(this, _availableUpdate)) Application.Current.Shutdown();
+            else RefreshTrayMenu();
+        }
+        catch (Exception ex)
+        {
+            DiagnosticsService.Log("update", ex.Message, ex);
+            MessageBox.Show(this, LocalizationService.Format("Update check failed: {0}", ex.Message), L("SnapPin update"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
 
     private void ShowDashboard()

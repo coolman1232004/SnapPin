@@ -312,15 +312,8 @@ public partial class PreferencesWindow : Window
     {
         try
         {
-            var result = await UpdateService.CheckAsync(AppSettings.DefaultUpdateFeedUrl);
-            var answer = MessageBox.Show(this, result.Message,
-                LocalizationService.Current(result.UpdateAvailable ? "SnapPin update available" : "SnapPin update"),
-                result.UpdateAvailable && !string.IsNullOrWhiteSpace(result.DownloadUrl) ? MessageBoxButton.YesNo : MessageBoxButton.OK,
-                result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
-            if (answer == MessageBoxResult.Yes)
-            {
-                if (UpdateProgressWindow.Run(this, result)) Application.Current.Shutdown();
-            }
+            if (await UpdateWorkflowService.CheckAndRunAsync(this, AppSettings.DefaultUpdateFeedUrl, automatic: false))
+                Application.Current.Shutdown();
         }
         catch (Exception ex)
         {

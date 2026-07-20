@@ -1407,4 +1407,51 @@ You can review the local diagnostic log in Preferences &gt; About.</value></data
   <data name="Preparing update…" xml:space="preserve"><value>Preparing update…</value></data>
   <data name="Cancel update" xml:space="preserve"><value>Cancel update</value></data>
   <data name="The update was cancelled." xml:space="preserve"><value>The update was cancelled.</value></data>
+  <data name="{0} update - Download size: {1}" xml:space="preserve"><value>{0} update - Download size: {1}</value></data>
+  <data name="about {0} remaining" xml:space="preserve"><value>about {0} remaining</value></data>
+  <data name="Applying portable update" xml:space="preserve"><value>Applying portable update</value></data>
+  <data name="Checking the package integrity before any files are changed." xml:space="preserve"><value>Checking the package integrity before any files are changed.</value></data>
+  <data name="Creating rollback backup..." xml:space="preserve"><value>Creating rollback backup...</value></data>
+  <data name="Do not close this window while the portable files are being replaced." xml:space="preserve"><value>Do not close this window while the portable files are being replaced.</value></data>
+  <data name="Download size: {0}" xml:space="preserve"><value>Download size: {0}</value></data>
+  <data name="Download SnapPin {0} update..." xml:space="preserve"><value>Download SnapPin {0} update...</value></data>
+  <data name="Download update" xml:space="preserve"><value>Download update</value></data>
+  <data name="Downloading SnapPin {0}..." xml:space="preserve"><value>Downloading SnapPin {0}...</value></data>
+  <data name="Extracting and validating the update in a temporary folder." xml:space="preserve"><value>Extracting and validating the update in a temporary folder.</value></data>
+  <data name="Installing updated files..." xml:space="preserve"><value>Installing updated files...</value></data>
+  <data name="Open update log" xml:space="preserve"><value>Open update log</value></data>
+  <data name="Portable update failed" xml:space="preserve"><value>Portable update failed</value></data>
+  <data name="Preparing portable update..." xml:space="preserve"><value>Preparing portable update...</value></data>
+  <data name="Restart and update to SnapPin {0}..." xml:space="preserve"><value>Restart and update to SnapPin {0}...</value></data>
+  <data name="SnapPin {0} is available" xml:space="preserve"><value>SnapPin {0} is available</value></data>
+  <data name="SnapPin {0} is available. Click to review and download it." xml:space="preserve"><value>SnapPin {0} is available. Click to review and download it.</value></data>
+  <data name="SnapPin {0} is downloaded and ready. Click to choose when to restart." xml:space="preserve"><value>SnapPin {0} is downloaded and ready. Click to choose when to restart.</value></data>
+  <data name="SnapPin {0} is ready" xml:space="preserve"><value>SnapPin {0} is ready</value></data>
+  <data name="SnapPin could not apply update {0}. The previous version was restored.&#xA;&#xA;{1}" xml:space="preserve"><value>SnapPin could not apply update {0}. The previous version was restored.
+
+{1}</value></data>
+  <data name="SnapPin updated successfully" xml:space="preserve"><value>SnapPin updated successfully</value></data>
+  <data name="SnapPin was updated from {0} to {1}." xml:space="preserve"><value>SnapPin was updated from {0} to {1}.</value></data>
+  <data name="The downloaded SnapPin version ({0}) did not match the expected version ({1})." xml:space="preserve"><value>The downloaded SnapPin version ({0}) did not match the expected version ({1}).</value></data>
+  <data name="The installer is downloaded and verified. Install it now, or choose Later to keep using this version." xml:space="preserve"><value>The installer is downloaded and verified. Install it now, or choose Later to keep using this version.</value></data>
+  <data name="The portable SnapPin folder is not writable." xml:space="preserve"><value>The portable SnapPin folder is not writable.</value></data>
+  <data name="The portable update needs at least {0} of free space." xml:space="preserve"><value>The portable update needs at least {0} of free space.</value></data>
+  <data name="The portable update request is incomplete." xml:space="preserve"><value>The portable update request is incomplete.</value></data>
+  <data name="The portable update request is invalid: {0}" xml:space="preserve"><value>The portable update request is invalid: {0}</value></data>
+  <data name="The portable update request is not safe to apply." xml:space="preserve"><value>The portable update request is not safe to apply.</value></data>
+  <data name="The prepared portable update is no longer available. Download it again." xml:space="preserve"><value>The prepared portable update is no longer available. Download it again.</value></data>
+  <data name="The previous version was restored. Reopening SnapPin..." xml:space="preserve"><value>The previous version was restored. Reopening SnapPin...</value></data>
+  <data name="The staged SnapPin executable is missing." xml:space="preserve"><value>The staged SnapPin executable is missing.</value></data>
+  <data name="The update helper is not running from the verified staging folder." xml:space="preserve"><value>The update helper is not running from the verified staging folder.</value></data>
+  <data name="The update is downloaded, verified, and prepared. Restart SnapPin now to replace the portable files, or choose Later to keep using this version." xml:space="preserve"><value>The update is downloaded, verified, and prepared. Restart SnapPin now to replace the portable files, or choose Later to keep using this version.</value></data>
+  <data name="Unknown size" xml:space="preserve"><value>Unknown size</value></data>
+  <data name="Update completed. Restarting SnapPin..." xml:space="preserve"><value>Update completed. Restarting SnapPin...</value></data>
+  <data name="Update failed. Restoring the previous version..." xml:space="preserve"><value>Update failed. Restoring the previous version...</value></data>
+  <data name="Update log: {0}" xml:space="preserve"><value>Update log: {0}</value></data>
+  <data name="Update ready" xml:space="preserve"><value>Update ready</value></data>
+  <data name="Verifying download..." xml:space="preserve"><value>Verifying download...</value></data>
+  <data name="Verifying the updated version..." xml:space="preserve"><value>Verifying the updated version...</value></data>
+  <data name="View release on GitHub" xml:space="preserve"><value>View release on GitHub</value></data>
+  <data name="Waiting for SnapPin to close..." xml:space="preserve"><value>Waiting for SnapPin to close...</value></data>
+  <data name="What's new" xml:space="preserve"><value>What's new</value></data>
 </root>

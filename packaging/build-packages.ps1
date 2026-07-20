@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.6',
+    [string]$Version = '1.2.7',
     [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
 )
 
@@ -66,6 +66,18 @@ foreach ($runtime in @('osx','linux-arm','linux-arm64','linux-musl-x64','linux-x
 
 Invoke-CodeSign (Join-Path $portableDirectory 'SnapPin.exe')
 
+# Portable updates use this managed-file list to remove files that belonged to
+# an older SnapPin package without touching documents users placed beside it.
+$managedFiles = @(
+    Get-ChildItem -LiteralPath $portableDirectory -File -Recurse |
+        ForEach-Object { $_.FullName.Substring($portableDirectory.Length).TrimStart('\').Replace('\', '/') }
+)
+$managedFiles += '.snappin-package.json'
+[ordered]@{
+    version = $Version
+    files = @($managedFiles | Sort-Object -Unique)
+} | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath (Join-Path $portableDirectory '.snappin-package.json') -Encoding UTF8
+
 Compress-Archive -Path (Join-Path $portableDirectory '*') -DestinationPath $payload -CompressionLevel Optimal -Force
 Copy-Item -LiteralPath $payload -Destination (Join-Path $dist 'SnapPin-Portable-win-x64.zip') -Force
 
@@ -95,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip'
-    releaseNotes = 'Completes rare-message localization through maintainable resource files, adds cancellable update download progress, improves mixed-DPI and remote-session compatibility, and expands automated regression coverage.'
+    releaseNotes = 'Redesigns portable updates with quiet availability notifications, release details, speed and ETA progress, reusable staged downloads, Restart now or Later, a visible updater, transactional replacement, automatic rollback, and post-update confirmation.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

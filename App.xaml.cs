@@ -12,10 +12,27 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        var startupArguments = RestartService.PrepareStartupArguments(e.Args);
         var settings = SettingsService.Load();
         LocalizationService.Configure(settings.UiLanguage);
         LocalizationService.EnableAutomaticLocalization();
+        if (PortableUpdateRequest.IsUpdateCommand(e.Args))
+        {
+            base.OnStartup(e);
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            if (!PortableUpdateRequest.TryParse(e.Args, out var request, out var updateError))
+            {
+                MessageBox.Show(updateError, LocalizationService.Current("Portable update failed"), MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(2);
+                return;
+            }
+            var updater = new PortableUpdateWindow(request);
+            MainWindow = updater;
+            updater.Show();
+            return;
+        }
+
+        var updateNotice = PortableUpdateService.ExtractStartupNotice(e.Args, out var applicationArguments);
+        var startupArguments = RestartService.PrepareStartupArguments(applicationArguments);
         var recoveredPreviousCrash = DiagnosticsService.Start();
         DispatcherUnhandledException += (_, args) =>
         {
@@ -70,6 +87,9 @@ public partial class App : System.Windows.Application
         };
         _singleInstance.StartListening();
         window.Show();
+        UpdateService.CleanupOldArtifacts();
+        if (updateNotice is not null)
+            Dispatcher.BeginInvoke(() => ShowUpdateResult(window, updateNotice));
         if (settings.CheckUpdatesOnStartup && !string.IsNullOrWhiteSpace(settings.UpdateFeedUrl))
             Dispatcher.BeginInvoke(async () => await CheckForUpdatesOnStartupAsync(window, settings));
         if (recoveredPreviousCrash)
@@ -85,15 +105,28 @@ public partial class App : System.Windows.Application
         try
         {
             var update = await UpdateService.CheckAsync(settings.UpdateFeedUrl);
-            if (!update.UpdateAvailable || string.IsNullOrWhiteSpace(update.DownloadUrl)) return;
-            if (MessageBox.Show(owner, update.Message + "\n\n" + LocalizationService.Current("Download and install it now?"), LocalizationService.Current("SnapPin update available"),
-                MessageBoxButton.YesNo, MessageBoxImage.Information) != MessageBoxResult.Yes) return;
-            if (UpdateProgressWindow.Run(owner, update)) Current.Shutdown();
+            if (update.UpdateAvailable && !string.IsNullOrWhiteSpace(update.DownloadUrl) && owner is MainWindow dashboard)
+                dashboard.NotifyUpdateAvailable(update);
         }
         catch (Exception ex)
         {
             DiagnosticsService.Log("startup-update", ex.Message, ex);
         }
+    }
+
+    private static void ShowUpdateResult(Window owner, UpdateStartupNotice notice)
+    {
+        if (notice.Success)
+        {
+            MessageBox.Show(owner, notice.Message, LocalizationService.Current("SnapPin updated successfully"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        var log = string.IsNullOrWhiteSpace(notice.LogPath) ? string.Empty :
+            "\n\n" + LocalizationService.Format("Update log: {0}", notice.LogPath);
+        MessageBox.Show(owner,
+            LocalizationService.Format("SnapPin could not apply update {0}. The previous version was restored.\n\n{1}", notice.CurrentVersion, notice.Message) + log,
+            LocalizationService.Current("Portable update failed"), MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     protected override void OnExit(ExitEventArgs e)
