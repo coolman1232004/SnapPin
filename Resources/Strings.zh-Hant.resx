@@ -1454,4 +1454,7 @@
   <data name="View release on GitHub" xml:space="preserve"><value>在 GitHub 檢視版本</value></data>
   <data name="Waiting for SnapPin to close..." xml:space="preserve"><value>正在等待 SnapPin 關閉...</value></data>
   <data name="What's new" xml:space="preserve"><value>更新內容</value></data>
+  <data name="Copy version information" xml:space="preserve"><value>複製版本資訊</value></data>
+  <data name="Edition: {0}" xml:space="preserve"><value>版本類型：{0}</value></data>
+  <data name="Version information copied." xml:space="preserve"><value>版本資訊已複製。</value></data>
 </root>

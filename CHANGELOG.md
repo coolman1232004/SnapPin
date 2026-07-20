@@ -2,6 +2,19 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.8] - 2026-07-20
+
+### Added
+
+- About page indicator showing whether the running copy is **Portable** or **Installed**
+- One-click **Copy version information** action including SnapPin version, edition, and process architecture
+
+### Validation
+
+- Added About-page edition and copy-summary regression coverage
+- Full x64 build, localization audit, and smoke-test suite pass with zero warnings or errors
+- This intentionally small release provides an end-to-end update target for testing the redesigned 1.2.7 portable updater
+
 ## [1.2.7] - 2026-07-20
 
 ### Added

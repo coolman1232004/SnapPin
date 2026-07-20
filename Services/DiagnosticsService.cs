@@ -19,6 +19,9 @@ internal static class DiagnosticsService
     internal static bool RecoveredPreviousCrash { get; private set; }
     internal static string Version => Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.0.0";
 
+    internal static string ProductSummary(bool portable) =>
+        $"SnapPin {Version} ({LocalizationService.Current(portable ? "portable copy" : "installed copy")}, {RuntimeInformation.ProcessArchitecture})";
+
     internal static bool Start()
     {
         lock (Sync)

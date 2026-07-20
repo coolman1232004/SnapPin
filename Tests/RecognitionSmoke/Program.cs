@@ -201,6 +201,17 @@ internal static class Program
         if (!dashboardPaletteMatches) return 50;
         Console.WriteLine("DASHBOARD PALETTE: teal, sky blue, cool background and card colours verified");
 
+        var aboutEdition = RunSta(() =>
+        {
+            var preferences = new PreferencesWindow(new AppSettings());
+            var edition = ((TextBlock)preferences.FindName("EditionText")).Text;
+            var copyButton = ((Button)preferences.FindName("CopyVersionButton")).Content as string == "Copy version information";
+            return (Edition: edition, CopyButton: copyButton);
+        });
+        if (!aboutEdition.Edition.Contains("portable copy", StringComparison.OrdinalIgnoreCase) ||
+            !aboutEdition.CopyButton || !DiagnosticsService.ProductSummary(true).Contains("portable copy", StringComparison.OrdinalIgnoreCase)) return 74;
+        Console.WriteLine("ABOUT EDITION: portable/installed identity and copyable version summary verified");
+
         if (!ElevationService.NeedsElevation(true, false) ||
             ElevationService.NeedsElevation(false, false) ||
             ElevationService.NeedsElevation(true, true)) return 51;

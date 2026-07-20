@@ -1454,4 +1454,7 @@ You can review the local diagnostic log in Preferences &gt; About.</value></data
   <data name="View release on GitHub" xml:space="preserve"><value>View release on GitHub</value></data>
   <data name="Waiting for SnapPin to close..." xml:space="preserve"><value>Waiting for SnapPin to close...</value></data>
   <data name="What's new" xml:space="preserve"><value>What's new</value></data>
+  <data name="Copy version information" xml:space="preserve"><value>Copy version information</value></data>
+  <data name="Edition: {0}" xml:space="preserve"><value>Edition: {0}</value></data>
+  <data name="Version information copied." xml:space="preserve"><value>Version information copied.</value></data>
 </root>

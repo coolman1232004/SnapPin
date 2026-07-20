@@ -304,7 +304,13 @@
             <TabItem Header="About">
                 <StackPanel Margin="22">
                     <TextBlock Text="SnapPin" FontSize="27" FontWeight="Bold" Foreground="#0F766E" />
-                    <TextBlock x:Name="VersionText" Text="Version" Foreground="#667085" Margin="0,2,0,3"/>
+                    <DockPanel Margin="0,2,0,3">
+                        <Button x:Name="CopyVersionButton" DockPanel.Dock="Right" Content="Copy version information" Style="{StaticResource DialogButton}" Click="CopyVersion_Click" Margin="12,0,0,0"/>
+                        <StackPanel>
+                            <TextBlock x:Name="VersionText" Text="Version" Foreground="#667085"/>
+                            <TextBlock x:Name="EditionText" Foreground="#667085" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
                     <TextBlock Text="Local-first capture and floating visual references" FontSize="15" Margin="0,7,0,15" />
                     <TextBlock Text="This is an independent implementation built with documented Windows APIs. It contains no Snipaste code, branding, or assets." TextWrapping="Wrap" Foreground="#667085" LineHeight="22" />
                     <Border Background="#F8FAFC" BorderBrush="#D0D5DD" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,18,0,12">

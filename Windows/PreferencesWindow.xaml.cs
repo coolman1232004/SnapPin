@@ -104,6 +104,8 @@ public partial class PreferencesWindow : Window
         if (OcrLanguageBox.SelectedIndex < 0) OcrLanguageBox.SelectedIndex = 3;
         ToolbarSizeBox.SelectedValue = ToolbarThemeService.Normalize(_settings.ToolbarSizeMode);
         VersionText.Text = LocalizationService.Format("Version {0}", DiagnosticsService.Version);
+        EditionText.Text = LocalizationService.Format("Edition: {0}",
+            LocalizationService.Current(UpdateService.IsPortableInstallation() ? "portable copy" : "installed copy"));
         PopulateCaptureToolbar(_settings.CaptureToolbarOrder, _settings.CaptureToolbarEnabled);
         PopulateToolbar(_settings.AnnotationToolbarOrder, _settings.AnnotationToolbarEnabled);
     }
@@ -306,6 +308,13 @@ public partial class PreferencesWindow : Window
     {
         Clipboard.SetText(DiagnosticsService.Summary());
         MessageBox.Show(this, LocalizationService.Current("The diagnostic summary was copied."), LocalizationService.Current("SnapPin diagnostics"), MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void CopyVersion_Click(object sender, RoutedEventArgs e)
+    {
+        Clipboard.SetText(DiagnosticsService.ProductSummary(UpdateService.IsPortableInstallation()));
+        MessageBox.Show(this, LocalizationService.Current("Version information copied."), "SnapPin",
+            MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private async void CheckUpdates_Click(object sender, RoutedEventArgs e)
