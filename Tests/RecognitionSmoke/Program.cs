@@ -495,14 +495,14 @@ internal static class Program
                     tabs.SelectedIndex = selectedTab;
                     var content = (FrameworkElement)window.Content;
                     content.InvalidateMeasure();
-                    content.Measure(new Size(680, 540));
-                    content.Arrange(new Rect(0, 0, 680, 540));
+                    content.Measure(new Size(620, 470));
+                    content.Arrange(new Rect(0, 0, 620, 470));
                     content.UpdateLayout();
                     content.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
-                    content.Measure(new Size(680, 540));
-                    content.Arrange(new Rect(0, 0, 680, 540));
+                    content.Measure(new Size(620, 470));
+                    content.Arrange(new Rect(0, 0, 620, 470));
                     content.UpdateLayout();
-                    var rendered = new RenderTargetBitmap(680, 540, 96, 96, PixelFormats.Pbgra32);
+                    var rendered = new RenderTargetBitmap(620, 470, 96, 96, PixelFormats.Pbgra32);
                     rendered.Render(content);
                     rendered.Freeze();
                     window.Close();
@@ -704,12 +704,17 @@ internal static class Program
             var preferences = new PreferencesWindow(new AppSettings());
             var annotationPanel = (StackPanel)preferences.FindName("AnnotationToolbarSettingsPanel");
             var capturePanel = (StackPanel)preferences.FindName("CaptureToolbarSettingsPanel");
-            var result = Grid.GetColumn(annotationPanel) == 0 && Grid.GetColumn(capturePanel) == 2;
+            var tabs = (TabControl)preferences.FindName("Tabs");
+            var everyTabScrolls = tabs.Items.OfType<TabItem>().All(tab =>
+                tab.Content is ScrollViewer scrollViewer &&
+                scrollViewer.VerticalScrollBarVisibility == ScrollBarVisibility.Auto);
+            var result = Grid.GetColumn(annotationPanel) == 0 && Grid.GetColumn(capturePanel) == 2 &&
+                everyTabScrolls && preferences.Width == 620 && preferences.Height == 470;
             preferences.Close();
             return result;
         });
         if (!toolbarPreferencesAreSwapped) return 75;
-        Console.WriteLine("TOOLBAR PREFERENCES: annotation settings are left; capture actions are right");
+        Console.WriteLine("PREFERENCES LAYOUT: compact 620 x 470 dialog; every tab scrolls; toolbar columns remain ordered");
 
         var captureToolbarMatches = RunSta(() =>
         {

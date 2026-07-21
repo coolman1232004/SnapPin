@@ -2,6 +2,21 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.12] - 2026-07-21
+
+### Changed
+
+- Reduced Preferences from 680 x 540 to a compact 620 x 470 logical-pixel layout for better use on scaled and smaller displays
+- Reduced tab padding, typography, button padding, field heights, margins, toolbar list sizes, and label-column widths
+- Added automatic vertical scrolling to every Preferences tab and horizontal overflow scrolling to the two-column Toolbar page
+- Kept Cancel and Save changes fixed at the bottom while tab content scrolls independently
+
+### Validation
+
+- Added a regression requiring all ten Preferences tabs to expose automatic vertical scrolling
+- Rendered and reviewed every tab at 620 x 470
+- Full x64 build, localization audit, and smoke-test suite pass with zero warnings or errors
+
 ## [1.2.11] - 2026-07-21
 
 ### Changed
