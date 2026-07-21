@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.8',
+    [string]$Version = '1.2.9',
     [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
 )
 
@@ -107,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip'
-    releaseNotes = 'The About page now identifies whether SnapPin is running as a portable or installed copy and can copy a concise version and architecture summary. This small release is also intended to exercise the redesigned portable updater introduced in 1.2.7.'
+    releaseNotes = 'Portable updates now recover from unexpected Windows access-denied errors by retrying with administrator permission only after a successful rollback. Failure details identify the exact file operation.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

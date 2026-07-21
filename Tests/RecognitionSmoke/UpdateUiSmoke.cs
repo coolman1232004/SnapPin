@@ -112,6 +112,13 @@ internal static class UpdateUiSmoke
                 !File.Exists(Path.Combine(failureTarget, "old-only.txt")))
                 throw new InvalidOperationException("Portable update rollback did not restore the previous managed files.");
 
+            var denied = new IOException("replace failed", new UnauthorizedAccessException("denied"));
+            if (!PortableUpdateService.ShouldRetryAsAdministrator(denied, null, isElevated: false) ||
+                PortableUpdateService.ShouldRetryAsAdministrator(denied, new IOException("rollback failed"), isElevated: false) ||
+                PortableUpdateService.ShouldRetryAsAdministrator(denied, null, isElevated: true) ||
+                PortableUpdateService.ShouldRetryAsAdministrator(new IOException("disk full"), null, isElevated: false))
+                throw new InvalidOperationException("Portable update administrator retry classification is unsafe.");
+
             var arguments = new[] { PortableUpdateRequest.Command, "--parent-pid", "123", "--source", source,
                 "--target", successTarget, "--backup", Path.Combine(root, "ArgsBackup"), "--expected-version", version,
                 "--previous-version", "1.0.0" };

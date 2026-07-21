@@ -2,6 +2,19 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.9] - 2026-07-21
+
+### Fixed
+
+- Portable updates now retry with administrator permission when Windows unexpectedly denies replacement of an existing application file
+- The elevated retry is offered only after the previous version was restored successfully, preventing unsafe retry loops
+- Portable update failures now identify whether backup, replacement, or obsolete-file removal failed and name the affected package file
+
+### Validation
+
+- Added regression coverage for safe access-denied retry classification
+- Full x64 build, localization audit, updater transaction tests, and smoke-test suite pass with zero warnings or errors
+
 ## [1.2.8] - 2026-07-20
 
 ### Added

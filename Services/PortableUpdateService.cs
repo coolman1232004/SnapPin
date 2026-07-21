@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
@@ -58,7 +59,8 @@ internal sealed record PortableUpdateRequest(
 }
 
 internal sealed record PortableUpdateProgress(string Status, double Fraction);
-internal sealed record PortableUpdateResult(bool Success, string Message, string LogPath, string ResultPath);
+internal sealed record PortableUpdateResult(bool Success, string Message, string LogPath, string ResultPath,
+    bool RetryAsAdministrator = false);
 internal sealed record UpdateStartupNotice(bool Success, string PreviousVersion, string CurrentVersion, string Message, string LogPath);
 
 internal static class PortableUpdateService
@@ -101,7 +103,8 @@ internal static class PortableUpdateService
                 {
                     var backup = SafeCombine(backupFiles, relative);
                     Directory.CreateDirectory(Path.GetDirectoryName(backup)!);
-                    File.Copy(target, backup, true);
+                    try { File.Copy(target, backup, true); }
+                    catch (Exception ex) { throw new IOException($"Could not back up '{relative}'.", ex); }
                     backedUpFiles.Add(relative);
                 }
                 else if (newSet.Contains(relative))
@@ -118,14 +121,19 @@ internal static class PortableUpdateService
                 var relative = sourceFiles[index];
                 var source = SafeCombine(request.SourceDirectory, relative);
                 var target = SafeCombine(request.TargetDirectory, relative);
-                CopyAtomically(source, target);
+                try { CopyAtomically(source, target); }
+                catch (Exception ex) { throw new IOException($"Could not replace '{relative}'.", ex); }
                 var fraction = 0.16 + (index + 1d) / Math.Max(1, sourceFiles.Count) * 0.7;
                 progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Installing updated files..."), fraction));
             }
             foreach (var relative in obsolete)
             {
                 var target = SafeCombine(request.TargetDirectory, relative);
-                if (File.Exists(target)) File.Delete(target);
+                if (File.Exists(target))
+                {
+                    try { File.Delete(target); }
+                    catch (Exception ex) { throw new IOException($"Could not remove obsolete file '{relative}'.", ex); }
+                }
             }
 
             progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Verifying the updated version..."), 0.92));
@@ -150,8 +158,80 @@ internal static class PortableUpdateService
             var result = new UpdateOutcome(false, request.PreviousVersion, request.ExpectedVersion, message, logPath, request.BackupDirectory);
             AtomicFileService.WriteJson(resultPath, result);
             progress?.Report(new PortableUpdateProgress(LocalizationService.Current("The previous version was restored. Reopening SnapPin..."), 1));
-            return new PortableUpdateResult(false, message, logPath, resultPath);
+            var retryAsAdministrator = ShouldRetryAsAdministrator(ex, rollbackError,
+                ElevationService.IsCurrentProcessElevated());
+            if (retryAsAdministrator)
+                Log(logPath, "Access was denied with normal permissions. An administrator retry is available.");
+            return new PortableUpdateResult(false, message, logPath, resultPath, retryAsAdministrator);
         }
+    }
+
+    internal static bool TryRestartAsAdministrator(PortableUpdateRequest request, out string error)
+    {
+        error = string.Empty;
+        var executable = Path.Combine(request.SourceDirectory, "SnapPin.exe");
+        var retryRequest = request with
+        {
+            ParentProcessId = Environment.ProcessId,
+            BackupDirectory = request.BackupDirectory.TrimEnd(Path.DirectorySeparatorChar) +
+                              $"-admin-{DateTime.UtcNow:HHmmss}-{Guid.NewGuid():N}"
+        };
+        var info = new ProcessStartInfo(executable)
+        {
+            UseShellExecute = true,
+            Verb = "runas",
+            WorkingDirectory = request.SourceDirectory
+        };
+        AddRequestArguments(info, retryRequest);
+        try
+        {
+            if (Process.Start(info) is not null) return true;
+            error = LocalizationService.Current("Windows could not start the portable update helper.");
+            return false;
+        }
+        catch (Win32Exception ex) when (ex.NativeErrorCode == 1223)
+        {
+            error = LocalizationService.Current("Administrator approval was cancelled. The previous version will reopen.");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            error = LocalizationService.Format("SnapPin could not restart the portable updater as administrator: {0}", ex.Message);
+            return false;
+        }
+    }
+
+    internal static bool ShouldRetryAsAdministrator(Exception exception, Exception? rollbackError, bool isElevated) =>
+        !isElevated && rollbackError is null && ContainsAccessDenied(exception);
+
+    private static bool ContainsAccessDenied(Exception? exception)
+    {
+        while (exception is not null)
+        {
+            if (exception is UnauthorizedAccessException ||
+                exception is Win32Exception { NativeErrorCode: 5 } ||
+                exception.HResult == unchecked((int)0x80070005))
+                return true;
+            exception = exception.InnerException;
+        }
+        return false;
+    }
+
+    private static void AddRequestArguments(ProcessStartInfo info, PortableUpdateRequest request)
+    {
+        info.ArgumentList.Add(PortableUpdateRequest.Command);
+        AddArgument(info, "--parent-pid", request.ParentProcessId.ToString());
+        AddArgument(info, "--source", request.SourceDirectory);
+        AddArgument(info, "--target", request.TargetDirectory);
+        AddArgument(info, "--backup", request.BackupDirectory);
+        AddArgument(info, "--expected-version", request.ExpectedVersion);
+        AddArgument(info, "--previous-version", request.PreviousVersion);
+    }
+
+    private static void AddArgument(ProcessStartInfo info, string name, string value)
+    {
+        info.ArgumentList.Add(name);
+        info.ArgumentList.Add(value);
     }
 
     internal static Process? RestartTarget(PortableUpdateRequest request, PortableUpdateResult result)

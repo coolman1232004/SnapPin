@@ -74,6 +74,24 @@ internal sealed class PortableUpdateWindow : Window
             return;
         }
 
+        if (!result.Success && result.RetryAsAdministrator)
+        {
+            _status.Text = LocalizationService.Current("Administrator permission is required. Waiting for approval...");
+            _detail.Text = LocalizationService.Current("SnapPin will retry the portable update with administrator permission.");
+            _progress.IsIndeterminate = true;
+            if (PortableUpdateService.TryRestartAsAdministrator(_request, out var elevationError))
+            {
+                await Task.Delay(250);
+                _running = false;
+                Application.Current.Shutdown(0);
+                return;
+            }
+            _progress.IsIndeterminate = false;
+            if (!string.IsNullOrWhiteSpace(elevationError))
+                result = result with { Message = result.Message + Environment.NewLine + elevationError,
+                    RetryAsAdministrator = false };
+        }
+
         await Task.Delay(650);
         _running = false;
         try

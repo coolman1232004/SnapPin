@@ -1457,4 +1457,8 @@
   <data name="Copy version information" xml:space="preserve"><value>复制版本信息</value></data>
   <data name="Edition: {0}" xml:space="preserve"><value>版本类型：{0}</value></data>
   <data name="Version information copied." xml:space="preserve"><value>版本信息已复制。</value></data>
+  <data name="Administrator approval was cancelled. The previous version will reopen." xml:space="preserve"><value>已取消管理员授权。将重新打开之前的版本。</value></data>
+  <data name="Administrator permission is required. Waiting for approval..." xml:space="preserve"><value>需要管理员权限。正在等待授权...</value></data>
+  <data name="SnapPin will retry the portable update with administrator permission." xml:space="preserve"><value>SnapPin 将使用管理员权限重试便携版更新。</value></data>
+  <data name="SnapPin could not restart the portable updater as administrator: {0}" xml:space="preserve"><value>SnapPin 无法以管理员身份重新启动便携版更新程序：{0}</value></data>
 </root>
