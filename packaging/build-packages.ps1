@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.12',
+    [string]$Version = '1.2.13',
     [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
 )
 
@@ -107,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip'
-    releaseNotes = 'Preferences now uses a smaller 620 x 470 layout with compact controls, fixed Cancel and Save actions, and automatic scrolling on every tab so settings remain reachable on smaller or scaled displays.'
+    releaseNotes = 'Added an independent Check for updates every day option. SnapPin checks at most once per local calendar day, continues checking while running across midnight, and counts a manual check toward the daily schedule.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

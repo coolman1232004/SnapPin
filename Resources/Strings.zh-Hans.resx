@@ -510,6 +510,9 @@
   <data name="Check for updates when SnapPin starts" xml:space="preserve">
     <value>SnapPin 启动时检查更新</value>
   </data>
+  <data name="Check for updates every day" xml:space="preserve">
+    <value>每天检查更新</value>
+  </data>
   <data name="Updates are published on " xml:space="preserve">
     <value>更新发布在 </value>
   </data>

@@ -40,6 +40,7 @@ public partial class PreferencesWindow : Window
         RunOnStartupBox.IsChecked = _settings.RunOnStartup;
         UiLanguageBox.SelectedValue = LocalizationService.Normalize(_settings.UiLanguage);
         CheckUpdatesOnStartupBox.IsChecked = _settings.CheckUpdatesOnStartup;
+        CheckUpdatesDailyBox.IsChecked = _settings.CheckUpdatesDaily;
         RunAsAdministratorBox.IsChecked = _settings.RunAsAdministrator;
         AutoBackupBox.IsChecked = _settings.AutoBackup;
         KeepResponsiveBox.IsChecked = _settings.KeepResponsive;
@@ -198,6 +199,7 @@ public partial class PreferencesWindow : Window
         _settings.RunOnStartup = RunOnStartupBox.IsChecked == true;
         _settings.UiLanguage = LocalizationService.Normalize(UiLanguageBox.SelectedValue as string);
         _settings.CheckUpdatesOnStartup = CheckUpdatesOnStartupBox.IsChecked == true;
+        _settings.CheckUpdatesDaily = CheckUpdatesDailyBox.IsChecked == true;
         _settings.RunAsAdministrator = RunAsAdministratorBox.IsChecked == true;
         _settings.AutoBackup = AutoBackupBox.IsChecked == true;
         _settings.KeepResponsive = KeepResponsiveBox.IsChecked == true;
@@ -328,6 +330,10 @@ public partial class PreferencesWindow : Window
         {
             DiagnosticsService.Log("update", ex.Message, ex);
             MessageBox.Show(this, LocalizationService.Format("Update check failed: {0}", ex.Message), LocalizationService.Current("SnapPin update"), MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        finally
+        {
+            UpdateCheckScheduleService.MarkChecked(DateTimeOffset.UtcNow);
         }
     }
 

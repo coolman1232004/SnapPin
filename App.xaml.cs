@@ -3,12 +3,15 @@ using System.IO;
 using SnapPin.Services;
 using SnapPin.Models;
 using SnapPin.Windows;
+using System.Windows.Threading;
 
 namespace SnapPin;
 
 public partial class App : System.Windows.Application
 {
     private SingleInstanceService? _singleInstance;
+    private DispatcherTimer? _dailyUpdateTimer;
+    private bool _automaticUpdateCheckRunning;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -90,8 +93,7 @@ public partial class App : System.Windows.Application
         UpdateService.CleanupOldArtifacts();
         if (updateNotice is not null)
             Dispatcher.BeginInvoke(() => ShowUpdateResult(window, updateNotice));
-        if (settings.CheckUpdatesOnStartup && !string.IsNullOrWhiteSpace(settings.UpdateFeedUrl))
-            Dispatcher.BeginInvoke(async () => await CheckForUpdatesOnStartupAsync(window, settings));
+        StartAutomaticUpdateChecks(window, settings);
         if (recoveredPreviousCrash)
             Dispatcher.BeginInvoke(() => MessageBox.Show(window,
                 LocalizationService.Current("SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.\n\nYou can review the local diagnostic log in Preferences > About."),
@@ -100,8 +102,35 @@ public partial class App : System.Windows.Application
             Dispatcher.BeginInvoke(() => window.ExecuteCommand(startupCommand));
     }
 
-    private static async Task CheckForUpdatesOnStartupAsync(Window owner, AppSettings settings)
+    private void StartAutomaticUpdateChecks(Window owner, AppSettings startupSettings)
     {
+        if (!string.IsNullOrWhiteSpace(startupSettings.UpdateFeedUrl) &&
+            (startupSettings.CheckUpdatesOnStartup ||
+             startupSettings.CheckUpdatesDaily && UpdateCheckScheduleService.IsDailyCheckDue(DateTimeOffset.UtcNow)))
+        {
+            Dispatcher.BeginInvoke(async () => await CheckForUpdatesAutomaticallyAsync(owner, startupSettings));
+        }
+
+        _dailyUpdateTimer = new DispatcherTimer(DispatcherPriority.Background)
+        {
+            Interval = TimeSpan.FromMinutes(30)
+        };
+        _dailyUpdateTimer.Tick += async (_, _) =>
+        {
+            var currentSettings = SettingsService.Load();
+            if (currentSettings.CheckUpdatesDaily && !string.IsNullOrWhiteSpace(currentSettings.UpdateFeedUrl) &&
+                UpdateCheckScheduleService.IsDailyCheckDue(DateTimeOffset.UtcNow))
+            {
+                await CheckForUpdatesAutomaticallyAsync(owner, currentSettings);
+            }
+        };
+        _dailyUpdateTimer.Start();
+    }
+
+    private async Task CheckForUpdatesAutomaticallyAsync(Window owner, AppSettings settings)
+    {
+        if (_automaticUpdateCheckRunning) return;
+        _automaticUpdateCheckRunning = true;
         try
         {
             var update = await UpdateService.CheckAsync(settings.UpdateFeedUrl);
@@ -110,7 +139,12 @@ public partial class App : System.Windows.Application
         }
         catch (Exception ex)
         {
-            DiagnosticsService.Log("startup-update", ex.Message, ex);
+            DiagnosticsService.Log("automatic-update", ex.Message, ex);
+        }
+        finally
+        {
+            UpdateCheckScheduleService.MarkChecked(DateTimeOffset.UtcNow);
+            _automaticUpdateCheckRunning = false;
         }
     }
 
@@ -131,6 +165,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _dailyUpdateTimer?.Stop();
         _singleInstance?.Dispose();
         DiagnosticsService.MarkCleanExit();
         base.OnExit(e);

@@ -19,6 +19,7 @@ public sealed class AppSettings
     public bool KeepResponsive { get; set; } = true;
     public string UiLanguage { get; set; } = "English";
     public bool CheckUpdatesOnStartup { get; set; } = true;
+    public bool CheckUpdatesDaily { get; set; }
     public int CaptureBorderWidth { get; set; } = 2;
     public string CaptureBorderColor { get; set; } = "#3388FF";
     public string CaptureMaskColor { get; set; } = "#66000000";

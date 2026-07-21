@@ -336,6 +336,7 @@
                     </Border>
                     <TextBlock Text="GitHub updates" FontWeight="SemiBold"/>
                     <CheckBox x:Name="CheckUpdatesOnStartupBox" Content="Check for updates when SnapPin starts" Margin="0,8,0,0"/>
+                    <CheckBox x:Name="CheckUpdatesDailyBox" Content="Check for updates every day" Margin="0,6,0,0"/>
                     <DockPanel Margin="0,7,0,0">
                         <Button DockPanel.Dock="Right" Content="Check now" Style="{StaticResource AccentDialogButton}" Click="CheckUpdates_Click" Margin="12,0,0,0"/>
                         <TextBlock VerticalAlignment="Center" Foreground="#667085">

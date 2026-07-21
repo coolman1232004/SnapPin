@@ -2,6 +2,20 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.13] - 2026-07-21
+
+### Added
+
+- Added an independent **Check for updates every day** option beside the existing startup check
+- Daily checks run at most once per local calendar day and continue while SnapPin remains open across midnight
+- Manual update checks count toward the daily schedule to avoid an immediate duplicate check
+- Added Simplified Chinese and Traditional Chinese translations for the new setting
+
+### Validation
+
+- Added date-boundary, same-day, future-timestamp, default-setting, and Preferences-control regression checks
+- Full x64 build, three-language localization audit, rendered About-page review, and smoke-test suite pass with zero warnings or errors
+
 ## [1.2.12] - 2026-07-21
 
 ### Changed

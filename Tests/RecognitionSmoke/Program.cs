@@ -705,11 +705,13 @@ internal static class Program
             var annotationPanel = (StackPanel)preferences.FindName("AnnotationToolbarSettingsPanel");
             var capturePanel = (StackPanel)preferences.FindName("CaptureToolbarSettingsPanel");
             var tabs = (TabControl)preferences.FindName("Tabs");
+            var dailyUpdates = (CheckBox)preferences.FindName("CheckUpdatesDailyBox");
             var everyTabScrolls = tabs.Items.OfType<TabItem>().All(tab =>
                 tab.Content is ScrollViewer scrollViewer &&
                 scrollViewer.VerticalScrollBarVisibility == ScrollBarVisibility.Auto);
             var result = Grid.GetColumn(annotationPanel) == 0 && Grid.GetColumn(capturePanel) == 2 &&
-                everyTabScrolls && preferences.Width == 620 && preferences.Height == 470;
+                everyTabScrolls && dailyUpdates.IsChecked == false &&
+                preferences.Width == 620 && preferences.Height == 470;
             preferences.Close();
             return result;
         });
@@ -998,13 +1000,19 @@ internal static class Program
             !Uri.TryCreate(AppSettings.DefaultUpdateFeedUrl, UriKind.Absolute, out var updateFeed) ||
             updateFeed.Scheme != Uri.UriSchemeHttps ||
             !updateFeed.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)) return 58;
+        var dailyCheckNow = new DateTimeOffset(2026, 7, 21, 12, 0, 0, TimeSpan.Zero);
+        if (new AppSettings().CheckUpdatesDaily ||
+            !UpdateCheckScheduleService.IsDailyCheckDue(null, dailyCheckNow, TimeZoneInfo.Utc) ||
+            UpdateCheckScheduleService.IsDailyCheckDue(dailyCheckNow.AddHours(-6), dailyCheckNow, TimeZoneInfo.Utc) ||
+            !UpdateCheckScheduleService.IsDailyCheckDue(dailyCheckNow.AddDays(-1), dailyCheckNow, TimeZoneInfo.Utc) ||
+            UpdateCheckScheduleService.IsDailyCheckDue(dailyCheckNow.AddHours(1), dailyCheckNow, TimeZoneInfo.Utc)) return 76;
         var installedExecutable = Path.Combine(Path.GetTempPath(), "SnapPinInstalled", "SnapPin.exe");
         var portableExecutable = Path.Combine(Path.GetTempPath(), "SnapPinPortable", "SnapPin.exe");
         var portableUrl = UpdateService.ResolvePackageUrl(updateFeed, null, "SnapPin-Portable-win-x64.zip");
         if (UpdateService.IsPortableLocation(installedExecutable, Path.GetDirectoryName(installedExecutable)) ||
             !UpdateService.IsPortableLocation(portableExecutable, Path.GetDirectoryName(installedExecutable)) ||
             !portableUrl.Equals("https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip", StringComparison.OrdinalIgnoreCase)) return 62;
-        Console.WriteLine("UPDATE CHANNEL: official GitHub feed and installed/portable package routing verified");
+        Console.WriteLine("UPDATE CHANNEL: startup and once-per-day schedules plus installed/portable package routing verified");
 
         var effectedOutput = CaptureService.ApplyOutputEffects(CreatePatternImage(160, 96), new AppSettings
         {
