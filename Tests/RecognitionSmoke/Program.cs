@@ -423,19 +423,47 @@ internal static class Program
             var historyPreview = RunSta(() =>
             {
                 var window = new HistoryWindow();
+                if (window.Width != 1120 || window.Height != 760 ||
+                    window.Background is not SolidColorBrush { Color: var background } || background != Color.FromRgb(235, 242, 245) ||
+                    window.FindName("FilterPanel") is not Border { CornerRadius: var radius } || radius.TopLeft != 12)
+                    throw new InvalidOperationException("History window does not use the redesigned light layout.");
+                var itemType = typeof(HistoryWindow).GetNestedType("HistoryViewItem", System.Reflection.BindingFlags.NonPublic)
+                    ?? throw new InvalidOperationException("History preview item type is missing.");
+                var previewItems = Array.CreateInstance(itemType, 3);
+                for (var index = 0; index < previewItems.Length; index++)
+                {
+                    var item = Activator.CreateInstance(itemType, nonPublic: true)!;
+                    void Set(string property, object value) => itemType.GetProperty(property)!.SetValue(item, value);
+                    Set("Id", $"preview-{index}");
+                    Set("Thumbnail", CreatePatternImage(560 + index * 10, 290));
+                    Set("SizeLabel", $"{1915 + index * 2} x {915 - index * 2}");
+                    Set("TimeLabel", $"Jul 21  10:05:{35 - index * 10:00}");
+                    Set("SourceLabel", "Copied");
+                    Set("RecognitionLabel", index == 1 ? "OCR text" : string.Empty);
+                    Set("EditLabel", "Edit");
+                    Set("ContextLabel", "Show context");
+                    Set("ContextVisibility", Visibility.Visible);
+                    Set("Title", "Copied");
+                    Set("FavoriteGlyph", index == 2 ? "★" : "☆");
+                    Set("ActiveVisibility", Visibility.Visible);
+                    Set("DeletedVisibility", Visibility.Collapsed);
+                    previewItems.SetValue(item, index);
+                }
+                ((ListBox)window.FindName("HistoryList")).ItemsSource = previewItems;
+                ((TextBlock)window.FindName("SummaryText")).Text = "43 saved items";
                 var content = (FrameworkElement)window.Content;
                 window.Content = null;
                 var host = new Border
                 {
-                    Width = 920,
-                    Height = 650,
-                    Background = new SolidColorBrush(Color.FromRgb(16, 18, 22)),
+                    Width = 1120,
+                    Height = 760,
+                    Background = new SolidColorBrush(Color.FromRgb(235, 242, 245)),
                     Child = content
                 };
-                host.Measure(new Size(920, 650));
-                host.Arrange(new Rect(0, 0, 920, 650));
+                host.Measure(new Size(1120, 760));
+                host.Arrange(new Rect(0, 0, 1120, 760));
                 host.UpdateLayout();
-                var rendered = new RenderTargetBitmap(920, 650, 96, 96, PixelFormats.Pbgra32);
+                var rendered = new RenderTargetBitmap(1120, 760, 96, 96, PixelFormats.Pbgra32);
                 rendered.Render(host);
                 rendered.Freeze();
                 return rendered;

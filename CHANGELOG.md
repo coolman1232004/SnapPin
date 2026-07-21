@@ -2,6 +2,20 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.10] - 2026-07-21
+
+### Changed
+
+- Capture History now follows SnapPin's cool light design instead of the legacy dark window
+- Added a spacious header with distinct teal, sky-blue, and coral actions
+- Consolidated searching, source/type/date filters, favourites, and recycle-bin controls into a rounded white panel
+- Expanded history cards into a responsive three-column layout with larger previews, clearer metadata, rounded surfaces, and pastel action buttons
+
+### Validation
+
+- Added a rendered 1120 x 760 History layout regression with representative three-card content
+- Full x64 build, localization audit, history behavior checks, and smoke-test suite pass with zero warnings or errors
+
 ## [1.2.9] - 2026-07-21
 
 ### Fixed
