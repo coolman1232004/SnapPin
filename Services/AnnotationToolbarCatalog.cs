@@ -7,20 +7,25 @@ internal static class AnnotationToolbarCatalog
     internal static readonly AnnotationToolbarDefinition[] All =
     [
         new("Rectangle", "Rectangle"),
-        new("Ellipse", "Ellipse"),
         new("Arrow", "Arrow"),
-        new("Line", "Straight line"),
         new("Pencil", "Pencil"),
         new("Marker", "Marker"),
         new("Blur", "Blur brush"),
         new("Text", "Text"),
         new("Eraser", "Eraser brush"),
+        new("Ellipse", "Ellipse"),
+        new("Line", "Straight line"),
         new("Magnify", "Magnifier")
+    ];
+
+    internal static readonly string[] DefaultOrder =
+    [
+        "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser", "Ellipse", "Line", "Magnify"
     ];
 
     internal static readonly string[] DefaultEnabled =
     [
-        "Rectangle", "Ellipse", "Arrow", "Line", "Pencil", "Marker", "Blur", "Text", "Eraser", "Magnify"
+        "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser"
     ];
 
     internal static List<string> NormalizeOrder(IEnumerable<string>? order)
@@ -50,17 +55,24 @@ internal static class CaptureToolbarCatalog
 {
     internal static readonly AnnotationToolbarDefinition[] All =
     [
-        new("Copy", "Copy"),
+        new("Cancel", "Cancel capture"),
         new("Pin", "Pin"),
-        new("PinThumbnail", "Pin as thumbnail"),
         new("Save", "Save as image"),
+        new("Copy", "Copy"),
+        new("PinThumbnail", "Pin as thumbnail"),
         new("QuickSave", "Quick save"),
         new("LongCapture", "Long scrolling capture"),
         new("Record", "Screen recording"),
         new("OCR", "OCR / QR recognition"),
-        new("Recapture", "Capture another area"),
-        new("Cancel", "Cancel capture")
+        new("Recapture", "Capture another area")
     ];
+
+    internal static readonly string[] DefaultOrder =
+    [
+        "Cancel", "Pin", "Save", "Copy", "PinThumbnail", "QuickSave", "LongCapture", "Record", "OCR", "Recapture"
+    ];
+
+    internal static readonly string[] DefaultEnabled = ["Cancel", "Pin", "Save", "Copy"];
 
     internal static List<string> NormalizeOrder(IEnumerable<string>? order)
     {

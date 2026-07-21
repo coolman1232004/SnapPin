@@ -2,6 +2,20 @@
 
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
+## [1.2.11] - 2026-07-21
+
+### Changed
+
+- The default annotation toolbar now follows Snipaste's compact order: Rectangle, Arrow, Pencil, Marker, Blur, Text, and Eraser
+- The default capture actions are now Cancel, Pin, Save, and Copy; other supported actions remain available from Toolbar Preferences
+- Toolbar Preferences now place Annotation settings on the left and Capture settings on the right
+- Existing untouched toolbar defaults automatically migrate to the new layout while custom layouts are preserved
+
+### Validation
+
+- Added exact default-order and settings-column regression checks
+- Full x64 build, rendered toolbar review, localization audit, and smoke-test suite pass with zero warnings or errors
+
 ## [1.2.10] - 2026-07-21
 
 ### Changed

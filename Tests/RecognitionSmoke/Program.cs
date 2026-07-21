@@ -670,7 +670,14 @@ internal static class Program
             var primaryToolbar = (Border)editor.FindName("PrimaryToolbarFrame");
             primaryToolbar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             textToolButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            var defaultsMatch = tags.SequenceEqual(defaults.AnnotationToolbarOrder) &&
+            var defaultsMatch = defaults.AnnotationToolbarOrder.SequenceEqual(
+                    new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser", "Ellipse", "Line", "Magnify" }) &&
+                defaults.AnnotationToolbarEnabled.SequenceEqual(
+                    new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser" }) &&
+                defaults.CaptureToolbarOrder.SequenceEqual(
+                    new[] { "Cancel", "Pin", "Save", "Copy", "PinThumbnail", "QuickSave", "LongCapture", "Record", "OCR", "Recapture" }) &&
+                defaults.CaptureToolbarEnabled.SequenceEqual(new[] { "Cancel", "Pin", "Save", "Copy" }) &&
+                tags.SequenceEqual(defaults.AnnotationToolbarOrder) &&
                 visibleTags.SequenceEqual(defaults.AnnotationToolbarEnabled) &&
                 new[] { "Ellipse", "Line", "Magnify" }.All(tag => tags.Contains(tag)) &&
                 new[] { "Select", "Number", "Callout", "Mosaic" }.All(tag => !tags.Contains(tag));
@@ -690,7 +697,19 @@ internal static class Program
                 arrowProperties.Children.OfType<Button>().All(button => button.Tag is null);
         });
         if (!annotationToolbarMatches) return 43;
-        Console.WriteLine("ANNOTATION TOOLS: all useful tools are first-row configurable; removed tools stay absent");
+        Console.WriteLine("ANNOTATION TOOLS: Snipaste-style defaults are first-row configurable; removed tools stay absent");
+
+        var toolbarPreferencesAreSwapped = RunSta(() =>
+        {
+            var preferences = new PreferencesWindow(new AppSettings());
+            var annotationPanel = (StackPanel)preferences.FindName("AnnotationToolbarSettingsPanel");
+            var capturePanel = (StackPanel)preferences.FindName("CaptureToolbarSettingsPanel");
+            var result = Grid.GetColumn(annotationPanel) == 0 && Grid.GetColumn(capturePanel) == 2;
+            preferences.Close();
+            return result;
+        });
+        if (!toolbarPreferencesAreSwapped) return 75;
+        Console.WriteLine("TOOLBAR PREFERENCES: annotation settings are left; capture actions are right");
 
         var captureToolbarMatches = RunSta(() =>
         {

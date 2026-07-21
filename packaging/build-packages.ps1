@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.10',
+    [string]$Version = '1.2.11',
     [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
 )
 
@@ -107,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip'
-    releaseNotes = 'Capture History now uses the SnapPin light design with a cool background, large header actions, compact filters, three-column rounded cards, and pastel item controls while preserving all existing history features.'
+    releaseNotes = 'The default capture toolbar now follows Snipaste''s compact tool sequence, with seven annotation tools and Cancel, Pin, Save, and Copy enabled by default. Toolbar Preferences now place Annotation settings on the left and Capture actions on the right.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

@@ -79,22 +79,10 @@ public sealed class AppSettings
     public double AnnotationBlurSize { get; set; } = 21;
     public double AnnotationTextSize { get; set; } = 2.75;
     public double AnnotationEraserSize { get; set; } = 21;
-    public List<string> AnnotationToolbarOrder { get; set; } =
-    [
-        "Rectangle", "Ellipse", "Arrow", "Line", "Pencil", "Marker", "Blur", "Text", "Eraser", "Magnify"
-    ];
-    public List<string> AnnotationToolbarEnabled { get; set; } =
-    [
-        "Rectangle", "Ellipse", "Arrow", "Line", "Pencil", "Marker", "Blur", "Text", "Eraser", "Magnify"
-    ];
-    public List<string> CaptureToolbarOrder { get; set; } =
-    [
-        "Copy", "Pin", "PinThumbnail", "Save", "QuickSave", "LongCapture", "Record", "OCR", "Recapture", "Cancel"
-    ];
-    public List<string> CaptureToolbarEnabled { get; set; } =
-    [
-        "Copy", "Pin", "PinThumbnail", "Save", "QuickSave", "LongCapture", "Record", "OCR", "Recapture", "Cancel"
-    ];
+    public List<string> AnnotationToolbarOrder { get; set; } = AnnotationToolbarCatalog.DefaultOrder.ToList();
+    public List<string> AnnotationToolbarEnabled { get; set; } = AnnotationToolbarCatalog.DefaultEnabled.ToList();
+    public List<string> CaptureToolbarOrder { get; set; } = CaptureToolbarCatalog.DefaultOrder.ToList();
+    public List<string> CaptureToolbarEnabled { get; set; } = CaptureToolbarCatalog.DefaultEnabled.ToList();
     public string RecordingFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "SnapPin");
     public string RecordingFormat { get; set; } = "MP4";
     public string RecordingCaptureMode { get; set; } = "Region";
@@ -207,15 +195,30 @@ internal static class SettingsService
         settings.PinGroupDesktopBindings ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         settings.CaptureExcludedProcesses ??= [];
         settings.HotkeyExcludedProcesses ??= [];
-        settings.AnnotationToolbarOrder = AnnotationToolbarCatalog.NormalizeOrder(settings.AnnotationToolbarOrder);
-        var legacyDefaultTools = new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser" };
-        var enabledTools = settings.AnnotationToolbarEnabled ?? [];
-        settings.AnnotationToolbarEnabled = legacyDefaultTools.All(tool => enabledTools.Contains(tool, StringComparer.OrdinalIgnoreCase)) &&
-            enabledTools.All(tool => legacyDefaultTools.Contains(tool, StringComparer.OrdinalIgnoreCase))
-                ? AnnotationToolbarCatalog.DefaultEnabled.ToList()
-                : AnnotationToolbarCatalog.NormalizeEnabled(enabledTools);
-        settings.CaptureToolbarOrder = CaptureToolbarCatalog.NormalizeOrder(settings.CaptureToolbarOrder);
-        settings.CaptureToolbarEnabled = CaptureToolbarCatalog.NormalizeEnabled(settings.CaptureToolbarEnabled);
+        var previousAnnotationOrder = new[] { "Rectangle", "Ellipse", "Arrow", "Line", "Pencil", "Marker", "Blur", "Text", "Eraser", "Magnify" };
+        var previousAnnotationEnabled = settings.AnnotationToolbarEnabled ?? [];
+        var previousAnnotationSet = previousAnnotationEnabled.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var migrateAnnotationDefault = (settings.AnnotationToolbarOrder ?? []).SequenceEqual(previousAnnotationOrder, StringComparer.OrdinalIgnoreCase) &&
+            ((previousAnnotationEnabled.Count == previousAnnotationOrder.Length && previousAnnotationSet.SetEquals(previousAnnotationOrder)) ||
+             previousAnnotationSet.SetEquals(AnnotationToolbarCatalog.DefaultEnabled));
+        settings.AnnotationToolbarOrder = migrateAnnotationDefault
+            ? AnnotationToolbarCatalog.DefaultOrder.ToList()
+            : AnnotationToolbarCatalog.NormalizeOrder(settings.AnnotationToolbarOrder);
+        settings.AnnotationToolbarEnabled = migrateAnnotationDefault
+            ? AnnotationToolbarCatalog.DefaultEnabled.ToList()
+            : AnnotationToolbarCatalog.NormalizeEnabled(previousAnnotationEnabled);
+
+        var previousCaptureOrder = new[] { "Copy", "Pin", "PinThumbnail", "Save", "QuickSave", "LongCapture", "Record", "OCR", "Recapture", "Cancel" };
+        var previousCaptureEnabled = settings.CaptureToolbarEnabled ?? [];
+        var migrateCaptureDefault = (settings.CaptureToolbarOrder ?? []).SequenceEqual(previousCaptureOrder, StringComparer.OrdinalIgnoreCase) &&
+            previousCaptureEnabled.Count == previousCaptureOrder.Length &&
+            previousCaptureEnabled.ToHashSet(StringComparer.OrdinalIgnoreCase).SetEquals(previousCaptureOrder);
+        settings.CaptureToolbarOrder = migrateCaptureDefault
+            ? CaptureToolbarCatalog.DefaultOrder.ToList()
+            : CaptureToolbarCatalog.NormalizeOrder(settings.CaptureToolbarOrder);
+        settings.CaptureToolbarEnabled = migrateCaptureDefault
+            ? CaptureToolbarCatalog.DefaultEnabled.ToList()
+            : CaptureToolbarCatalog.NormalizeEnabled(previousCaptureEnabled);
         settings.ToolbarSizeMode = ToolbarThemeService.Normalize(settings.ToolbarSizeMode);
         settings.UiLanguage = LocalizationService.Normalize(settings.UiLanguage);
         if (string.Equals(settings.CaptureBorderColor, "#63E6BE", StringComparison.OrdinalIgnoreCase))

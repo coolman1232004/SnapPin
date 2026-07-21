@@ -110,23 +110,7 @@
                         </ComboBox>
                         <TextBlock Text="Automatically follows Windows display scaling." Foreground="#667085" VerticalAlignment="Center" Margin="12,0,0,0"/>
                     </StackPanel>
-                    <StackPanel Grid.Row="1" Grid.Column="0">
-                        <TextBlock Text="Capture toolbar" FontSize="16" FontWeight="SemiBold"/>
-                        <TextBlock Text="Output actions shown after the drawing tools." Foreground="#667085" Margin="0,4,0,8"/>
-                        <Grid HorizontalAlignment="Left">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="248"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <ListBox x:Name="CaptureToolbarToolsList" Height="235" BorderBrush="#C9D0D9" BorderThickness="1" SelectionMode="Single"/>
-                            <StackPanel Grid.Column="1" Margin="7,0,0,0">
-                                <Button Content="▲" ToolTip="Move up" Click="MoveCaptureToolbarUp_Click" Style="{StaticResource DialogButton}" Width="36" Margin="0,0,0,6"/>
-                                <Button Content="▼" ToolTip="Move down" Click="MoveCaptureToolbarDown_Click" Style="{StaticResource DialogButton}" Width="36"/>
-                            </StackPanel>
-                        </Grid>
-                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                            <Button Content="Enable all" Click="EnableAllCaptureToolbar_Click" Style="{StaticResource DialogButton}" Margin="0,0,7,0"/>
-                            <Button Content="Default" Click="ResetCaptureToolbar_Click" Style="{StaticResource DialogButton}"/>
-                        </StackPanel>
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" Grid.Column="2">
+                    <StackPanel x:Name="AnnotationToolbarSettingsPanel" Grid.Row="1" Grid.Column="0">
                         <TextBlock Text="Annotation toolbar" FontSize="16" FontWeight="SemiBold"/>
                         <TextBlock Text="Drawing tools shown directly in the first capture row." Foreground="#667085" Margin="0,4,0,8"/>
                         <Grid HorizontalAlignment="Left">
@@ -140,6 +124,22 @@
                         <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                             <Button Content="Enable all" Click="EnableAllToolbar_Click" Style="{StaticResource DialogButton}" Margin="0,0,7,0"/>
                             <Button Content="Default" Click="ResetToolbar_Click" Style="{StaticResource DialogButton}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel x:Name="CaptureToolbarSettingsPanel" Grid.Row="1" Grid.Column="2">
+                        <TextBlock Text="Capture toolbar" FontSize="16" FontWeight="SemiBold"/>
+                        <TextBlock Text="Output actions shown after the drawing tools." Foreground="#667085" Margin="0,4,0,8"/>
+                        <Grid HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="248"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <ListBox x:Name="CaptureToolbarToolsList" Height="235" BorderBrush="#C9D0D9" BorderThickness="1" SelectionMode="Single"/>
+                            <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                <Button Content="▲" ToolTip="Move up" Click="MoveCaptureToolbarUp_Click" Style="{StaticResource DialogButton}" Width="36" Margin="0,0,0,6"/>
+                                <Button Content="▼" ToolTip="Move down" Click="MoveCaptureToolbarDown_Click" Style="{StaticResource DialogButton}" Width="36"/>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Enable all" Click="EnableAllCaptureToolbar_Click" Style="{StaticResource DialogButton}" Margin="0,0,7,0"/>
+                            <Button Content="Default" Click="ResetCaptureToolbar_Click" Style="{StaticResource DialogButton}"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
