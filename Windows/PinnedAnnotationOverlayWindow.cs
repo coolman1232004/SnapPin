@@ -37,7 +37,7 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         Top = SystemParameters.VirtualScreenTop;
         Width = SystemParameters.VirtualScreenWidth;
         Height = SystemParameters.VirtualScreenHeight;
-        SourceInitialized += (_, _) => FitToVirtualScreenPixels();
+        SourceInitialized += (_, _) => FitToOwnerMonitorPixels();
 
         _editor = new AnnotationEditorControl();
         Content = _editor;
@@ -71,7 +71,8 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         {
             if (Owner is not PinnedImageWindow pin) return;
             pin.CompleteAnnotationOverlayMove();
-            AlignEditorToOwnerPin();
+            FitToOwnerMonitorPixels();
+            Dispatcher.BeginInvoke(AlignEditorToOwnerPin, DispatcherPriority.ContextIdle);
         };
 
         _editor.Applied += document =>
@@ -83,7 +84,7 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         _editor.Cancelled += (_, _) => Close();
         Loaded += (_, _) => Dispatcher.BeginInvoke(() =>
         {
-            FitToVirtualScreenPixels();
+            FitToOwnerMonitorPixels();
             AlignEditorToOwnerPin();
             Activate();
             _editor.Focus();
@@ -101,10 +102,13 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
 
         var dpi = VisualTreeHelper.GetDpi(this);
         var actualPinBounds = PhysicalBoundsToOverlay(pinPixels, overlayPixels, dpi.DpiScaleX, dpi.DpiScaleY);
+        var overlayViewport = new Size(
+            Math.Max(1, overlayPixels.Width / Math.Max(0.1, dpi.DpiScaleX)),
+            Math.Max(1, overlayPixels.Height / Math.Max(0.1, dpi.DpiScaleY)));
 
         _editor.UpdateCaptureOverlayBounds(
             actualPinBounds,
-            new Size(Math.Max(1, ActualWidth), Math.Max(1, ActualHeight)),
+            overlayViewport,
             actualPinBounds,
             resetToolbarPosition: true);
     }
@@ -129,12 +133,14 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
             delta.X * from.DpiScaleX / Math.Max(0.1, to.DpiScaleX),
             delta.Y * from.DpiScaleY / Math.Max(0.1, to.DpiScaleY));
 
-    private void FitToVirtualScreenPixels()
+    private void FitToOwnerMonitorPixels()
     {
         var handle = new WindowInteropHelper(this).Handle;
-        var bounds = Forms.SystemInformation.VirtualScreen;
-        if (handle != IntPtr.Zero)
-            NativeMethods.SetWindowPos(handle, IntPtr.Zero, bounds.Left, bounds.Top, bounds.Width, bounds.Height,
-                NativeMethods.SwpNoZOrder | NativeMethods.SwpNoActivate);
+        if (handle == IntPtr.Zero) return;
+        var ownerHandle = Owner is null ? IntPtr.Zero : new WindowInteropHelper(Owner).Handle;
+        var screen = ownerHandle == IntPtr.Zero ? Forms.Screen.PrimaryScreen : Forms.Screen.FromHandle(ownerHandle);
+        var bounds = screen?.Bounds ?? Forms.SystemInformation.VirtualScreen;
+        NativeMethods.SetWindowPos(handle, IntPtr.Zero, bounds.Left, bounds.Top, bounds.Width, bounds.Height,
+            NativeMethods.SwpNoZOrder | NativeMethods.SwpNoActivate);
     }
 }
