@@ -62,12 +62,19 @@ public partial class AnnotationEditorControl : UserControl
     private bool _customToolCursorCentered;
     private bool _surfacePointerInside;
     private bool _externalBackgroundMode;
+    private bool _allowToolToggleOff;
+    private bool _externalSurfaceDragging;
+    private Point _externalSurfaceLast;
     private string _selectedColor = "#FFEF4444";
     private readonly Dictionary<string, double> _toolSizes = new(StringComparer.OrdinalIgnoreCase);
 
     internal event Action<AnnotationAppliedEventArgs>? Applied;
     internal event Action<AnnotationAppliedEventArgs>? DocumentStored;
+    internal event Action<Vector>? ExternalSurfaceMoved;
+    internal event Action? ExternalSurfaceMoveCompleted;
     public event EventHandler? Cancelled;
+
+    internal string ActiveTool => _tool;
 
     public AnnotationEditorControl()
     {
@@ -135,6 +142,15 @@ public partial class AnnotationEditorControl : UserControl
             ActivateTool(tool, button);
     }
 
+    internal void ToggleConfiguredTool(string tool)
+    {
+        if (FindToolButton(tool) is not { Visibility: Visibility.Visible } button) return;
+        if (_allowToolToggleOff && _tool.Equals(tool, StringComparison.OrdinalIgnoreCase))
+            DeactivateTool();
+        else
+            ActivateTool(tool, button);
+    }
+
     private Button? FindToolButton(string tool) => ToolPanel.Children.OfType<Button>()
         .FirstOrDefault(button => button.Tag is string tag && tag.Equals(tool, StringComparison.OrdinalIgnoreCase));
 
@@ -144,8 +160,25 @@ public partial class AnnotationEditorControl : UserControl
     private void Tool_Click(object sender, RoutedEventArgs e)
     {
         CommitTextEditor();
-        if (sender is not Button { Tag: string tool } activeButton) return;
-        ActivateTool(tool, activeButton);
+        if (sender is not Button { Tag: string tool }) return;
+        ToggleConfiguredTool(tool);
+    }
+
+    private void DeactivateTool()
+    {
+        RememberCurrentToolSize();
+        foreach (var button in ToolPanel.Children.OfType<Button>())
+        {
+            button.Background = Brushes.Transparent;
+            button.Foreground = TryFindResource("ToolbarInkBrush") as Brush ?? new SolidColorBrush(Color.FromRgb(51, 65, 85));
+        }
+        _tool = "None";
+        _selectedId = null;
+        _activeId = null;
+        StatusText.Text = L("Drag the pinned image to move it, or choose a drawing tool.");
+        UpdateSurfaceCursor(_tool);
+        UpdateToolOptions(_tool);
+        RenderAnnotations();
     }
 
     private void PaletteColor_Click(object sender, RoutedEventArgs e)
@@ -279,6 +312,7 @@ public partial class AnnotationEditorControl : UserControl
         _customToolCursorCentered = false;
         Surface.Cursor = tool switch
         {
+            "None" => _externalBackgroundMode ? Cursors.SizeAll : Cursors.Arrow,
             "Select" => Cursors.Arrow,
             "Text" => Cursors.IBeam,
             "Pencil" or "Marker" => Cursors.Pen,
@@ -374,13 +408,14 @@ public partial class AnnotationEditorControl : UserControl
         EraserOptionsPanel.Visibility = tool == "Eraser" ? Visibility.Visible : Visibility.Collapsed;
         ColorPalettePanel.Visibility = tool is "Rectangle" or "Ellipse" or "Arrow" or "Line" or "Pencil" or "Marker" or "Text" or "Callout" or "Number" or "Magnify"
             ? Visibility.Visible : Visibility.Collapsed;
-        PropertiesToolbarFrame.Visibility = tool == "Select" ? Visibility.Collapsed : Visibility.Visible;
+        PropertiesToolbarFrame.Visibility = tool is "Select" or "None" ? Visibility.Collapsed : Visibility.Visible;
         UpdateStyleButtons();
         if (_captureOverlayMode) Dispatcher.BeginInvoke(LayoutCaptureOverlay);
     }
 
     internal void ConfigureCaptureOverlay(Rect surfaceBounds, Size viewport, Rect? toolbarAnchor = null, bool showActions = false,
-        double? toolbarLeft = null, double? toolbarTop = null, bool showPrimaryToolbar = true, bool showCancelAction = false)
+        double? toolbarLeft = null, double? toolbarTop = null, bool showPrimaryToolbar = true, bool showCancelAction = false,
+        bool startWithNoTool = false, bool allowToolToggleOff = false)
     {
         _captureOverlayMode = true;
         _captureSurfaceBounds = surfaceBounds;
@@ -396,11 +431,14 @@ public partial class AnnotationEditorControl : UserControl
         ApplyActionButton.Visibility = showActions ? Visibility.Visible : Visibility.Collapsed;
         CancelActionButton.Visibility = showCancelAction ? Visibility.Visible : Visibility.Collapsed;
         PrimaryToolbarFrame.Visibility = showPrimaryToolbar ? Visibility.Visible : Visibility.Collapsed;
+        _allowToolToggleOff = allowToolToggleOff;
         Grid.SetRowSpan(SurfaceHost, 2);
         SurfaceHost.BorderThickness = new Thickness(0);
         SurfaceHost.HorizontalAlignment = HorizontalAlignment.Left;
         SurfaceHost.VerticalAlignment = VerticalAlignment.Top;
-        if (FirstVisibleToolButton() is { } firstButton)
+        if (startWithNoTool)
+            DeactivateTool();
+        else if (FirstVisibleToolButton() is { } firstButton)
             ActivateTool(firstButton.Tag as string ?? "Rectangle", firstButton);
         Dispatcher.BeginInvoke(LayoutCaptureOverlay);
     }
@@ -416,7 +454,7 @@ public partial class AnnotationEditorControl : UserControl
     internal void SetCapturePropertiesToolbarVisible(bool visible)
     {
         if (!_captureOverlayMode) return;
-        PropertiesToolbarFrame.Visibility = visible && _tool != "Select"
+        PropertiesToolbarFrame.Visibility = visible && _tool is not ("Select" or "None")
             ? Visibility.Visible
             : Visibility.Collapsed;
         if (visible) Dispatcher.BeginInvoke(LayoutCaptureOverlay);
@@ -433,6 +471,16 @@ public partial class AnnotationEditorControl : UserControl
         _captureViewport = viewport;
         Width = Math.Max(1, viewport.Width);
         Height = Math.Max(1, viewport.Height);
+        Dispatcher.BeginInvoke(LayoutCaptureOverlay);
+    }
+
+    internal void TranslateCaptureOverlay(Vector delta)
+    {
+        if (!_captureOverlayMode || delta.LengthSquared < 0.0001) return;
+        _captureSurfaceBounds.Offset(delta.X, delta.Y);
+        _captureToolbarAnchor.Offset(delta.X, delta.Y);
+        if (_captureToolbarLeft is { } left) _captureToolbarLeft = left + delta.X;
+        if (_captureToolbarTop is { } top) _captureToolbarTop = top + delta.Y;
         Dispatcher.BeginInvoke(LayoutCaptureOverlay);
     }
 
@@ -461,10 +509,7 @@ public partial class AnnotationEditorControl : UserControl
         var anchor = _captureToolbarAnchor.IsEmpty ? bounds : _captureToolbarAnchor;
         var placement = OverlayLayoutService.PlaceBelowAndKeepVisible(anchor, new Size(toolbarWidth, toolbarHeight), _captureViewport, 5);
         var maximumLeft = Math.Max(5, _captureViewport.Width - toolbarWidth - 5);
-        var positioningWidth = Math.Min(availableWidth, Math.Max(toolbarWidth, 460));
-        var initialLeft = OverlayLayoutService.PlaceBelowAndKeepVisible(
-            anchor, new Size(positioningWidth, toolbarHeight), _captureViewport, 5).X;
-        var stableLeft = Math.Clamp(_captureToolbarLeft ?? initialLeft, 5, maximumLeft);
+        var stableLeft = Math.Clamp(_captureToolbarLeft ?? placement.X, 5, maximumLeft);
         var maximumTop = Math.Max(5, _captureViewport.Height - toolbarHeight - 5);
         var stableTop = Math.Clamp(_captureToolbarTop ?? placement.Y, 5, maximumTop);
         _captureToolbarLeft = stableLeft;
@@ -486,6 +531,16 @@ public partial class AnnotationEditorControl : UserControl
                 return;
             CommitTextEditor();
         }
+
+        if (_externalBackgroundMode && _tool == "None")
+        {
+            _externalSurfaceDragging = true;
+            _externalSurfaceLast = e.GetPosition(this);
+            Surface.CaptureMouse();
+            e.Handled = true;
+            return;
+        }
+
         var point = Clamp(e.GetPosition(AnnotationCanvas));
         _start = _last = point;
 
@@ -703,6 +758,16 @@ public partial class AnnotationEditorControl : UserControl
 
     private void Surface_MouseMove(object sender, MouseEventArgs e)
     {
+        if (_externalSurfaceDragging)
+        {
+            var current = e.GetPosition(this);
+            var delta = current - _externalSurfaceLast;
+            _externalSurfaceLast = current;
+            if (delta.LengthSquared >= 0.0001) ExternalSurfaceMoved?.Invoke(delta);
+            e.Handled = true;
+            return;
+        }
+
         var pointer = Clamp(e.GetPosition(AnnotationCanvas));
         if (_textBoxDragging)
         {
@@ -765,6 +830,15 @@ public partial class AnnotationEditorControl : UserControl
 
     private void Surface_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        if (_externalSurfaceDragging)
+        {
+            _externalSurfaceDragging = false;
+            Surface.ReleaseMouseCapture();
+            ExternalSurfaceMoveCompleted?.Invoke();
+            e.Handled = true;
+            return;
+        }
+
         if (_textBoxDragging)
         {
             FinishTextEditorDrag();

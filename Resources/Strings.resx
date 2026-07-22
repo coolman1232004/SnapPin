@@ -1298,6 +1298,9 @@ Choose No to apply it the next time SnapAnchor starts.</value>
   <data name="Click an annotation to select it, then drag to move it." xml:space="preserve">
     <value>Click an annotation to select it, then drag to move it.</value>
   </data>
+  <data name="Drag the pinned image to move it, or choose a drawing tool." xml:space="preserve">
+    <value>Drag the pinned image to move it, or choose a drawing tool.</value>
+  </data>
   <data name="Click to place text. Enter adds a line; Ctrl+Enter finishes." xml:space="preserve">
     <value>Click to place text. Enter adds a line; Ctrl+Enter finishes.</value>
   </data>

@@ -487,6 +487,29 @@ public partial class PinnedImageWindow : Window
         overlay.Show();
     }
 
+    internal Vector MoveFromAnnotationOverlay(Vector requestedDelta)
+    {
+        if (_positionLocked)
+        {
+            ShowPinStatus("Position locked");
+            return default;
+        }
+
+        StopZoomAnimation(true);
+        var before = new Point(Left, Top);
+        Left += requestedDelta.X;
+        Top += requestedDelta.Y;
+        return new Vector(Left - before.X, Top - before.Y);
+    }
+
+    internal Vector CompleteAnnotationOverlayMove()
+    {
+        var before = new Point(Left, Top);
+        if (!_positionLocked && _edgeSnapping) SnapToCurrentMonitorEdges();
+        SaveSession();
+        return new Vector(Left - before.X, Top - before.Y);
+    }
+
     public void BeginCropMode()
     {
         if (_inlineMode != "None") return;

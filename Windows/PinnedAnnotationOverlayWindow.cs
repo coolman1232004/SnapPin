@@ -51,7 +51,22 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
             relativePinBounds,
             showActions: true,
             showPrimaryToolbar: true,
-            showCancelAction: true);
+            showCancelAction: true,
+            startWithNoTool: true,
+            allowToolToggleOff: true);
+
+        _editor.ExternalSurfaceMoved += requestedDelta =>
+        {
+            if (Owner is not PinnedImageWindow pin) return;
+            var actualDelta = pin.MoveFromAnnotationOverlay(requestedDelta);
+            _editor.TranslateCaptureOverlay(actualDelta);
+        };
+        _editor.ExternalSurfaceMoveCompleted += () =>
+        {
+            if (Owner is not PinnedImageWindow pin) return;
+            var snapDelta = pin.CompleteAnnotationOverlayMove();
+            _editor.TranslateCaptureOverlay(snapDelta);
+        };
 
         _editor.Applied += document =>
         {

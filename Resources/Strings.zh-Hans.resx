@@ -1298,6 +1298,9 @@
   <data name="Click an annotation to select it, then drag to move it." xml:space="preserve">
     <value>单击标注以选择，然后拖动进行移动。</value>
   </data>
+  <data name="Drag the pinned image to move it, or choose a drawing tool." xml:space="preserve">
+    <value>拖动贴图可移动它，或选择一个绘图工具。</value>
+  </data>
   <data name="Click to place text. Enter adds a line; Ctrl+Enter finishes." xml:space="preserve">
     <value>单击放置文字。Enter 换行；Ctrl+Enter 完成。</value>
   </data>

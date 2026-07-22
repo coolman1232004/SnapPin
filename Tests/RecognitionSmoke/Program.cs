@@ -164,6 +164,9 @@ internal static class Program
             pin.SetScreenPixelBounds(target);
             pin.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             NativeMethods.GetWindowRect(new System.Windows.Interop.WindowInteropHelper(pin).Handle, out var actual);
+            var moved = pin.MoveFromAnnotationOverlay(new Vector(12, 8));
+            var moveModeWorks = Math.Abs(moved.X - 12) < 0.1 && Math.Abs(moved.Y - 8) < 0.1;
+            pin.CompleteAnnotationOverlayMove();
             var selectableTextLayer = pin.FindName("SelectableTextLayer") as Canvas;
             var longSelectableTextLayer = pin.FindName("LongSelectableTextLayer") as Canvas;
             var selectableLayers = selectableTextLayer is not null &&
@@ -175,7 +178,8 @@ internal static class Program
             pin.Close();
             return (Target: target, Actual: actual, SelectableLayers: selectableLayers,
                 SelectableCursorDefaults: selectableCursorDefaults,
-                SelectableTextDefaultOff: !new AppSettings().PinTextSelectableByDefault);
+                SelectableTextDefaultOff: !new AppSettings().PinTextSelectableByDefault,
+                MoveModeWorks: moveModeWorks);
         });
         var selectableCursorPolicy =
             PinnedImageWindow.SelectableTextCursor([new Rect(20, 15, 80, 24)], new Point(40, 25)) == System.Windows.Input.Cursors.IBeam &&
@@ -186,7 +190,7 @@ internal static class Program
             Math.Abs(pinPlacement.Actual.Width - pinPlacement.Target.Width) > 1 ||
             Math.Abs(pinPlacement.Actual.Height - pinPlacement.Target.Height) > 1 ||
             !pinPlacement.SelectableLayers || !pinPlacement.SelectableCursorDefaults ||
-            !pinPlacement.SelectableTextDefaultOff || !selectableCursorPolicy) return 39;
+            !pinPlacement.SelectableTextDefaultOff || !pinPlacement.MoveModeWorks || !selectableCursorPolicy) return 39;
         Console.WriteLine("PIN PLACEMENT: physical bounds and context-aware selectable OCR cursors verified");
 
         var sharpnessPolicy = RunSta(() =>
@@ -196,22 +200,46 @@ internal static class Program
             editor.LoadImage(source);
             editor.SetExternalBackgroundMode(true);
             editor.ConfigureCaptureOverlay(new Rect(20, 15, 160, 100), new Size(600, 300),
-                showActions: true, showCancelAction: true);
+                showActions: true, showCancelAction: true, startWithNoTool: true, allowToolToggleOff: true);
+            editor.Measure(new Size(600, 300));
+            editor.Arrange(new Rect(0, 0, 600, 300));
+            editor.UpdateLayout();
+            editor.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            editor.UpdateLayout();
             var surfaceHost = (Border)editor.FindName("SurfaceHost");
             var background = (Image)editor.FindName("BackgroundImage");
             var cancel = (Button)editor.FindName("CancelActionButton");
+            var toolbar = (Grid)editor.FindName("ToolbarHost");
+            var toolbarPosition = toolbar.TranslatePoint(new Point(), editor);
+            var expectedToolbarPosition = OverlayLayoutService.PlaceBelowAndKeepVisible(
+                new Rect(20, 15, 160, 100),
+                new Size(toolbar.ActualWidth, toolbar.ActualHeight),
+                new Size(600, 300), 5);
+            var startsInMoveMode = editor.ActiveTool == "None" &&
+                ((Border)editor.FindName("PropertiesToolbarFrame")).Visibility == Visibility.Collapsed;
+            editor.ToggleConfiguredTool("Rectangle");
+            var activatesTool = editor.ActiveTool == "Rectangle";
+            editor.ToggleConfiguredTool("Rectangle");
+            var togglesBackToMoveMode = editor.ActiveTool == "None";
             var flattened = editor.Flatten();
             return (Border: surfaceHost.BorderThickness,
                 Scaling: RenderOptions.GetBitmapScalingMode(background),
                 ExternalBackgroundHidden: background.Visibility == Visibility.Collapsed,
                 CancelVisible: cancel.Visibility == Visibility.Visible,
-                FlattenedSizeMatches: flattened.PixelWidth == source.PixelWidth && flattened.PixelHeight == source.PixelHeight);
+                FlattenedSizeMatches: flattened.PixelWidth == source.PixelWidth && flattened.PixelHeight == source.PixelHeight,
+                ExactToolbarPlacement: Math.Abs(toolbarPosition.X - expectedToolbarPosition.X) < 1 &&
+                    Math.Abs(toolbarPosition.Y - expectedToolbarPosition.Y) < 1,
+                StartsInMoveMode: startsInMoveMode,
+                ActivatesTool: activatesTool,
+                TogglesBackToMoveMode: togglesBackToMoveMode);
         });
         if (sharpnessPolicy.Border != new Thickness(0) ||
             sharpnessPolicy.Scaling != BitmapScalingMode.NearestNeighbor ||
             !sharpnessPolicy.ExternalBackgroundHidden || !sharpnessPolicy.CancelVisible ||
-            !sharpnessPolicy.FlattenedSizeMatches) return 35;
-        Console.WriteLine("PIN TOOLBAR: transparent edit surface, visible Cancel action and lossless flattening verified");
+            !sharpnessPolicy.FlattenedSizeMatches || !sharpnessPolicy.ExactToolbarPlacement ||
+            !sharpnessPolicy.StartsInMoveMode || !sharpnessPolicy.ActivatesTool ||
+            !sharpnessPolicy.TogglesBackToMoveMode) return 35;
+        Console.WriteLine("PIN TOOLBAR: capture-identical placement, move-first tool state, toggle-off tools and lossless editing verified");
 
         var dashboardPaletteMatches = RunSta(() =>
         {
