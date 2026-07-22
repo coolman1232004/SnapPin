@@ -97,6 +97,8 @@ public partial class PinnedImageWindow
             captured.ReleaseMouseCapture();
         SelectableTextLayer.Visibility = Visibility.Collapsed;
         LongSelectableTextLayer.Visibility = Visibility.Collapsed;
+        SelectableTextLayer.Cursor = Cursors.Arrow;
+        LongSelectableTextLayer.Cursor = Cursors.Arrow;
         ClearRecognizedTextSelection();
         UpdatePinStateBadge();
     }
@@ -127,6 +129,7 @@ public partial class PinnedImageWindow
     private void RebuildSelectableTextLayer(Canvas layer)
     {
         layer.Children.Clear();
+        layer.Cursor = Cursors.Arrow;
         for (var index = 0; index < _recognizedWords.Count; index++)
         {
             layer.Children.Add(new Border
@@ -185,6 +188,7 @@ public partial class PinnedImageWindow
         var index = HitRecognizedWord(layer, e.GetPosition(layer), false);
         if (index is null)
         {
+            layer.Cursor = Cursors.Arrow;
             if (_textSelectionAnchor is not null || _textSelectionEnd is not null)
             {
                 ClearRecognizedTextSelection();
@@ -192,6 +196,7 @@ public partial class PinnedImageWindow
             }
             return;
         }
+        layer.Cursor = Cursors.IBeam;
         _textSelectionAnchor = _textSelectionEnd = index;
         if (e.ClickCount >= 2)
         {
@@ -211,9 +216,13 @@ public partial class PinnedImageWindow
 
     private void SelectableText_MouseMove(object sender, MouseEventArgs e)
     {
-        if (!_selectingText || sender is not Canvas layer || e.LeftButton != MouseButtonState.Pressed) return;
+        if (sender is not Canvas layer) return;
+        var point = e.GetPosition(layer);
+        _textHitRegions.TryGetValue(layer, out var regions);
+        layer.Cursor = SelectableTextCursor(regions, point, _selectingText);
+        if (!_selectingText || e.LeftButton != MouseButtonState.Pressed) return;
         UpdateTextAutoScroll(layer);
-        var index = HitRecognizedWord(layer, e.GetPosition(layer), true);
+        var index = HitRecognizedWord(layer, point, true);
         if (index is null || index == _textSelectionEnd) return;
         _textSelectionEnd = index;
         UpdateRecognizedTextSelectionVisuals();
@@ -228,10 +237,21 @@ public partial class PinnedImageWindow
         _selectingText = false;
         StopTextAutoScroll();
         if (Mouse.Captured == layer) layer.ReleaseMouseCapture();
+        _textHitRegions.TryGetValue(layer, out var regions);
+        layer.Cursor = SelectableTextCursor(regions, e.GetPosition(layer));
         UpdateRecognizedTextSelectionVisuals();
         PositionTextSelectionToolbar(reanchor: true);
         e.Handled = true;
     }
+
+    private void SelectableText_MouseLeave(object sender, MouseEventArgs e)
+    {
+        if (sender is Canvas layer && !_selectingText)
+            layer.Cursor = Cursors.Arrow;
+    }
+
+    internal static Cursor SelectableTextCursor(IReadOnlyList<Rect>? regions, Point point, bool selecting = false) =>
+        selecting || regions?.Any(region => region.Contains(point)) == true ? Cursors.IBeam : Cursors.Arrow;
 
     private void UpdateTextAutoScroll(Canvas layer)
     {

@@ -147,20 +147,30 @@ internal static class Program
             pin.SetScreenPixelBounds(target);
             pin.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             NativeMethods.GetWindowRect(new System.Windows.Interop.WindowInteropHelper(pin).Handle, out var actual);
-            var selectableLayers = pin.FindName("SelectableTextLayer") is Canvas &&
-                pin.FindName("LongSelectableTextLayer") is Canvas &&
+            var selectableTextLayer = pin.FindName("SelectableTextLayer") as Canvas;
+            var longSelectableTextLayer = pin.FindName("LongSelectableTextLayer") as Canvas;
+            var selectableLayers = selectableTextLayer is not null &&
+                longSelectableTextLayer is not null &&
                 pin.FindName("TextSelectionToolbar") is Border &&
                 pin.FindName("CancelTextSelectionButton") is Button;
+            var selectableCursorDefaults = selectableTextLayer?.Cursor == System.Windows.Input.Cursors.Arrow &&
+                longSelectableTextLayer?.Cursor == System.Windows.Input.Cursors.Arrow;
             pin.Close();
             return (Target: target, Actual: actual, SelectableLayers: selectableLayers,
+                SelectableCursorDefaults: selectableCursorDefaults,
                 SelectableTextDefaultOff: !new AppSettings().PinTextSelectableByDefault);
         });
+        var selectableCursorPolicy =
+            PinnedImageWindow.SelectableTextCursor([new Rect(20, 15, 80, 24)], new Point(40, 25)) == System.Windows.Input.Cursors.IBeam &&
+            PinnedImageWindow.SelectableTextCursor([new Rect(20, 15, 80, 24)], new Point(140, 70)) == System.Windows.Input.Cursors.Arrow &&
+            PinnedImageWindow.SelectableTextCursor([], new Point(140, 70), selecting: true) == System.Windows.Input.Cursors.IBeam;
         if (Math.Abs(pinPlacement.Actual.Left - pinPlacement.Target.Left) > 1 ||
             Math.Abs(pinPlacement.Actual.Top - pinPlacement.Target.Top) > 1 ||
             Math.Abs(pinPlacement.Actual.Width - pinPlacement.Target.Width) > 1 ||
             Math.Abs(pinPlacement.Actual.Height - pinPlacement.Target.Height) > 1 ||
-            !pinPlacement.SelectableLayers || !pinPlacement.SelectableTextDefaultOff) return 39;
-        Console.WriteLine("PIN PLACEMENT: physical capture bounds, selectable OCR layers and opt-in default verified");
+            !pinPlacement.SelectableLayers || !pinPlacement.SelectableCursorDefaults ||
+            !pinPlacement.SelectableTextDefaultOff || !selectableCursorPolicy) return 39;
+        Console.WriteLine("PIN PLACEMENT: physical bounds and context-aware selectable OCR cursors verified");
 
         var sharpnessPolicy = RunSta(() =>
         {
