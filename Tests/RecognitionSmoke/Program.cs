@@ -176,8 +176,10 @@ internal static class Program
                 longSelectableTextLayer?.Cursor == System.Windows.Input.Cursors.Arrow;
             var pixelPerfectPresentation = pin.FindName("Frame") is Border { BorderThickness: var frameThickness } &&
                 frameThickness == new Thickness(0) &&
+                ((Border)pin.FindName("Frame")).Effect is null &&
                 pin.FindName("PinOutline") is Border &&
                 pin.FindName("PinnedImage") is Image pinnedImage &&
+                pinnedImage.Stretch == Stretch.Fill &&
                 RenderOptions.GetBitmapScalingMode(pinnedImage) == BitmapScalingMode.NearestNeighbor;
             pin.Close();
             return (Target: target, Actual: actual, SelectableLayers: selectableLayers,

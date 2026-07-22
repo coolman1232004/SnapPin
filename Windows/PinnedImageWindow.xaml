@@ -9,7 +9,7 @@
     <Border x:Name="Frame" Background="#05000000" BorderThickness="0" CornerRadius="3" SnapsToDevicePixels="True" UseLayoutRounding="True">
         <Grid ClipToBounds="True">
             <Grid x:Name="PinnedImageSurface">
-                <Image x:Name="PinnedImage" Stretch="Uniform" SnapsToDevicePixels="True" UseLayoutRounding="True"
+                <Image x:Name="PinnedImage" Stretch="Fill" SnapsToDevicePixels="True" UseLayoutRounding="True"
                        RenderOptions.BitmapScalingMode="NearestNeighbor" />
                 <Canvas x:Name="SelectableTextLayer" Visibility="Collapsed" Background="Transparent" Cursor="Arrow"
                         MouseLeftButtonDown="SelectableText_MouseLeftButtonDown"

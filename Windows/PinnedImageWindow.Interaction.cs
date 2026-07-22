@@ -21,6 +21,7 @@ public partial class PinnedImageWindow
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (_inlineMode != "None" || TitleEditor.Visibility == Visibility.Visible) return;
+        StopScreenPixelBoundsStabilization();
         StopZoomAnimation(true);
         Focus();
         if (e.ClickCount == 2) { Close(); return; }
@@ -80,6 +81,7 @@ public partial class PinnedImageWindow
     private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
     {
         if (_inlineMode != "None") return;
+        StopScreenPixelBoundsStabilization();
         var targets = SelectedPins.Contains(this) && SelectedPins.Count > 1 ? SelectedPins.ToArray() : [this];
         if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
         {
@@ -146,13 +148,19 @@ public partial class PinnedImageWindow
         _targetZoomBounds = new Rect(Left, Top, Width, Height);
     }
 
-    private void ApplyShadow() => Frame.Effect = _shadowEnabled
-        ? new DropShadowEffect { BlurRadius = 12, ShadowDepth = 2, Opacity = 0.32 }
-        : null;
+    private void ApplyShadow()
+    {
+        // Effects on Frame rasterize and soften the screenshot itself. Keep
+        // the image layer untouched and apply decoration only to the outline.
+        Frame.Effect = null;
+        PinOutline.Effect = _shadowEnabled
+            ? new DropShadowEffect { BlurRadius = 12, ShadowDepth = 2, Opacity = 0.32 }
+            : null;
+    }
 
     private void ShowZoomPercent(double width)
     {
-        var dpi = VisualTreeHelper.GetDpi(this);
+        var dpi = DpiLayoutService.WindowScale(this);
         ZoomText.Text = $"{DpiLayoutService.PhysicalZoomPercent(width, dpi.DpiScaleX, _source.PixelWidth)}%";
         ZoomBadge.Visibility = Visibility.Visible;
         _zoomBadgeTimer.Stop();

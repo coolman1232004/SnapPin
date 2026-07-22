@@ -7,6 +7,21 @@ namespace SnapAnchor.Services;
 
 internal static class DpiLayoutService
 {
+    internal static DpiScale WindowScale(Window window)
+    {
+        var handle = new WindowInteropHelper(window).Handle;
+        if (handle != IntPtr.Zero)
+        {
+            var nativeDpi = NativeMethods.GetDpiForWindow(handle);
+            if (nativeDpi > 0)
+            {
+                var scale = nativeDpi / 96d;
+                return new DpiScale(scale, scale);
+            }
+        }
+        return VisualTreeHelper.GetDpi(window);
+    }
+
     public static void Attach(Window window)
     {
         var preferredMinimumWidth = window.MinWidth;
@@ -43,7 +58,7 @@ internal static class DpiLayoutService
         var handle = new WindowInteropHelper(window).Handle;
         if (handle == IntPtr.Zero) return;
         var screen = Forms.Screen.FromHandle(handle);
-        var dpi = VisualTreeHelper.GetDpi(window);
+        var dpi = WindowScale(window);
         var available = AvailableLogicalSize(
             new Size(screen.WorkingArea.Width, screen.WorkingArea.Height),
             dpi.DpiScaleX,

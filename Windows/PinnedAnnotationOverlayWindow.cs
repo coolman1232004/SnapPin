@@ -1,5 +1,6 @@
 using SnapAnchor.Controls;
 using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -16,6 +17,8 @@ namespace SnapAnchor.Windows;
 internal sealed class PinnedAnnotationOverlayWindow : Window
 {
     private readonly AnnotationEditorControl _editor;
+    private readonly DispatcherTimer _placementTimer = new() { Interval = TimeSpan.FromMilliseconds(40) };
+    private int _placementPasses;
 
     internal event Action<AnnotationAppliedEventArgs>? Applied;
     internal event Action<AnnotationAppliedEventArgs>? DocumentStored;
@@ -37,7 +40,7 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         Top = SystemParameters.VirtualScreenTop;
         Width = SystemParameters.VirtualScreenWidth;
         Height = SystemParameters.VirtualScreenHeight;
-        SourceInitialized += (_, _) => FitToOwnerMonitorPixels();
+        SourceInitialized += (_, _) => BeginPlacementStabilization();
 
         _editor = new AnnotationEditorControl();
         Content = _editor;
@@ -71,8 +74,7 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         {
             if (Owner is not PinnedImageWindow pin) return;
             pin.CompleteAnnotationOverlayMove();
-            FitToOwnerMonitorPixels();
-            Dispatcher.BeginInvoke(AlignEditorToOwnerPin, DispatcherPriority.ContextIdle);
+            BeginPlacementStabilization();
         };
 
         _editor.Applied += document =>
@@ -82,13 +84,33 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         };
         _editor.DocumentStored += document => DocumentStored?.Invoke(document);
         _editor.Cancelled += (_, _) => Close();
+        _placementTimer.Tick += PlacementTimer_Tick;
+        DpiChanged += (_, _) => Dispatcher.BeginInvoke(BeginPlacementStabilization, DispatcherPriority.Render);
         Loaded += (_, _) => Dispatcher.BeginInvoke(() =>
         {
-            FitToOwnerMonitorPixels();
-            AlignEditorToOwnerPin();
+            BeginPlacementStabilization();
             Activate();
             _editor.Focus();
         }, DispatcherPriority.ContextIdle);
+        ContentRendered += (_, _) => Dispatcher.BeginInvoke(BeginPlacementStabilization, DispatcherPriority.ContextIdle);
+        Closed += (_, _) => _placementTimer.Stop();
+    }
+
+    private void BeginPlacementStabilization()
+    {
+        _placementPasses = 12;
+        FitToOwnerMonitorPixels();
+        AlignEditorToOwnerPin();
+        _placementTimer.Start();
+    }
+
+    private void PlacementTimer_Tick(object? sender, EventArgs e)
+    {
+        FitToOwnerMonitorPixels();
+        AlignEditorToOwnerPin();
+        _placementPasses--;
+        if (_placementPasses > 0) return;
+        _placementTimer.Stop();
     }
 
     private void AlignEditorToOwnerPin()
@@ -100,7 +122,7 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
             !NativeMethods.GetWindowRect(overlayHandle, out var overlayPixels) ||
             !NativeMethods.GetWindowRect(pinHandle, out var pinPixels)) return;
 
-        var dpi = VisualTreeHelper.GetDpi(this);
+        var dpi = DpiLayoutService.WindowScale(this);
         var actualPinBounds = PhysicalBoundsToOverlay(pinPixels, overlayPixels, dpi.DpiScaleX, dpi.DpiScaleY);
         var overlayViewport = new Size(
             Math.Max(1, overlayPixels.Width / Math.Max(0.1, dpi.DpiScaleX)),
