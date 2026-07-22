@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.2] - 2026-07-22
+
+- Fixed pinned-image toolbar placement on secondary monitors with a different Windows display scale
+- Sized the annotation overlay from the physical virtual-desktop rectangle and aligned pins from native window bounds
+- Kept pin movement synchronized when the pin and overlay use different DPI scales
+- Updated the available, download, ready, and portable-update screens to the dashboard's warm-neutral and charcoal palette
+- Added secondary-monitor, mixed-DPI coordinate, virtual-desktop coverage, and update-palette regression tests
+
 ## [2.1.1] - 2026-07-22
 
 - Fixed pinned-image annotation gestures passing through the fully transparent edit surface instead of reaching the selected tool

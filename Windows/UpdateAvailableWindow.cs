@@ -19,8 +19,8 @@ internal sealed class UpdateAvailableWindow : Window
         ResizeMode = ResizeMode.NoResize;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ShowInTaskbar = false;
-        Background = new SolidColorBrush(Color.FromRgb(245, 247, 250));
-        Foreground = new SolidColorBrush(Color.FromRgb(17, 24, 29));
+        Background = new SolidColorBrush(Color.FromRgb(250, 249, 247));
+        Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23));
         DpiLayoutService.Attach(this);
 
         var root = new Grid { Margin = new Thickness(26, 22, 26, 20) };
@@ -43,7 +43,7 @@ internal sealed class UpdateAvailableWindow : Window
             Text = LocalizationService.Format("{0} update - Download size: {1}",
                 LocalizationService.Current(update.PackageKind == UpdatePackageKind.Portable ? "Portable" : "Installed"),
                 UpdateService.FormatBytes(update.DownloadSize)),
-            Foreground = new SolidColorBrush(Color.FromRgb(75, 85, 99)),
+            Foreground = new SolidColorBrush(Color.FromRgb(87, 83, 78)),
             Margin = new Thickness(0, 0, 0, 16)
         };
         Grid.SetRow(details, 1);
@@ -52,7 +52,7 @@ internal sealed class UpdateAvailableWindow : Window
         var notesPanel = new Border
         {
             Background = Brushes.White,
-            BorderBrush = new SolidColorBrush(Color.FromRgb(209, 217, 220)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(231, 229, 228)),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(9),
             Padding = new Thickness(16),
@@ -71,7 +71,7 @@ internal sealed class UpdateAvailableWindow : Window
                 ? LocalizationService.Current("See the GitHub release page for full release notes.")
                 : update.ReleaseNotes,
             TextWrapping = TextWrapping.Wrap,
-            Foreground = new SolidColorBrush(Color.FromRgb(75, 85, 99)),
+            Foreground = new SolidColorBrush(Color.FromRgb(87, 83, 78)),
             LineHeight = 20
         });
         if (Uri.TryCreate(update.ReleasePageUrl, UriKind.Absolute, out var releaseUri))
@@ -81,7 +81,7 @@ internal sealed class UpdateAvailableWindow : Window
                 Content = LocalizationService.Current("View release on GitHub"),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
-                Foreground = new SolidColorBrush(Color.FromRgb(44, 151, 142)),
+                Foreground = new SolidColorBrush(Color.FromRgb(41, 37, 36)),
                 Padding = new Thickness(0),
                 Margin = new Thickness(0, 12, 0, 0)
             };
@@ -103,7 +103,8 @@ internal sealed class UpdateAvailableWindow : Window
             Content = LocalizationService.Current("Later"),
             MinWidth = 96,
             Height = 36,
-            Background = new SolidColorBrush(Color.FromRgb(225, 231, 235)),
+            Background = new SolidColorBrush(Color.FromRgb(231, 229, 228)),
+            Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23)),
             Margin = new Thickness(0, 0, 10, 0),
             IsCancel = true
         };
@@ -113,7 +114,7 @@ internal sealed class UpdateAvailableWindow : Window
             Content = LocalizationService.Current("Download update"),
             MinWidth = 132,
             Height = 36,
-            Background = new SolidColorBrush(Color.FromRgb(44, 151, 142)),
+            Background = new SolidColorBrush(Color.FromRgb(41, 37, 36)),
             Foreground = Brushes.White,
             IsDefault = true
         };

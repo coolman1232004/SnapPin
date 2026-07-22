@@ -26,8 +26,8 @@ internal sealed class PortableUpdateWindow : Window
         ShowInTaskbar = true;
         Icon = BitmapFrame.Create(new Uri("pack://application:,,,/SnapAnchor;component/Assets/SnapAnchor-icon-512.png"));
         Topmost = true;
-        Background = Brushes.White;
-        Foreground = new SolidColorBrush(Color.FromRgb(17, 24, 29));
+        Background = new SolidColorBrush(Color.FromRgb(250, 249, 247));
+        Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23));
         DpiLayoutService.Attach(this);
 
         var panel = new StackPanel { Margin = new Thickness(30, 26, 30, 24) };
@@ -41,11 +41,18 @@ internal sealed class PortableUpdateWindow : Window
         _detail = new TextBlock
         {
             Text = LocalizationService.Current("Do not close this window while the portable files are being replaced."),
-            Foreground = new SolidColorBrush(Color.FromRgb(75, 85, 99)),
+            Foreground = new SolidColorBrush(Color.FromRgb(87, 83, 78)),
             TextWrapping = TextWrapping.Wrap,
             Margin = new Thickness(0, 0, 0, 18)
         };
-        _progress = new ProgressBar { Height = 13, Minimum = 0, Maximum = 100 };
+        _progress = new ProgressBar
+        {
+            Height = 13,
+            Minimum = 0,
+            Maximum = 100,
+            Foreground = new SolidColorBrush(Color.FromRgb(41, 37, 36)),
+            Background = new SolidColorBrush(Color.FromRgb(231, 229, 228))
+        };
         panel.Children.Add(_status);
         panel.Children.Add(_detail);
         panel.Children.Add(_progress);
@@ -116,13 +123,28 @@ internal sealed class PortableUpdateWindow : Window
     {
         _status.Text = LocalizationService.Current("Portable update failed");
         _detail.Text = result.Message;
-        _progress.Foreground = Brushes.IndianRed;
+        _progress.Foreground = new SolidColorBrush(Color.FromRgb(120, 113, 108));
         var panel = Content as StackPanel;
         if (panel is null) return;
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 18, 0, 0) };
-        var log = new Button { Content = LocalizationService.Current("Open update log"), MinWidth = 120, Height = 34, Margin = new Thickness(0, 0, 10, 0) };
+        var log = new Button
+        {
+            Content = LocalizationService.Current("Open update log"),
+            MinWidth = 120,
+            Height = 34,
+            Margin = new Thickness(0, 0, 10, 0),
+            Background = new SolidColorBrush(Color.FromRgb(231, 229, 228)),
+            Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23))
+        };
         log.Click += (_, _) => Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{result.LogPath}\"") { UseShellExecute = true });
-        var close = new Button { Content = LocalizationService.Current("Close"), MinWidth = 88, Height = 34 };
+        var close = new Button
+        {
+            Content = LocalizationService.Current("Close"),
+            MinWidth = 88,
+            Height = 34,
+            Background = new SolidColorBrush(Color.FromRgb(41, 37, 36)),
+            Foreground = Brushes.White
+        };
         close.Click += (_, _) => Application.Current.Shutdown(1);
         buttons.Children.Add(log);
         buttons.Children.Add(close);

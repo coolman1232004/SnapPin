@@ -246,10 +246,16 @@ internal static class Program
 
         var livePinOverlay = RunSta(() =>
         {
+            var targetScreen = System.Windows.Forms.Screen.AllScreens
+                .OrderBy(screen => screen.Primary)
+                .First();
+            var targetBounds = new Drawing.Rectangle(
+                targetScreen.WorkingArea.Left + 48,
+                targetScreen.WorkingArea.Top + 48,
+                Math.Min(320, Math.Max(160, targetScreen.WorkingArea.Width - 96)),
+                Math.Min(180, Math.Max(100, targetScreen.WorkingArea.Height - 96)));
             var pin = new PinnedImageWindow(CreatePatternImage(320, 180), applyTextSelectableDefault: false)
             {
-                Left = SystemParameters.VirtualScreenLeft + 48,
-                Top = SystemParameters.VirtualScreenTop + 48,
                 Width = 320,
                 Height = 180,
                 ShowActivated = false
@@ -258,13 +264,14 @@ internal static class Program
             try
             {
                 pin.Show();
+                pin.SetScreenPixelBounds(targetBounds);
                 pin.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
                 pin.BeginEditMode();
                 pin.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
                 overlay = (PinnedAnnotationOverlayWindow?)typeof(PinnedImageWindow)
                     .GetField("_annotationOverlay", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                     .GetValue(pin);
-                if (overlay is null) return (ReceivesPointer: false, Aligned: false);
+                if (overlay is null) return (ReceivesPointer: false, Aligned: false, CoversVirtualDesktop: false);
 
                 overlay.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
                 var editor = (AnnotationEditorControl)typeof(PinnedAnnotationOverlayWindow)
@@ -280,10 +287,16 @@ internal static class Program
                     Y = (int)Math.Round(pinCenter.Y)
                 });
                 var overlayHandle = new System.Windows.Interop.WindowInteropHelper(overlay).Handle;
+                NativeMethods.GetWindowRect(overlayHandle, out var overlayPixels);
+                var virtualPixels = System.Windows.Forms.SystemInformation.VirtualScreen;
                 return (
                     ReceivesPointer: topWindow == overlayHandle,
                     Aligned: Math.Abs(pinTopLeft.X - surfaceTopLeft.X) < 2 &&
-                        Math.Abs(pinTopLeft.Y - surfaceTopLeft.Y) < 2);
+                        Math.Abs(pinTopLeft.Y - surfaceTopLeft.Y) < 2,
+                    CoversVirtualDesktop: Math.Abs(overlayPixels.Left - virtualPixels.Left) <= 1 &&
+                        Math.Abs(overlayPixels.Top - virtualPixels.Top) <= 1 &&
+                        Math.Abs(overlayPixels.Width - virtualPixels.Width) <= 1 &&
+                        Math.Abs(overlayPixels.Height - virtualPixels.Height) <= 1);
             }
             finally
             {
@@ -291,8 +304,18 @@ internal static class Program
                 pin.Close();
             }
         });
-        if (!livePinOverlay.ReceivesPointer || !livePinOverlay.Aligned) return 83;
-        Console.WriteLine("PIN TOOLBAR: capture-identical placement, move-first tool state, toggle-off tools and lossless editing verified");
+        if (!livePinOverlay.ReceivesPointer || !livePinOverlay.Aligned || !livePinOverlay.CoversVirtualDesktop) return 83;
+
+        var mixedDpiOverlayBounds = PinnedAnnotationOverlayWindow.PhysicalBoundsToOverlay(
+            new NativeMethods.NativeRect { Left = 1920, Top = 120, Right = 2560, Bottom = 480 },
+            new NativeMethods.NativeRect { Left = -1920, Top = 0, Right = 3840, Bottom = 1440 },
+            1.5,
+            1.5);
+        if (Math.Abs(mixedDpiOverlayBounds.X - 2560) > 0.01 ||
+            Math.Abs(mixedDpiOverlayBounds.Y - 80) > 0.01 ||
+            Math.Abs(mixedDpiOverlayBounds.Width - 426.6667) > 0.01 ||
+            Math.Abs(mixedDpiOverlayBounds.Height - 240) > 0.01) return 83;
+        Console.WriteLine("PIN TOOLBAR: physical mixed-DPI multi-monitor placement, move-first tool state, toggle-off tools and lossless editing verified");
 
         var dashboardPaletteMatches = RunSta(() =>
         {

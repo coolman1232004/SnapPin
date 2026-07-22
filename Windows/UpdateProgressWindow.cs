@@ -29,8 +29,8 @@ internal sealed class UpdateProgressWindow : Window
         ResizeMode = ResizeMode.NoResize;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ShowInTaskbar = false;
-        Background = Brushes.White;
-        Foreground = new SolidColorBrush(Color.FromRgb(17, 24, 29));
+        Background = new SolidColorBrush(Color.FromRgb(250, 249, 247));
+        Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23));
         DpiLayoutService.Attach(this);
 
         _status = new TextBlock
@@ -43,7 +43,7 @@ internal sealed class UpdateProgressWindow : Window
         _detail = new TextBlock
         {
             Text = update.DownloadSize > 0 ? LocalizationService.Format("Download size: {0}", UpdateService.FormatBytes(update.DownloadSize)) : string.Empty,
-            Foreground = new SolidColorBrush(Color.FromRgb(75, 85, 99)),
+            Foreground = new SolidColorBrush(Color.FromRgb(87, 83, 78)),
             Margin = new Thickness(0, 0, 0, 15)
         };
         _progress = new ProgressBar
@@ -51,6 +51,8 @@ internal sealed class UpdateProgressWindow : Window
             Height = 12,
             Minimum = 0,
             Maximum = 100,
+            Foreground = new SolidColorBrush(Color.FromRgb(41, 37, 36)),
+            Background = new SolidColorBrush(Color.FromRgb(231, 229, 228)),
             Margin = new Thickness(0, 0, 0, 18)
         };
         _cancel = new Button
@@ -60,7 +62,8 @@ internal sealed class UpdateProgressWindow : Window
             Height = 34,
             Padding = new Thickness(14, 4, 14, 4),
             HorizontalAlignment = HorizontalAlignment.Right,
-            Background = new SolidColorBrush(Color.FromRgb(225, 231, 235)),
+            Background = new SolidColorBrush(Color.FromRgb(231, 229, 228)),
+            Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23)),
             IsCancel = false
         };
         _cancel.Click += (_, _) => CancelUpdate();
