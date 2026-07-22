@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.2] - 2026-07-22
+
+- Existing portable folders now remove the obsolete previous-name executable during in-place update or the next SnapAnchor startup
+- Added regression coverage for cleaning unmanaged legacy apphosts left by version 2.0.0
+
 ## [2.0.1] - 2026-07-22
 
 - Removed the obsolete previous-name executable from the portable ZIP and extracted folder

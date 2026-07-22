@@ -66,6 +66,7 @@ internal sealed record UpdateStartupNotice(bool Success, string PreviousVersion,
 internal static class PortableUpdateService
 {
     private const string PackageManifestName = ".snapanchor-package.json";
+    private static readonly string LegacyExecutableName = string.Concat("Snap", "Pin", ".exe");
     private const string SuccessArgument = "--updated-from";
     private const string FailureArgument = "--update-failed";
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
@@ -90,7 +91,7 @@ internal static class PortableUpdateService
             var sourceFiles = LoadManagedFiles(request.SourceDirectory, requireExisting: true);
             var previousFiles = LoadManagedFiles(request.TargetDirectory, requireExisting: false);
             var newSet = sourceFiles.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var obsolete = previousFiles.Where(path => !newSet.Contains(path)).ToList();
+            var obsolete = DetermineObsoleteFiles(previousFiles, newSet, request.TargetDirectory);
             EnsureFreeSpace(request, sourceFiles);
 
             progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Creating rollback backup..."), 0.1));
@@ -164,6 +165,17 @@ internal static class PortableUpdateService
                 Log(logPath, "Access was denied with normal permissions. An administrator retry is available.");
             return new PortableUpdateResult(false, message, logPath, resultPath, retryAsAdministrator);
         }
+    }
+
+    internal static List<string> DetermineObsoleteFiles(IEnumerable<string> previousFiles,
+        IReadOnlySet<string> newFiles, string targetDirectory)
+    {
+        var obsolete = previousFiles.Where(path => !newFiles.Contains(path)).ToList();
+        var legacyExecutable = SafeCombine(targetDirectory, LegacyExecutableName);
+        if (!newFiles.Contains(LegacyExecutableName) && File.Exists(legacyExecutable) &&
+            !obsolete.Contains(LegacyExecutableName, StringComparer.OrdinalIgnoreCase))
+            obsolete.Add(LegacyExecutableName);
+        return obsolete;
     }
 
     internal static bool TryRestartAsAdministrator(PortableUpdateRequest request, out string error)
