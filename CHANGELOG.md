@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1] - 2026-07-22
+
+- Fixed pinned-image annotation gestures passing through the fully transparent edit surface instead of reaching the selected tool
+- Re-aligned pinned toolbars from the pin's actual on-screen coordinates, including mixed-DPI placement
+- Capture annotation tools can now be clicked a second time to return to an unselected state
+- Added live layered-window pointer ownership, pin alignment, and capture toggle-off regression coverage
+
 ## [2.1.0] - 2026-07-22
 
 - Long scrolling capture now sends wheel input to the selected underlying window, with a system-input fallback for controls that ignore posted messages

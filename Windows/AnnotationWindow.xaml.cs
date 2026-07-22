@@ -117,6 +117,15 @@ public partial class AnnotationEditorControl : UserControl
     {
         _externalBackgroundMode = enabled;
         BackgroundImage.Visibility = enabled ? Visibility.Collapsed : Visibility.Visible;
+        // A fully transparent layered window can be skipped by Win32 hit testing.
+        // Keep one imperceptible alpha value over the external pin so drawing
+        // gestures reach this editor while the original pinned image remains
+        // the only visible image.
+        var inputSurface = enabled
+            ? new SolidColorBrush(Color.FromArgb(1, 0, 0, 0))
+            : Brushes.Transparent;
+        SurfaceHost.Background = inputSurface;
+        AnnotationCanvas.Background = inputSurface;
     }
 
     internal void ApplyToolbarConfiguration(IEnumerable<string>? order, IEnumerable<string>? enabled)
@@ -463,11 +472,17 @@ public partial class AnnotationEditorControl : UserControl
     internal void UndoForCapture() => Undo();
     internal void RedoForCapture() => Redo();
 
-    internal void UpdateCaptureOverlayBounds(Rect surfaceBounds, Size viewport, Rect? toolbarAnchor = null)
+    internal void UpdateCaptureOverlayBounds(Rect surfaceBounds, Size viewport, Rect? toolbarAnchor = null,
+        bool resetToolbarPosition = false)
     {
         if (!_captureOverlayMode) return;
         _captureSurfaceBounds = surfaceBounds;
         if (toolbarAnchor is { } anchor) _captureToolbarAnchor = anchor;
+        if (resetToolbarPosition)
+        {
+            _captureToolbarLeft = null;
+            _captureToolbarTop = null;
+        }
         _captureViewport = viewport;
         Width = Math.Max(1, viewport.Width);
         Height = Math.Max(1, viewport.Height);

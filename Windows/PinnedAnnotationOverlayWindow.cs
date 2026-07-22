@@ -77,8 +77,34 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         _editor.Cancelled += (_, _) => Close();
         Loaded += (_, _) =>
         {
+            AlignEditorToOwnerPin();
             Activate();
             _editor.Focus();
         };
+    }
+
+    private void AlignEditorToOwnerPin()
+    {
+        if (Owner is not PinnedImageWindow pin) return;
+        pin.UpdateLayout();
+        UpdateLayout();
+
+        var screenTopLeft = pin.PointToScreen(new Point(0, 0));
+        var screenBottomRight = pin.PointToScreen(new Point(
+            Math.Max(1, pin.ActualWidth),
+            Math.Max(1, pin.ActualHeight)));
+        var overlayTopLeft = PointFromScreen(screenTopLeft);
+        var overlayBottomRight = PointFromScreen(screenBottomRight);
+        var actualPinBounds = new Rect(
+            overlayTopLeft,
+            new Size(
+                Math.Max(1, overlayBottomRight.X - overlayTopLeft.X),
+                Math.Max(1, overlayBottomRight.Y - overlayTopLeft.Y)));
+
+        _editor.UpdateCaptureOverlayBounds(
+            actualPinBounds,
+            new Size(Math.Max(1, ActualWidth), Math.Max(1, ActualHeight)),
+            actualPinBounds,
+            resetToolbarPosition: true);
     }
 }
