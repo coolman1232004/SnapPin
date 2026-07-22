@@ -61,7 +61,7 @@
                 <Grid Margin="12" VerticalAlignment="Top">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="165"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -76,6 +76,8 @@
                         <CheckBox x:Name="ShowSizeBox" Content="Show coordinate and size badge above the selection" Margin="0,4" />
                         <CheckBox x:Name="ShowElementDetectionBox" Content="Show automatic window and UI-element detection outline" Margin="0,4" />
                         <CheckBox x:Name="ShowCaptureHintsBox" Content="Show capture shortcut hints" Margin="0,4" />
+                        <CheckBox x:Name="HdrColorCorrectionBox" Content="Correct washed-out colours on HDR displays" Margin="0,4"
+                                  ToolTip="Applies a conservative local tone correction only when Windows reports that HDR is active."/>
                     </StackPanel>
                     <TextBlock Grid.Row="5" Text="Long capture frames" VerticalAlignment="Center" Margin="0,8" />
                     <TextBox x:Name="ScrollFramesBox" Grid.Row="5" Grid.Column="1" Width="90" Height="32" HorizontalAlignment="Left" Margin="0,6" Padding="7,5" />
@@ -303,6 +305,8 @@
                         <ComboBoxItem Content="English + 繁體中文" Tag="eng+chi_tra"/>
                         <ComboBoxItem Content="English + 简体 + 繁體" Tag="eng+chi_sim+chi_tra"/>
                     </ComboBox>
+                    <CheckBox x:Name="OcrOrientationBox" Content="Automatically detect rotated text" Margin="0,0,0,14"
+                              ToolTip="Retries low-confidence local OCR at 90, 180 and 270 degrees."/>
                     <Border Background="White" BorderBrush="#D0D5DD" BorderThickness="1" CornerRadius="7" Padding="10">
                         <StackPanel>
                             <TextBlock Text="Private by design" FontWeight="SemiBold" />

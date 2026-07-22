@@ -55,6 +55,8 @@ public sealed class AppSettings
     public int HistoryLimit { get; set; } = 200;
     public string OcrLanguage { get; set; } = "eng+chi_sim+chi_tra";
     public bool OcrAutoCopy { get; set; }
+    public bool OcrDetectOrientation { get; set; } = true;
+    public bool CorrectHdrColors { get; set; } = true;
     public string UpdateFeedUrl { get; set; } = DefaultUpdateFeedUrl;
     public int ScrollCaptureMaxFrames { get; set; } = 12;
     public int ScrollCaptureDelayMs { get; set; } = 450;

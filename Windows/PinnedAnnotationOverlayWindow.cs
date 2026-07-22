@@ -3,6 +3,7 @@ using SnapAnchor.Models;
 using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -40,6 +41,7 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         Width = SystemParameters.VirtualScreenWidth;
         Height = SystemParameters.VirtualScreenHeight;
         SourceInitialized += (_, _) => BeginPlacementStabilization();
+        PreviewMouseWheel += Overlay_PreviewMouseWheel;
 
         _editor = new AnnotationEditorControl();
         // Keep one almost-transparent hit-test layer alive until the monitor
@@ -97,6 +99,25 @@ internal sealed class PinnedAnnotationOverlayWindow : Window
         }, DispatcherPriority.ContextIdle);
         ContentRendered += (_, _) => Dispatcher.BeginInvoke(BeginPlacementStabilization, DispatcherPriority.ContextIdle);
         Closed += (_, _) => _placementTimer.Stop();
+    }
+
+    private void Overlay_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (Owner is not PinnedImageWindow pin) return;
+        var pinHandle = new WindowInteropHelper(pin).Handle;
+        var cursor = new NativeMethods.CursorInfo
+        {
+            Size = System.Runtime.InteropServices.Marshal.SizeOf<NativeMethods.CursorInfo>()
+        };
+        if (pinHandle == IntPtr.Zero || !NativeMethods.GetWindowRect(pinHandle, out var bounds) ||
+            !NativeMethods.GetCursorInfo(ref cursor)) return;
+        var point = cursor.ScreenPosition;
+        if (point.X < bounds.Left || point.X >= bounds.Right || point.Y < bounds.Top || point.Y >= bounds.Bottom)
+            return;
+
+        pin.HandleAnnotationOverlayWheel(e.Delta, Keyboard.Modifiers);
+        BeginPlacementStabilization();
+        e.Handled = true;
     }
 
     private void BeginPlacementStabilization()

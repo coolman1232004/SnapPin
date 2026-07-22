@@ -1,5 +1,6 @@
 using SnapAnchor.Services;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace SnapAnchor.RecognitionSmoke;
@@ -59,10 +60,34 @@ internal static class CompatibilitySmoke
         if (stitched.PixelWidth != 160 || stitched.PixelHeight <= 300 || stitched.PixelHeight > 50000)
             throw new InvalidOperationException($"Long-capture stress stitching produced {stitched.PixelWidth}x{stitched.PixelHeight}.");
 
+        // A fixed web-app header must not confuse the content overlap below
+        // it. This mirrors the most common long-capture failure mode.
+        var stickyFrames = Enumerable.Range(0, 8)
+            .Select(index => WithStickyHeader(
+                CaptureService.Crop(tall, new Int32Rect(0, index * 120, 160, 300)), tall, 36))
+            .ToList();
+        var detectedShift = ScrollingCaptureService.FindVerticalShift(stickyFrames[0], stickyFrames[1]);
+        var stickyStitched = ScrollingCaptureService.StitchFrames(stickyFrames);
+        if (detectedShift is < 116 or > 124 || stickyStitched.PixelHeight is < 1120 or > 1160)
+            throw new InvalidOperationException($"Sticky-header stitching failed: shift={detectedShift}, height={stickyStitched.PixelHeight}.");
+
         var runtime = RuntimeCompatibilityService.Snapshot();
         if (runtime.Displays.Count == 0 || string.IsNullOrWhiteSpace(RuntimeCompatibilityService.Describe(runtime)))
             throw new InvalidOperationException("Runtime display diagnostics were unavailable.");
 
-        Console.WriteLine($"COMPATIBILITY: mixed DPI, portrait, negative coordinates, remote-session diagnostics, audio fallback and {frames.Count}-frame stitching verified");
+        Console.WriteLine($"COMPATIBILITY: mixed DPI, portrait, negative coordinates, remote-session diagnostics, audio fallback and feature-matched stitching verified");
+    }
+
+    private static BitmapSource WithStickyHeader(BitmapSource frame, BitmapSource headerSource, int height)
+    {
+        var convertedFrame = frame.Format == PixelFormats.Bgra32 ? frame : new FormatConvertedBitmap(frame, PixelFormats.Bgra32, null, 0);
+        var convertedHeader = headerSource.Format == PixelFormats.Bgra32 ? headerSource : new FormatConvertedBitmap(headerSource, PixelFormats.Bgra32, null, 0);
+        var writable = new WriteableBitmap(convertedFrame);
+        var stride = convertedFrame.PixelWidth * 4;
+        var bytes = new byte[stride * height];
+        convertedHeader.CopyPixels(new Int32Rect(0, 0, convertedFrame.PixelWidth, height), bytes, stride, 0);
+        writable.WritePixels(new Int32Rect(0, 0, convertedFrame.PixelWidth, height), bytes, stride, 0);
+        writable.Freeze();
+        return writable;
     }
 }

@@ -51,6 +51,7 @@ public partial class PreferencesWindow : Window
         ShowSizeBox.IsChecked = _settings.ShowCaptureSize;
         ShowElementDetectionBox.IsChecked = _settings.ShowElementDetection != false;
         ShowCaptureHintsBox.IsChecked = _settings.ShowCaptureHints;
+        HdrColorCorrectionBox.IsChecked = _settings.CorrectHdrColors;
         ExcludeSnapAnchorBox.IsChecked = _settings.ExcludeSnapAnchorFromCapture;
         ExcludedAppsList.ItemsSource = _settings.CaptureExcludedProcesses.ToList();
         HotkeyExcludedAppsList.ItemsSource = _settings.HotkeyExcludedProcesses.ToList();
@@ -102,6 +103,7 @@ public partial class PreferencesWindow : Window
         TogglePinsHotkeyBox.SelectedValue = _settings.TogglePinsHotkey;
         RecordingHotkeyBox.SelectedValue = _settings.RecordingHotkey;
         OcrLanguageBox.SelectedValue = _settings.OcrLanguage;
+        OcrOrientationBox.IsChecked = _settings.OcrDetectOrientation;
         if (OcrLanguageBox.SelectedIndex < 0) OcrLanguageBox.SelectedIndex = 3;
         ToolbarSizeBox.SelectedValue = ToolbarThemeService.Normalize(_settings.ToolbarSizeMode);
         VersionText.Text = LocalizationService.Format("Version {0}", DiagnosticsService.Version);
@@ -210,6 +212,7 @@ public partial class PreferencesWindow : Window
         _settings.ShowCaptureSize = ShowSizeBox.IsChecked == true;
         _settings.ShowElementDetection = ShowElementDetectionBox.IsChecked == true;
         _settings.ShowCaptureHints = ShowCaptureHintsBox.IsChecked == true;
+        _settings.CorrectHdrColors = HdrColorCorrectionBox.IsChecked == true;
         _settings.ExcludeSnapAnchorFromCapture = ExcludeSnapAnchorBox.IsChecked == true;
         _settings.CaptureExcludedProcesses = ExcludedAppsList.Items.Cast<string>()
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -269,6 +272,7 @@ public partial class PreferencesWindow : Window
         _settings.TogglePinsHotkey = Selected(TogglePinsHotkeyBox, "ShiftF3");
         _settings.RecordingHotkey = Selected(RecordingHotkeyBox, "CtrlShiftR");
         _settings.OcrLanguage = OcrLanguageBox.SelectedValue as string ?? "eng+chi_sim+chi_tra";
+        _settings.OcrDetectOrientation = OcrOrientationBox.IsChecked == true;
         _settings.ToolbarSizeMode = ToolbarThemeService.Normalize(ToolbarSizeBox.SelectedValue as string);
         _settings.UpdateFeedUrl = AppSettings.DefaultUpdateFeedUrl;
         _settings.AnnotationToolbarOrder = AnnotationToolbarCatalog.NormalizeOrder(

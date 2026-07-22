@@ -59,7 +59,9 @@ internal static partial class CaptureService
             var source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
                 handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             source = NormalizeDpi96(source);
-            return CaptureExclusionService.Apply(source, bounds, SettingsService.Load());
+            var settings = SettingsService.Load();
+            source = HdrColorService.CorrectIfNeeded(source, bounds, settings);
+            return CaptureExclusionService.Apply(source, bounds, settings);
         }
         finally
         {
