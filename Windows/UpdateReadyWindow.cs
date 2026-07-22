@@ -24,8 +24,8 @@ internal sealed class UpdateReadyWindow : Window
         ResizeMode = ResizeMode.NoResize;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ShowInTaskbar = false;
-        Background = Brushes.White;
-        Foreground = new SolidColorBrush(Color.FromRgb(17, 24, 29));
+        Background = new SolidColorBrush(Color.FromRgb(250, 249, 247));
+        Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23));
         DpiLayoutService.Attach(this);
 
         var root = new Grid { Margin = new Thickness(28, 24, 28, 22) };
@@ -45,7 +45,7 @@ internal sealed class UpdateReadyWindow : Window
                 ? LocalizationService.Current("The update is downloaded, verified, and prepared. Restart SnapAnchor now to replace the portable files, or choose Later to keep using this version.")
                 : LocalizationService.Current("The installer is downloaded and verified. Install it now, or choose Later to keep using this version."),
             TextWrapping = TextWrapping.Wrap,
-            Foreground = new SolidColorBrush(Color.FromRgb(75, 85, 99)),
+            Foreground = new SolidColorBrush(Color.FromRgb(87, 83, 78)),
             LineHeight = 21
         };
         Grid.SetRow(body, 1);
@@ -57,7 +57,8 @@ internal sealed class UpdateReadyWindow : Window
             Content = LocalizationService.Current("Later"),
             MinWidth = 100,
             Height = 36,
-            Background = new SolidColorBrush(Color.FromRgb(225, 231, 235)),
+            Background = new SolidColorBrush(Color.FromRgb(231, 229, 228)),
+            Foreground = new SolidColorBrush(Color.FromRgb(28, 25, 23)),
             Margin = new Thickness(0, 0, 10, 0),
             IsCancel = true
         };
@@ -67,7 +68,7 @@ internal sealed class UpdateReadyWindow : Window
             Content = LocalizationService.Current(prepared.Update.PackageKind == UpdatePackageKind.Portable ? "Restart and update" : "Install update"),
             MinWidth = 142,
             Height = 36,
-            Background = new SolidColorBrush(Color.FromRgb(44, 151, 142)),
+            Background = new SolidColorBrush(Color.FromRgb(41, 37, 36)),
             Foreground = Brushes.White,
             IsDefault = true
         };

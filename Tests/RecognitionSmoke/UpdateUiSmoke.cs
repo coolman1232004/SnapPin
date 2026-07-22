@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SnapAnchor.RecognitionSmoke;
 
@@ -41,6 +42,9 @@ internal static class UpdateUiSmoke
             var cancel = panel.Children.OfType<Button>().Single();
             if (window.Width > 510 || window.Height > 250 || cancel.Content as string != "Cancel update" || texts.Count != 2)
                 throw new InvalidOperationException("Update progress window is oversized or missing status details.");
+            if (!IsColor(window.Background, 250, 249, 247) || !IsColor(window.Foreground, 28, 25, 23) ||
+                !IsColor(cancel.Background, 231, 229, 228) || !IsColor(progress.Foreground, 41, 37, 36))
+                throw new InvalidOperationException("Update progress window does not match the warm-neutral application palette.");
 
             var updateProgress = typeof(UpdateProgressWindow).GetMethod("UpdateProgress", BindingFlags.Instance | BindingFlags.NonPublic)
                 ?? throw new InvalidOperationException("Update progress handler is missing.");
@@ -56,12 +60,12 @@ internal static class UpdateUiSmoke
 
             var availableConstructor = typeof(UpdateAvailableWindow).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic).Single();
             var available = (UpdateAvailableWindow)availableConstructor.Invoke([owner, update]);
-            if (available.Width > 550 || available.Height > 410)
+            if (available.Width > 550 || available.Height > 410 || !IsColor(available.Background, 250, 249, 247))
                 throw new InvalidOperationException("Update details window is oversized.");
             var prepared = new PreparedUpdate(update, "package.zip", "staging");
             var readyConstructor = typeof(UpdateReadyWindow).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic).Single();
             var ready = (UpdateReadyWindow)readyConstructor.Invoke([owner, prepared]);
-            if (ready.Width > 520 || ready.Height > 290)
+            if (ready.Width > 520 || ready.Height > 290 || !IsColor(ready.Background, 250, 249, 247))
                 throw new InvalidOperationException("Update-ready window is oversized.");
 
             window.Close();
@@ -74,6 +78,9 @@ internal static class UpdateUiSmoke
         TestArgumentsAndTransaction();
         Console.WriteLine("UPDATE UI: quiet notification workflow, detailed progress, ready decision, transactional apply and rollback verified");
     }
+
+    private static bool IsColor(Brush? brush, byte red, byte green, byte blue)
+        => brush is SolidColorBrush solid && solid.Color == Color.FromRgb(red, green, blue);
 
     private static void TestArgumentsAndTransaction()
     {
