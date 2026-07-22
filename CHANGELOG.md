@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1] - 2026-07-22
+
+- Removed the obsolete previous-name executable from the portable ZIP and extracted folder
+- Pinned-image OCR now shows an I-beam only over recognized selectable words
+- Restored the normal arrow pointer over non-text areas and after leaving recognized text
+
 ## [2.0.0] - 2026-07-22
 
 - Renamed the product, executable, installer, portable package, namespaces, assets, local storage, and update channel from SnapPin to SnapAnchor

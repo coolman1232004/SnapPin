@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '2.0.0',
+    [string]$Version = '2.0.1',
     [string]$CertificateThumbprint = $env:SNAPANCHOR_CERT_THUMBPRINT
 )
 
@@ -66,18 +66,10 @@ foreach ($runtime in @('osx','linux-arm','linux-arm64','linux-musl-x64','linux-x
 
 Invoke-CodeSign (Join-Path $portableDirectory 'SnapAnchor.exe')
 
-# Existing portable 1.x copies expect to find their former apphost name before
-# they can hand control to the verified 2.0 updater. The compatibility apphost
-# is deliberately excluded from the new managed-file manifest, so the 2.0
-# updater does not install or retain it after migration.
-$legacyExecutable = ('Snap' + 'Pin.exe')
-Copy-Item -LiteralPath (Join-Path $portableDirectory 'SnapAnchor.exe') -Destination (Join-Path $portableDirectory $legacyExecutable) -Force
-
 # Portable updates use this managed-file list to remove files that belonged to
 # an older SnapAnchor package without touching documents users placed beside it.
 $managedFiles = @(
     Get-ChildItem -LiteralPath $portableDirectory -File -Recurse |
-        Where-Object { $_.Name -ne $legacyExecutable } |
         ForEach-Object { $_.FullName.Substring($portableDirectory.Length).TrimStart('\').Replace('\', '/') }
 )
 $managedFiles += '.snapanchor-package.json'
@@ -87,16 +79,6 @@ $managedFiles += '.snapanchor-package.json'
 } | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath (Join-Path $portableDirectory '.snapanchor-package.json') -Encoding UTF8
 
 Compress-Archive -Path (Join-Path $portableDirectory '*') -DestinationPath $payload -CompressionLevel Optimal -Force
-# Mark the one-release compatibility apphost as hidden for Explorer users. It
-# remains available to 1.x portable updaters but is never installed by 2.0.
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-$payloadArchive = [System.IO.Compression.ZipFile]::Open($payload, [System.IO.Compression.ZipArchiveMode]::Update)
-try {
-    $legacyEntry = $payloadArchive.GetEntry($legacyExecutable)
-    if ($legacyEntry) { $legacyEntry.ExternalAttributes = $legacyEntry.ExternalAttributes -bor 2 }
-} finally {
-    $payloadArchive.Dispose()
-}
 Copy-Item -LiteralPath $payload -Destination (Join-Path $dist 'SnapAnchor-Portable-win-x64.zip') -Force
 
 dotnet publish $setupProject `
@@ -110,7 +92,6 @@ if ($LASTEXITCODE -ne 0) { throw 'Installer publish failed.' }
 
 Copy-Item -LiteralPath (Join-Path $setupDirectory 'SnapAnchor.Setup.exe') -Destination (Join-Path $dist 'SnapAnchor-Setup-win-x64.exe') -Force
 Invoke-CodeSign (Join-Path $dist 'SnapAnchor-Setup-win-x64.exe')
-Remove-Item -LiteralPath (Join-Path $portableDirectory $legacyExecutable) -Force
 Copy-Item -LiteralPath $portableDirectory -Destination (Join-Path $dist 'SnapAnchor-Portable') -Recurse -Force
 
 $manifest = [ordered]@{
@@ -126,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Portable-win-x64.zip'
-    releaseNotes = 'SnapPin is now SnapAnchor. This major release preserves existing local settings and pin history, introduces a lighter 34 px vector toolbar, and updates portable and installer packaging for the new product identity.'
+    releaseNotes = 'SnapAnchor 2.0.1 removes the obsolete portable compatibility executable and adds context-aware OCR text cursors to pinned images.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 
