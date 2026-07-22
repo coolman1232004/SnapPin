@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class HotkeyExclusionService
 {

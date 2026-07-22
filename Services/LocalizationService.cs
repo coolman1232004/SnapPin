@@ -5,7 +5,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Collections;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class LocalizationService
 {
@@ -16,7 +16,7 @@ internal static class LocalizationService
     private static bool _automaticLocalizationEnabled;
 
     private static readonly System.Resources.ResourceManager Strings =
-        new("SnapPin.Resources.Strings", typeof(LocalizationService).Assembly);
+        new("SnapAnchor.Resources.Strings", typeof(LocalizationService).Assembly);
     private static readonly System.Globalization.CultureInfo SimplifiedCulture =
         System.Globalization.CultureInfo.GetCultureInfo("zh-Hans");
     private static readonly System.Globalization.CultureInfo TraditionalCulture =

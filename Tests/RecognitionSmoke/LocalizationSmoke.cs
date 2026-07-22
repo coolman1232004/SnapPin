@@ -1,8 +1,8 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace SnapPin.RecognitionSmoke;
+namespace SnapAnchor.RecognitionSmoke;
 
 internal static class LocalizationSmoke
 {
@@ -16,7 +16,7 @@ internal static class LocalizationSmoke
 
         if (LocalizationService.Translate("Capture", LocalizationService.SimplifiedChinese) != "截图" ||
             LocalizationService.Translate("General", LocalizationService.TraditionalChinese) != "一般" ||
-            LocalizationService.Translate("SnapPin recovered", LocalizationService.SimplifiedChinese) != "SnapPin 已恢复" ||
+            LocalizationService.Translate("SnapAnchor recovered", LocalizationService.SimplifiedChinese) != "SnapAnchor 已恢复" ||
             LocalizationService.Translate("The update was cancelled.", LocalizationService.TraditionalChinese) != "更新已取消。")
             throw new InvalidOperationException("One or more localized resource lookups returned the wrong value.");
 
@@ -26,7 +26,7 @@ internal static class LocalizationSmoke
             var bound = new TextBlock { DataContext = model };
             bound.SetBinding(TextBlock.TextProperty, new Binding(nameof(LocalizationBindingProbe.Value)));
             var staticText = new TextBlock { Text = "Configuration storage" };
-            var check = new CheckBox { Content = "Run SnapPin on system startup" };
+            var check = new CheckBox { Content = "Run SnapAnchor on system startup" };
             var panel = new StackPanel();
             panel.Children.Add(bound);
             panel.Children.Add(staticText);
@@ -36,7 +36,7 @@ internal static class LocalizationSmoke
                 StaticText: staticText.Text, Check: check.Content as string);
         });
         if (controlResult.BoundText != "Live value" || controlResult.Binding is null ||
-            controlResult.StaticText != "配置存储" || controlResult.Check != "系统启动时运行 SnapPin")
+            controlResult.StaticText != "配置存储" || controlResult.Check != "系统启动时运行 SnapAnchor")
             throw new InvalidOperationException("Automatic localization damaged a binding or missed a static control.");
 
         Console.WriteLine($"LOCALIZATION RESOURCES: {simplifiedMissing.Count + traditionalMissing.Count} missing; bindings preserved");

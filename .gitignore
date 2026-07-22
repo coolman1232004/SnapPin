@@ -7,9 +7,9 @@ package-smoke/
 packaging/staging/
 packaging/RecognitionSmokeOut/
 packaging/setup-previews/
-packaging/SnapPin.Setup/bin/
-packaging/SnapPin.Setup/obj/
-packaging/SnapPin.Setup/Payload.zip
+packaging/SnapAnchor.Setup/bin/
+packaging/SnapAnchor.Setup/obj/
+packaging/SnapAnchor.Setup/Payload.zip
 Tests/**/bin/
 Tests/**/obj/
 
@@ -19,7 +19,7 @@ PRODUCT_NOTES.md
 *.bak
 *.backup
 
-# User-specific SnapPin data and diagnostics
+# User-specific SnapAnchor data and diagnostics
 config.json
 settings.json
 history/

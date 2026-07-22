@@ -1,4 +1,4 @@
-namespace SnapPin.Models;
+namespace SnapAnchor.Models;
 
 internal sealed class CaptureRecord
 {

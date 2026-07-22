@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.0] - 2026-07-22
+
+- Renamed the product, executable, installer, portable package, namespaces, assets, local storage, and update channel from SnapPin to SnapAnchor
+- Added one-time migration for existing settings, capture history, pinned sessions, diagnostics, and startup registration
+- Rebuilt the capture and annotation toolbar around a shared 18 px WPF vector icon system
+- Reduced the compact toolbar to a light 34 px surface with restrained shadow, spacing, hover, active, and disabled states
+- Retained a verified compatibility bootstrap so existing portable copies can update in place to the renamed executable
+
 All notable user-facing changes should be recorded here. Versions follow semantic versioning where practical.
 
 ## [1.2.15] - 2026-07-21
@@ -23,7 +31,7 @@ All notable user-facing changes should be recorded here. Versions follow semanti
 
 ### Fixed
 
-- Taskbar-visible SnapPin windows now explicitly supply the high-resolution SnapPin logo to Windows Shell
+- Taskbar-visible SnapAnchor windows now explicitly supply the high-resolution SnapAnchor logo to Windows Shell
 - The dashboard, Preferences, History, custom capture, and portable updater no longer fall back to a blank or generic taskbar tile
 
 ### Validation
@@ -36,7 +44,7 @@ All notable user-facing changes should be recorded here. Versions follow semanti
 ### Added
 
 - Added an independent **Check for updates every day** option beside the existing startup check
-- Daily checks run at most once per local calendar day and continue while SnapPin remains open across midnight
+- Daily checks run at most once per local calendar day and continue while SnapAnchor remains open across midnight
 - Manual update checks count toward the daily schedule to avoid an immediate duplicate check
 - Added Simplified Chinese and Traditional Chinese translations for the new setting
 
@@ -78,7 +86,7 @@ All notable user-facing changes should be recorded here. Versions follow semanti
 
 ### Changed
 
-- Capture History now follows SnapPin's cool light design instead of the legacy dark window
+- Capture History now follows SnapAnchor's cool light design instead of the legacy dark window
 - Added a spacious header with distinct teal, sky-blue, and coral actions
 - Consolidated searching, source/type/date filters, favourites, and recycle-bin controls into a rounded white panel
 - Expanded history cards into a responsive three-column layout with larger previews, clearer metadata, rounded surfaces, and pastel action buttons
@@ -106,7 +114,7 @@ All notable user-facing changes should be recorded here. Versions follow semanti
 ### Added
 
 - About page indicator showing whether the running copy is **Portable** or **Installed**
-- One-click **Copy version information** action including SnapPin version, edition, and process architecture
+- One-click **Copy version information** action including SnapAnchor version, edition, and process architecture
 
 ### Validation
 
@@ -128,7 +136,7 @@ All notable user-facing changes should be recorded here. Versions follow semanti
 ### Changed
 
 - Verified downloads and staged portable files are reused after choosing **Later**
-- Portable replacement is performed by SnapPin's verified staged executable instead of a hidden PowerShell script
+- Portable replacement is performed by SnapAnchor's verified staged executable instead of a hidden PowerShell script
 - Only the two newest portable rollback copies are retained
 
 ### Fixed
@@ -190,9 +198,9 @@ All notable user-facing changes should be recorded here. Versions follow semanti
 
 ### Added
 
-- True in-place updates for portable SnapPin copies
+- True in-place updates for portable SnapAnchor copies
 - Automatic portable-package selection, SHA-256 verification, rollback backup, and restart
-- Friendly link to the SnapPin GitHub page in Preferences
+- Friendly link to the SnapAnchor GitHub page in Preferences
 
 ### Changed
 

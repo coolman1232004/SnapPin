@@ -1,17 +1,17 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 internal sealed class UpdateAvailableWindow : Window
 {
     private UpdateAvailableWindow(Window owner, UpdateCheckResult update)
     {
         Owner = owner;
-        Title = LocalizationService.Current("SnapPin update available");
+        Title = LocalizationService.Current("SnapAnchor update available");
         Width = 530;
         Height = 390;
         MinWidth = 460;
@@ -31,7 +31,7 @@ internal sealed class UpdateAvailableWindow : Window
 
         var title = new TextBlock
         {
-            Text = LocalizationService.Format("SnapPin {0} is available", update.Version),
+            Text = LocalizationService.Format("SnapAnchor {0} is available", update.Version),
             FontSize = 22,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 0, 6)

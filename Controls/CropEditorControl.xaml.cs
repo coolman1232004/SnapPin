@@ -1,10 +1,10 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Controls;
+namespace SnapAnchor.Controls;
 
 public partial class CropEditorControl : UserControl
 {

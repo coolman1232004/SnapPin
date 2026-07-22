@@ -2,9 +2,9 @@ using System.Windows;
 using System.IO;
 using System.Windows.Controls;
 using Forms = System.Windows.Forms;
-using SnapPin.Services;
+using SnapAnchor.Services;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 public partial class PreferencesWindow : Window
 {
@@ -51,7 +51,7 @@ public partial class PreferencesWindow : Window
         ShowSizeBox.IsChecked = _settings.ShowCaptureSize;
         ShowElementDetectionBox.IsChecked = _settings.ShowElementDetection != false;
         ShowCaptureHintsBox.IsChecked = _settings.ShowCaptureHints;
-        ExcludeSnapPinBox.IsChecked = _settings.ExcludeSnapPinFromCapture;
+        ExcludeSnapAnchorBox.IsChecked = _settings.ExcludeSnapAnchorFromCapture;
         ExcludedAppsList.ItemsSource = _settings.CaptureExcludedProcesses.ToList();
         HotkeyExcludedAppsList.ItemsSource = _settings.HotkeyExcludedProcesses.ToList();
         ScrollFramesBox.Text = _settings.ScrollCaptureMaxFrames.ToString();
@@ -210,7 +210,7 @@ public partial class PreferencesWindow : Window
         _settings.ShowCaptureSize = ShowSizeBox.IsChecked == true;
         _settings.ShowElementDetection = ShowElementDetectionBox.IsChecked == true;
         _settings.ShowCaptureHints = ShowCaptureHintsBox.IsChecked == true;
-        _settings.ExcludeSnapPinFromCapture = ExcludeSnapPinBox.IsChecked == true;
+        _settings.ExcludeSnapAnchorFromCapture = ExcludeSnapAnchorBox.IsChecked == true;
         _settings.CaptureExcludedProcesses = ExcludedAppsList.Items.Cast<string>()
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
@@ -232,7 +232,7 @@ public partial class PreferencesWindow : Window
         _settings.RecordingMicrophone = RecordingMicrophoneBox.IsChecked == true;
         _settings.RecordingInputDevice = RecordingInputDeviceBox.SelectedValue as string ?? string.Empty;
         _settings.RecordingOutputDevice = RecordingOutputDeviceBox.SelectedValue as string ?? string.Empty;
-        _settings.RecordingFolder = string.IsNullOrWhiteSpace(RecordingFolderBox.Text) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "SnapPin") : RecordingFolderBox.Text.Trim();
+        _settings.RecordingFolder = string.IsNullOrWhiteSpace(RecordingFolderBox.Text) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "SnapAnchor") : RecordingFolderBox.Text.Trim();
         _settings.PinWindowShadow = PinShadowBox.IsChecked == true;
         _settings.PinTextSelectableByDefault = PinTextSelectableDefaultBox.IsChecked == true;
         _settings.PinDefaultOpacity = Parse(PinOpacityBox.Text, 15, 100, 100);
@@ -255,7 +255,7 @@ public partial class PreferencesWindow : Window
         _settings.OutputShadowColor = OutputShadowColorBox.Text.Trim();
         var imageExtension = _settings.OutputFormat switch { "JPEG" => ".jpg", "WEBP" => ".webp", _ => ".png" };
         _settings.OutputFileName = Path.ChangeExtension(
-            string.IsNullOrWhiteSpace(FileNameBox.Text) ? "SnapPin_$yyyy-MM-dd_HH-mm-ss" : FileNameBox.Text.Trim(),
+            string.IsNullOrWhiteSpace(FileNameBox.Text) ? "SnapAnchor_$yyyy-MM-dd_HH-mm-ss" : FileNameBox.Text.Trim(),
             imageExtension);
         _settings.QuickSaveFolder = QuickFolderBox.Text.Trim();
         _settings.ShowSaveNotification = SaveNotificationBox.IsChecked == true;
@@ -309,13 +309,13 @@ public partial class PreferencesWindow : Window
     private void CopyDiagnostics_Click(object sender, RoutedEventArgs e)
     {
         Clipboard.SetText(DiagnosticsService.Summary());
-        MessageBox.Show(this, LocalizationService.Current("The diagnostic summary was copied."), LocalizationService.Current("SnapPin diagnostics"), MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show(this, LocalizationService.Current("The diagnostic summary was copied."), LocalizationService.Current("SnapAnchor diagnostics"), MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void CopyVersion_Click(object sender, RoutedEventArgs e)
     {
         Clipboard.SetText(DiagnosticsService.ProductSummary(UpdateService.IsPortableInstallation()));
-        MessageBox.Show(this, LocalizationService.Current("Version information copied."), "SnapPin",
+        MessageBox.Show(this, LocalizationService.Current("Version information copied."), "SnapAnchor",
             MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
@@ -329,7 +329,7 @@ public partial class PreferencesWindow : Window
         catch (Exception ex)
         {
             DiagnosticsService.Log("update", ex.Message, ex);
-            MessageBox.Show(this, LocalizationService.Format("Update check failed: {0}", ex.Message), LocalizationService.Current("SnapPin update"), MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, LocalizationService.Format("Update check failed: {0}", ex.Message), LocalizationService.Current("SnapAnchor update"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         finally
         {
@@ -380,7 +380,7 @@ public partial class PreferencesWindow : Window
 
     private static void BrowseInto(System.Windows.Controls.TextBox target)
     {
-        using var dialog = new Forms.FolderBrowserDialog { InitialDirectory = target.Text, UseDescriptionForTitle = true, Description = LocalizationService.Current("Choose a SnapPin output folder") };
+        using var dialog = new Forms.FolderBrowserDialog { InitialDirectory = target.Text, UseDescriptionForTitle = true, Description = LocalizationService.Current("Choose a SnapAnchor output folder") };
         if (dialog.ShowDialog() == Forms.DialogResult.OK) target.Text = dialog.SelectedPath;
     }
 

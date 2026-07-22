@@ -52,7 +52,7 @@ $codeFiles |
     }
 
 $nonLocalizedTechnicalLabels = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-foreach ($value in @('0 frames', 'Arial', 'Calibri', 'English', 'JPEG', 'Microsoft YaHei UI', 'Segoe UI', 'SNAPPIN', 'SnapPin', 'WebP')) {
+foreach ($value in @('0 frames', 'Arial', 'Calibri', 'English', 'JPEG', 'Microsoft YaHei UI', 'Segoe UI', 'SNAPANCHOR', 'SnapAnchor', 'WebP')) {
     [void]$nonLocalizedTechnicalLabels.Add($value)
 }
 $untracked = @($used | Where-Object { -not $base.ContainsKey($_) -and -not $nonLocalizedTechnicalLabels.Contains($_) } | Sort-Object)

@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 /// <summary>Writes animated GIF frames immediately so recording memory does not grow with duration.</summary>
 internal sealed class StreamingGifWriter : IDisposable

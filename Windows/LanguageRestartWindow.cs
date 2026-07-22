@@ -1,9 +1,9 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 internal sealed class LanguageRestartWindow : Window
 {
@@ -24,7 +24,7 @@ internal sealed class LanguageRestartWindow : Window
         var message = new TextBlock
         {
             Text = LocalizationService.Translate(
-                "The interface language has changed. Restart SnapPin now to apply it throughout the app?\n\nChoose Later to apply it the next time SnapPin starts.", language),
+                "The interface language has changed. Restart SnapAnchor now to apply it throughout the app?\n\nChoose Later to apply it the next time SnapAnchor starts.", language),
             TextWrapping = TextWrapping.Wrap,
             FontSize = 14,
             LineHeight = 22,

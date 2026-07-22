@@ -1,11 +1,11 @@
-using SnapPin.Models;
-using SnapPin.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Controls;
+namespace SnapAnchor.Controls;
 
 internal sealed class RecognitionCompletedEventArgs(RecognitionResult result) : EventArgs
 {

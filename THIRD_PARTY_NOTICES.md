@@ -1,6 +1,6 @@
 # Third-party notices
 
-SnapPin is an independent application. It uses the following open-source components:
+SnapAnchor is an independent application. It uses the following open-source components:
 
 - Tesseract .NET wrapper 5.2.0 — Apache License 2.0 — https://github.com/charlesw/tesseract
 - Tesseract OCR engine and `tessdata_fast` language models — Apache License 2.0 — https://github.com/tesseract-ocr/tesseract
@@ -17,4 +17,4 @@ SkiaSharp copyright (c) 2015-2016 Xamarin, Inc. and copyright (c) 2017-2018 Micr
 
 Skia copyright (c) 2011 Google Inc. Redistribution and use in source and binary forms, with or without modification, are permitted provided that copyright, conditions, and disclaimer notices are retained, and contributor names are not used for endorsement without permission. Skia is provided "AS IS", without warranty of any kind.
 
-These projects and their authors do not endorse SnapPin. Snipaste code, branding, and assets are not used.
+These projects and their authors do not endorse SnapAnchor. Snipaste code, branding, and assets are not used.

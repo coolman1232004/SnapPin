@@ -1,7 +1,7 @@
-using SnapPin.Windows;
+using SnapAnchor.Windows;
 using System.Windows;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class UpdateWorkflowService
 {
@@ -11,7 +11,7 @@ internal static class UpdateWorkflowService
         if (!update.UpdateAvailable || string.IsNullOrWhiteSpace(update.DownloadUrl))
         {
             if (!automatic)
-                MessageBox.Show(owner, update.Message, LocalizationService.Current("SnapPin update"),
+                MessageBox.Show(owner, update.Message, LocalizationService.Current("SnapAnchor update"),
                     MessageBoxButton.OK, MessageBoxImage.Information);
             return false;
         }

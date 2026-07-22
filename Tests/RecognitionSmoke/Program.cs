@@ -1,7 +1,7 @@
-using SnapPin.Services;
-using SnapPin.Controls;
-using SnapPin.Models;
-using SnapPin.Windows;
+using SnapAnchor.Services;
+using SnapAnchor.Controls;
+using SnapAnchor.Models;
+using SnapAnchor.Windows;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -14,7 +14,7 @@ using SkiaSharp;
 using Drawing = System.Drawing;
 using DrawingImaging = System.Drawing.Imaging;
 
-namespace SnapPin.RecognitionSmoke;
+namespace SnapAnchor.RecognitionSmoke;
 
 internal static class Program
 {
@@ -28,10 +28,10 @@ internal static class Program
         CompatibilitySmoke.Run(CreatePatternImage);
         UpdateUiSmoke.Run();
 
-        var textImage = CreateTextImage("SNAPPIN OCR TEST 2026");
+        var textImage = CreateTextImage("SNAPANCHOR OCR TEST 2026");
         var textResult = await RecognitionService.RecognizeAsync(textImage, "eng");
         Console.WriteLine($"OCR: {textResult.Text.Replace(Environment.NewLine, " | ")} ERROR: {textResult.ErrorMessage}");
-        if (!textResult.Text.Contains("SNAPPIN", StringComparison.OrdinalIgnoreCase)) return 2;
+        if (!textResult.Text.Contains("SNAPANCHOR", StringComparison.OrdinalIgnoreCase)) return 2;
         if (textResult.RecognizedWords.Count == 0 ||
             textResult.RecognizedWords.Any(word => word.Width <= 0 || word.Height <= 0 || word.X < 0 || word.Y < 0)) return 50;
         var selectionText = PinnedImageWindow.ComposeRecognizedText(
@@ -75,7 +75,7 @@ internal static class Program
             CaptureService.FilterIndexForFormat("PNG") != 1) return 34;
         Console.WriteLine("EXPORT DEFAULTS: PNG, JPEG and WebP mappings verified");
 
-        const string payload = "https://example.com/snappin-test";
+        const string payload = "https://example.com/snapanchor-test";
         var qrImage = CreateQrImage(payload);
         var qrResult = await RecognitionService.RecognizeAsync(qrImage, "eng");
         Console.WriteLine($"BARCODE: {qrResult.BarcodeFormat} {qrResult.BarcodeText}");
@@ -253,7 +253,7 @@ internal static class Program
         if (!stableToolbarAnchor) return 48;
         Console.WriteLine("ANNOTATION POSITION: primary toolbar anchor remains fixed when the property row changes");
 
-        if (Environment.GetEnvironmentVariable("SNAPPIN_RENDER_LAYOUT") == "1")
+        if (Environment.GetEnvironmentVariable("SNAPANCHOR_RENDER_LAYOUT") == "1")
         {
             var dashboardLayoutPath = Path.Combine(AppContext.BaseDirectory, "dashboard-light-preview.png");
             var dashboardPreview = RunSta(() =>
@@ -291,7 +291,7 @@ internal static class Program
                 };
                 host.Resources.MergedDictionaries.Add(new ResourceDictionary
                 {
-                    Source = new Uri("/SnapPin;component/Resources/ToolbarResources.xaml", UriKind.RelativeOrAbsolute)
+                    Source = new Uri("/SnapAnchor;component/Resources/ToolbarResources.xaml", UriKind.RelativeOrAbsolute)
                 });
                 ToolbarThemeService.ApplyTo(host.Resources, "Compact");
                 host.Measure(new Size(850, 92));
@@ -331,7 +331,7 @@ internal static class Program
             {
                 var overlay = new CaptureOverlayWindow(CreatePatternImage(900, 560));
                 var review = (Border)overlay.FindName("RecordingReviewPanel");
-                ((TextBlock)overlay.FindName("RecordingSavePathText")).Text = @"Will save to: C:\Users\Example\Videos\SnapPin\recording.mp4";
+                ((TextBlock)overlay.FindName("RecordingSavePathText")).Text = @"Will save to: C:\Users\Example\Videos\SnapAnchor\recording.mp4";
                 review.Visibility = Visibility.Visible;
                 if (review.Parent is Panel parent) parent.Children.Remove(review);
                 review.Measure(new Size(620, 470));
@@ -487,7 +487,7 @@ internal static class Program
                     {
                         OutputFormat = "WEBP",
                         ImageQuality = 86,
-                        OutputFileName = "SnapPin_$yyyy-MM-dd_HH-mm-ss.webp"
+                        OutputFileName = "SnapAnchor_$yyyy-MM-dd_HH-mm-ss.webp"
                     })
                     {
                         Left = -10000,
@@ -518,7 +518,7 @@ internal static class Program
             }
         }
 
-        var instanceId = $"SnapPin.Smoke.{Guid.NewGuid():N}";
+        var instanceId = $"SnapAnchor.Smoke.{Guid.NewGuid():N}";
         using (var primaryInstance = new SingleInstanceService(instanceId))
         using (var secondaryInstance = new SingleInstanceService(instanceId))
         {
@@ -565,7 +565,7 @@ internal static class Program
         if (whiteboardPolicy.TransparentAlpha != 0 || whiteboardPolicy.SolidAlpha != 255 || !whiteboardPolicy.ActionsVisible) return 42;
         Console.WriteLine("WHITEBOARD: solid and transparent inline annotation modes verified");
 
-        var recoveryRoot = Path.Combine(Path.GetTempPath(), $"snappin-recovery-{Guid.NewGuid():N}");
+        var recoveryRoot = Path.Combine(Path.GetTempPath(), $"snapanchor-recovery-{Guid.NewGuid():N}");
         try
         {
             var atomicPath = Path.Combine(recoveryRoot, "atomic.json");
@@ -598,12 +598,12 @@ internal static class Program
             if (LocalizationService.Translate("Capture", "简体中文") != "截图" ||
                 LocalizationService.Translate("General", "繁體中文") != "一般" ||
                 LocalizationService.Translate("Restart required", "繁體中文") != "需要重新啟動" ||
-                LocalizationService.Translate("Run SnapPin on system startup", "简体中文") != "系统启动时运行 SnapPin" ||
+                LocalizationService.Translate("Run SnapAnchor on system startup", "简体中文") != "系统启动时运行 SnapAnchor" ||
                 LocalizationService.Normalize("invalid") != "English") return 56;
             var localizedControls = RunSta(() =>
             {
                 var text = new TextBlock { Text = "Configuration storage" };
-                var check = new CheckBox { Content = "Run SnapPin on system startup" };
+                var check = new CheckBox { Content = "Run SnapAnchor on system startup" };
                 var panel = new StackPanel();
                 panel.Children.Add(text);
                 panel.Children.Add(check);
@@ -611,7 +611,7 @@ internal static class Program
                 return (text.Text, check.Content as string);
             });
             Console.WriteLine($"LOCALIZATION: text='{localizedControls.Item1}', checkbox='{localizedControls.Item2}'");
-            if (localizedControls.Item1 != "配置存储" || localizedControls.Item2 != "系统启动时运行 SnapPin") return 63;
+            if (localizedControls.Item1 != "配置存储" || localizedControls.Item2 != "系统启动时运行 SnapAnchor") return 63;
             Console.WriteLine("PIN SESSION: verified generation, physical monitor state and application-wide localization recovered");
         }
         finally
@@ -694,9 +694,9 @@ internal static class Program
             return defaultsMatch && customVisibleTags.SequenceEqual(new[] { "Magnify", "Text" }) &&
                 swatches == 20 && ((StackPanel)editor.FindName("TextOptionsPanel")).Visibility == Visibility.Visible &&
                 ((StackPanel)editor.FindName("ShapeOptionsPanel")).Visibility == Visibility.Collapsed &&
-                textToolButton.Width == 26 && textToolButton.Height == 26 && textToolButton.Padding == new Thickness(2) &&
-                textToolButton.Margin == new Thickness(1) &&
-                primaryToolbar.DesiredSize.Height <= 32.1 &&
+                textToolButton.Width == 28 && textToolButton.Height == 28 && textToolButton.Padding == new Thickness(4) &&
+                textToolButton.Margin == new Thickness(1, 0, 1, 0) &&
+                primaryToolbar.DesiredSize.Height <= 34.1 &&
                 textToolButton.Content is System.Windows.Shapes.Path &&
                 shapeProperties.Children.OfType<Button>().All(button => button.Tag is null) &&
                 arrowProperties.Children.OfType<Button>().All(button => button.Tag is null);
@@ -734,10 +734,10 @@ internal static class Program
                 .Select(button => button.Tag as string)
                 .ToArray();
             var compactSpacing = panel.Children.OfType<Button>().All(button =>
-                button.Width == 26 && button.Height == 26 && button.Padding == new Thickness(2) && button.Margin == new Thickness(1));
+                button.Width == 28 && button.Height == 28 && button.Padding == new Thickness(4) && button.Margin == new Thickness(1, 0, 1, 0));
             var actionBar = (Border)overlay.FindName("ActionBar");
             actionBar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            var compactHeight = actionBar.DesiredSize.Height <= 32.1;
+            var compactHeight = actionBar.DesiredSize.Height <= 34.1;
             var historySlotsStartMuted = ((StackPanel)overlay.FindName("AnnotationHistoryPanel")).Visibility == Visibility.Visible &&
                 !((Button)overlay.FindName("CaptureUndoButton")).IsEnabled &&
                 !((Button)overlay.FindName("CaptureRedoButton")).IsEnabled;
@@ -988,9 +988,9 @@ internal static class Program
         if (restoredRecord is null || !restoredRecord.HasContext || restoredRecord.ContextWidth != 1920 || restoredRecord.SourceRegion?.Width != 100 || restoredRecord.SourceKind != "Pinned") return 18;
         Console.WriteLine("HISTORY MODEL: legacy migration and full-context metadata preserved");
 
-        var outputRoot = Path.Combine(Path.GetTempPath(), $"snappin-output-{Guid.NewGuid():N}");
-        var webpOutput = SettingsService.CreateOutputPath(outputRoot, "SnapPin_$yyyy.webp");
-        var jpegOutput = SettingsService.CreateOutputPath(outputRoot, "SnapPin_$yyyy.jpeg");
+        var outputRoot = Path.Combine(Path.GetTempPath(), $"snapanchor-output-{Guid.NewGuid():N}");
+        var webpOutput = SettingsService.CreateOutputPath(outputRoot, "SnapAnchor_$yyyy.webp");
+        var jpegOutput = SettingsService.CreateOutputPath(outputRoot, "SnapAnchor_$yyyy.jpeg");
         if (Path.GetExtension(webpOutput) != ".webp" || Path.GetExtension(jpegOutput) != ".jpeg" ||
             HotkeyOptions.Get("CtrlShiftD").VirtualKey != 0x44 || HotkeyOptions.Get("CtrlAlt9").VirtualKey != 0x39 || HotkeyOptions.All.Length < 200) return 23;
         var normalizedHotkeyExclusions = HotkeyExclusionService.Normalize([" chrome ", "CHROME", "PowerPnt", ""]);
@@ -1011,12 +1011,12 @@ internal static class Program
             UpdateCheckScheduleService.IsDailyCheckDue(dailyCheckNow.AddHours(-6), dailyCheckNow, TimeZoneInfo.Utc) ||
             !UpdateCheckScheduleService.IsDailyCheckDue(dailyCheckNow.AddDays(-1), dailyCheckNow, TimeZoneInfo.Utc) ||
             UpdateCheckScheduleService.IsDailyCheckDue(dailyCheckNow.AddHours(1), dailyCheckNow, TimeZoneInfo.Utc)) return 76;
-        var installedExecutable = Path.Combine(Path.GetTempPath(), "SnapPinInstalled", "SnapPin.exe");
-        var portableExecutable = Path.Combine(Path.GetTempPath(), "SnapPinPortable", "SnapPin.exe");
-        var portableUrl = UpdateService.ResolvePackageUrl(updateFeed, null, "SnapPin-Portable-win-x64.zip");
+        var installedExecutable = Path.Combine(Path.GetTempPath(), "SnapAnchorInstalled", "SnapAnchor.exe");
+        var portableExecutable = Path.Combine(Path.GetTempPath(), "SnapAnchorPortable", "SnapAnchor.exe");
+        var portableUrl = UpdateService.ResolvePackageUrl(updateFeed, null, "SnapAnchor-Portable-win-x64.zip");
         if (UpdateService.IsPortableLocation(installedExecutable, Path.GetDirectoryName(installedExecutable)) ||
             !UpdateService.IsPortableLocation(portableExecutable, Path.GetDirectoryName(installedExecutable)) ||
-            !portableUrl.Equals("https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip", StringComparison.OrdinalIgnoreCase)) return 62;
+            !portableUrl.Equals("https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Portable-win-x64.zip", StringComparison.OrdinalIgnoreCase)) return 62;
         Console.WriteLine("UPDATE CHANNEL: startup and once-per-day schedules plus installed/portable package routing verified");
 
         var effectedOutput = CaptureService.ApplyOutputEffects(CreatePatternImage(160, 96), new AppSettings
@@ -1075,7 +1075,7 @@ internal static class Program
         if (!drawingMode.IsDrawingInline || !drawingMode.HandlesVisible || !drawingMode.SharedToolbar || drawingMode.CurrentSelection.Width < 300 || drawingMode.CurrentSelection.Height < 160) return 24;
         Console.WriteLine($"FULL-SCREEN DRAW: capture actions remain visible while properties open over {drawingMode.CurrentSelection.Width:N0} x {drawingMode.CurrentSelection.Height:N0}");
 
-        var formatRoot = Path.Combine(Path.GetTempPath(), $"snappin-formats-{Guid.NewGuid():N}");
+        var formatRoot = Path.Combine(Path.GetTempPath(), $"snapanchor-formats-{Guid.NewGuid():N}");
         try
         {
             Directory.CreateDirectory(formatRoot);
@@ -1094,8 +1094,8 @@ internal static class Program
             if (Directory.Exists(formatRoot)) Directory.Delete(formatRoot, recursive: true);
         }
 
-        var historyRoot = Path.Combine(Path.GetTempPath(), $"snappin-history-{Guid.NewGuid():N}");
-        Environment.SetEnvironmentVariable("SNAPPIN_HISTORY_ROOT", historyRoot);
+        var historyRoot = Path.Combine(Path.GetTempPath(), $"snapanchor-history-{Guid.NewGuid():N}");
+        Environment.SetEnvironmentVariable("SNAPANCHOR_HISTORY_ROOT", historyRoot);
         try
         {
             var context = CreatePatternImage(320, 180);
@@ -1121,7 +1121,7 @@ internal static class Program
             if (HistoryService.List().All(record => record.Id != contextRecord.Id)) return 38;
             var fullRecord = HistoryService.Add(context, new Int32Rect(0, 0, 320, 180), context, "Edited");
             if (fullRecord.HasContext) return 21;
-            if (Environment.GetEnvironmentVariable("SNAPPIN_RENDER_LAYOUT") == "1")
+            if (Environment.GetEnvironmentVariable("SNAPANCHOR_RENDER_LAYOUT") == "1")
                 CaptureService.SavePng(contextPreview, Path.Combine(AppContext.BaseDirectory, "context-highlight-preview.png"));
             HistoryService.UpdateMetadata(contextRecord.Id, title: "Quarterly award", favorite: true,
                 tags: ["finance", "reference"]);
@@ -1145,7 +1145,7 @@ internal static class Program
             if (Directory.Exists(historyRoot)) Directory.Delete(historyRoot, recursive: true);
         }
 
-        var gifPath = Path.Combine(Path.GetTempPath(), $"snappin-recording-{Guid.NewGuid():N}.gif");
+        var gifPath = Path.Combine(Path.GetTempPath(), $"snapanchor-recording-{Guid.NewGuid():N}.gif");
         try
         {
             var gifFrame = CreatePatternImage(180, 110);
@@ -1160,9 +1160,9 @@ internal static class Program
         {
             if (File.Exists(gifPath)) File.Delete(gifPath);
         }
-        if (Environment.GetEnvironmentVariable("SNAPPIN_TEST_MP4") == "1")
+        if (Environment.GetEnvironmentVariable("SNAPANCHOR_TEST_MP4") == "1")
         {
-            var stillPath = Path.Combine(Path.GetTempPath(), $"snappin-mp4-source-{Guid.NewGuid():N}.png");
+            var stillPath = Path.Combine(Path.GetTempPath(), $"snapanchor-mp4-source-{Guid.NewGuid():N}.png");
             var mp4Path = Path.ChangeExtension(stillPath, ".mp4");
             CaptureService.SavePng(CreatePatternImage(320, 180), stillPath);
             var completion = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -1221,7 +1221,7 @@ internal static class Program
             ]);
             var window = new Window
             {
-                Title = "SnapPin Annotation QA",
+                Title = "SnapAnchor Annotation QA",
                 Width = 900,
                 Height = 610,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,

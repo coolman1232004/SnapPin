@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record RunningAppOption(string ProcessName, string DisplayName);
 
@@ -40,8 +40,8 @@ internal static class CaptureExclusionService
     public static BitmapSource Apply(BitmapSource source, System.Drawing.Rectangle capturedBounds, AppSettings settings)
     {
         var excluded = new HashSet<string>(settings.CaptureExcludedProcesses, StringComparer.OrdinalIgnoreCase);
-        // SnapPin's own windows use WDA_EXCLUDEFROMCAPTURE so Windows can reveal the content behind them.
-        // Third-party windows cannot be assigned that flag by SnapPin, so those are covered after capture.
+        // SnapAnchor's own windows use WDA_EXCLUDEFROMCAPTURE so Windows can reveal the content behind them.
+        // Third-party windows cannot be assigned that flag by SnapAnchor, so those are covered after capture.
         const bool redactOwnWindows = false;
         if (excluded.Count == 0) return source;
 

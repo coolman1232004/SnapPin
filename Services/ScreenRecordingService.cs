@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record ScreenRecordingResult(string FilePath, BitmapSource Preview, TimeSpan Duration, int FrameCount);
 
@@ -25,7 +25,7 @@ internal static class ScreenRecordingService
         var active = Stopwatch.StartNew();
         var total = Stopwatch.StartNew();
         var wasPaused = false;
-        var output = SettingsService.CreateOutputPath(settings.RecordingFolder, "SnapPin_$yyyy-MM-dd_HH-mm-ss.gif", ".gif");
+        var output = SettingsService.CreateOutputPath(settings.RecordingFolder, "SnapAnchor_$yyyy-MM-dd_HH-mm-ss.gif", ".gif");
         BitmapSource? preview = null;
         StreamingGifWriter? writer = null;
         var frameCount = 0;

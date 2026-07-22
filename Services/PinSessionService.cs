@@ -1,16 +1,16 @@
-using SnapPin.Models;
+using SnapAnchor.Models;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record PinSessionSnapshot(BitmapSource Image, PinSessionItem Item);
 
 internal static class PinSessionService
 {
     private static readonly string Root = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapPin", "PinSession");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapAnchor", "PinSession");
     private static readonly object QueueSync = new();
     private static PendingWrite? _pending;
     private static Task _worker = Task.CompletedTask;

@@ -1,11 +1,11 @@
 using System.IO;
 using System.Text.Json;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 public sealed class AppSettings
 {
-    public const string DefaultUpdateFeedUrl = "https://github.com/coolman1232004/SnapPin/releases/latest/download/release.json";
+    public const string DefaultUpdateFeedUrl = "https://github.com/coolman1232004/SnapAnchor/releases/latest/download/release.json";
 
     public string CaptureHotkey { get; set; } = "F1";
     public string CaptureAndCopyHotkey { get; set; } = "CtrlF1";
@@ -27,7 +27,7 @@ public sealed class AppSettings
     public bool ShowCaptureSize { get; set; } = true;
     public bool? ShowElementDetection { get; set; }
     public bool ShowCaptureHints { get; set; } = true;
-    public bool ExcludeSnapPinFromCapture { get; set; } = true;
+    public bool ExcludeSnapAnchorFromCapture { get; set; } = true;
     public List<string> CaptureExcludedProcesses { get; set; } = [];
     public List<string> HotkeyExcludedProcesses { get; set; } = [];
     public bool PinWindowShadow { get; set; } = true;
@@ -40,7 +40,7 @@ public sealed class AppSettings
     public bool PinGroupsFollowVirtualDesktops { get; set; }
     public Dictionary<string, string> PinGroupDesktopBindings { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public string DefaultPinBackground { get; set; } = "Transparent";
-    public string OutputFileName { get; set; } = "SnapPin_$yyyy-MM-dd_HH-mm-ss.png";
+    public string OutputFileName { get; set; } = "SnapAnchor_$yyyy-MM-dd_HH-mm-ss.png";
     public string OutputFormat { get; set; } = "PNG";
     public int ImageQuality { get; set; } = 92;
     public int OutputBorderWidth { get; set; }
@@ -51,7 +51,7 @@ public sealed class AppSettings
     public string QuickSaveFolder { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
     public bool ShowSaveNotification { get; set; } = true;
     public bool AutoSave { get; set; }
-    public string AutoSaveFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "SnapPin");
+    public string AutoSaveFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "SnapAnchor");
     public int HistoryLimit { get; set; } = 200;
     public string OcrLanguage { get; set; } = "eng+chi_sim+chi_tra";
     public bool OcrAutoCopy { get; set; }
@@ -84,7 +84,7 @@ public sealed class AppSettings
     public List<string> AnnotationToolbarEnabled { get; set; } = AnnotationToolbarCatalog.DefaultEnabled.ToList();
     public List<string> CaptureToolbarOrder { get; set; } = CaptureToolbarCatalog.DefaultOrder.ToList();
     public List<string> CaptureToolbarEnabled { get; set; } = CaptureToolbarCatalog.DefaultEnabled.ToList();
-    public string RecordingFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "SnapPin");
+    public string RecordingFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "SnapAnchor");
     public string RecordingFormat { get; set; } = "MP4";
     public string RecordingCaptureMode { get; set; } = "Region";
     public string RecordingQuality { get; set; } = "High";
@@ -151,7 +151,7 @@ internal static class SettingsService
 {
     private static readonly object Sync = new();
     private static readonly string SettingsDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapPin");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapAnchor");
     private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "settings.json");
 
     public static AppSettings Load()
@@ -175,9 +175,19 @@ internal static class SettingsService
 
     private static AppSettings Normalize(AppSettings settings)
     {
-        // Updates always come from SnapPin's official GitHub release channel.
+        // Updates always come from SnapAnchor's official GitHub release channel.
         // Older custom or empty feed values are migrated to the trusted source.
         settings.UpdateFeedUrl = AppSettings.DefaultUpdateFeedUrl;
+        var legacyName = string.Concat("Snap", "Pin");
+        if (!string.IsNullOrWhiteSpace(settings.OutputFileName) &&
+            settings.OutputFileName.StartsWith(legacyName + "_", StringComparison.OrdinalIgnoreCase))
+            settings.OutputFileName = "SnapAnchor_" + settings.OutputFileName[(legacyName.Length + 1)..];
+        var legacyPictures = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), legacyName);
+        if (PathsEqual(settings.AutoSaveFolder, legacyPictures))
+            settings.AutoSaveFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "SnapAnchor");
+        var legacyVideos = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), legacyName);
+        if (PathsEqual(settings.RecordingFolder, legacyVideos))
+            settings.RecordingFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "SnapAnchor");
 
         // Older builds used the size/dimension checkbox as the closest capture-
         // guidance preference. Preserve the user's choice when introducing the
@@ -250,9 +260,23 @@ internal static class SettingsService
         settings.OutputShadowSize = Math.Clamp(settings.OutputShadowSize, 1, 64);
         var outputExtension = settings.OutputFormat switch { "JPEG" => ".jpg", "WEBP" => ".webp", _ => ".png" };
         settings.OutputFileName = Path.ChangeExtension(
-            string.IsNullOrWhiteSpace(settings.OutputFileName) ? "SnapPin_$yyyy-MM-dd_HH-mm-ss" : settings.OutputFileName,
+            string.IsNullOrWhiteSpace(settings.OutputFileName) ? "SnapAnchor_$yyyy-MM-dd_HH-mm-ss" : settings.OutputFileName,
             outputExtension);
         return settings;
+    }
+
+    private static bool PathsEqual(string? left, string? right)
+    {
+        if (string.IsNullOrWhiteSpace(left) || string.IsNullOrWhiteSpace(right)) return false;
+        try
+        {
+            return Path.GetFullPath(left).Equals(Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            // A malformed user-edited path must not prevent settings migration.
+            return false;
+        }
     }
 
     public static string CreateOutputPath(string folder, string template)
@@ -285,8 +309,8 @@ internal static class SettingsService
     {
         using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
         if (enabled)
-            key?.SetValue("SnapPin", $"\"{Environment.ProcessPath}\"");
+            key?.SetValue("SnapAnchor", $"\"{Environment.ProcessPath}\"");
         else
-            key?.DeleteValue("SnapPin", false);
+            key?.DeleteValue("SnapAnchor", false);
     }
 }

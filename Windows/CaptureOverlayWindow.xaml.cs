@@ -7,12 +7,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
-using SnapPin.Services;
-using SnapPin.Models;
-using SnapPin.Controls;
+using SnapAnchor.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Controls;
 using Forms = System.Windows.Forms;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 public enum CaptureCompletionMode
 {
@@ -711,8 +711,11 @@ public partial class CaptureOverlayWindow : Window
             var isActive = activeTool is not null &&
                 string.Equals(button.Tag as string, activeTool, StringComparison.OrdinalIgnoreCase);
             button.Background = isActive
-                ? new SolidColorBrush(Color.FromRgb(197, 230, 247))
+                ? (TryFindResource("ToolbarActiveBrush") as Brush ?? new SolidColorBrush(Color.FromRgb(204, 251, 241)))
                 : Brushes.Transparent;
+            button.Foreground = isActive
+                ? (TryFindResource("ToolbarActiveInkBrush") as Brush ?? new SolidColorBrush(Color.FromRgb(13, 148, 136)))
+                : (TryFindResource("ToolbarInkBrush") as Brush ?? new SolidColorBrush(Color.FromRgb(51, 65, 85)));
         }
     }
 

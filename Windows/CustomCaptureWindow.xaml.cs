@@ -1,9 +1,9 @@
-using SnapPin.Models;
-using SnapPin.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.Globalization;
 using System.Windows;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 public partial class CustomCaptureWindow : Window
 {

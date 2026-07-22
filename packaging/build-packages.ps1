@@ -1,7 +1,7 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '1.2.15',
-    [string]$CertificateThumbprint = $env:SNAPPIN_CERT_THUMBPRINT
+    [string]$Version = '2.0.0',
+    [string]$CertificateThumbprint = $env:SNAPANCHOR_CERT_THUMBPRINT
 )
 
 $ErrorActionPreference = 'Stop'
@@ -9,13 +9,13 @@ $ErrorActionPreference = 'Stop'
 $workspace = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $dist = [System.IO.Path]::GetFullPath((Join-Path $workspace $DistDirectory))
 $staging = [System.IO.Path]::GetFullPath((Join-Path $workspace 'packaging\staging'))
-$setupProject = Join-Path $workspace 'packaging\SnapPin.Setup\SnapPin.Setup.csproj'
-$payload = Join-Path $workspace 'packaging\SnapPin.Setup\Payload.zip'
+$setupProject = Join-Path $workspace 'packaging\SnapAnchor.Setup\SnapAnchor.Setup.csproj'
+$payload = Join-Path $workspace 'packaging\SnapAnchor.Setup\Payload.zip'
 
 function Invoke-CodeSign([string]$Path) {
     if ([string]::IsNullOrWhiteSpace($CertificateThumbprint)) { return }
     $signTool = Get-Command signtool.exe -ErrorAction SilentlyContinue
-    if (-not $signTool) { throw 'SNAPPIN_CERT_THUMBPRINT was provided, but signtool.exe was not found.' }
+    if (-not $signTool) { throw 'SNAPANCHOR_CERT_THUMBPRINT was provided, but signtool.exe was not found.' }
     & $signTool.Source sign /sha1 $CertificateThumbprint /fd SHA256 /td SHA256 /tr 'http://timestamp.digicert.com' $Path
     if ($LASTEXITCODE -ne 0) { throw "Code signing failed for $Path" }
 }
@@ -30,10 +30,10 @@ foreach ($target in @($dist, $staging)) {
 }
 
 New-Item -ItemType Directory -Path $dist, $staging -Force | Out-Null
-$portableDirectory = Join-Path $staging 'SnapPin-Portable'
+$portableDirectory = Join-Path $staging 'SnapAnchor-Portable'
 $setupDirectory = Join-Path $staging 'Setup'
 
-dotnet publish (Join-Path $workspace 'SnapPin.csproj') `
+dotnet publish (Join-Path $workspace 'SnapAnchor.csproj') `
     -c Release -r win-x64 --self-contained true `
     -p:Platform=x64 `
     -p:Version=$Version -p:AssemblyVersion="$Version.0" -p:FileVersion="$Version.0" `
@@ -43,7 +43,7 @@ dotnet publish (Join-Path $workspace 'SnapPin.csproj') `
 if ($LASTEXITCODE -ne 0) { throw 'Portable publish failed.' }
 
 # The x64 product does not load the NuGet packages' x86 native payload. Keep
-# only English/Chinese satellite resources used by SnapPin's supported UI.
+# only English/Chinese satellite resources used by SnapAnchor's supported UI.
 $unusedDirectories = @('x86','ar','cs','da','de','el','es','fi','fr','he','hu','it','ja','ko','nb','nl','pl','pt-BR','pt-PT','ro','ru','sk','sv','th','tr','uk','vi')
 foreach ($name in $unusedDirectories) {
     $candidate = Join-Path $portableDirectory $name
@@ -64,22 +64,40 @@ foreach ($runtime in @('osx','linux-arm','linux-arm64','linux-musl-x64','linux-x
     }
 }
 
-Invoke-CodeSign (Join-Path $portableDirectory 'SnapPin.exe')
+Invoke-CodeSign (Join-Path $portableDirectory 'SnapAnchor.exe')
+
+# Existing portable 1.x copies expect to find their former apphost name before
+# they can hand control to the verified 2.0 updater. The compatibility apphost
+# is deliberately excluded from the new managed-file manifest, so the 2.0
+# updater does not install or retain it after migration.
+$legacyExecutable = ('Snap' + 'Pin.exe')
+Copy-Item -LiteralPath (Join-Path $portableDirectory 'SnapAnchor.exe') -Destination (Join-Path $portableDirectory $legacyExecutable) -Force
 
 # Portable updates use this managed-file list to remove files that belonged to
-# an older SnapPin package without touching documents users placed beside it.
+# an older SnapAnchor package without touching documents users placed beside it.
 $managedFiles = @(
     Get-ChildItem -LiteralPath $portableDirectory -File -Recurse |
+        Where-Object { $_.Name -ne $legacyExecutable } |
         ForEach-Object { $_.FullName.Substring($portableDirectory.Length).TrimStart('\').Replace('\', '/') }
 )
-$managedFiles += '.snappin-package.json'
+$managedFiles += '.snapanchor-package.json'
 [ordered]@{
     version = $Version
     files = @($managedFiles | Sort-Object -Unique)
-} | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath (Join-Path $portableDirectory '.snappin-package.json') -Encoding UTF8
+} | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath (Join-Path $portableDirectory '.snapanchor-package.json') -Encoding UTF8
 
 Compress-Archive -Path (Join-Path $portableDirectory '*') -DestinationPath $payload -CompressionLevel Optimal -Force
-Copy-Item -LiteralPath $payload -Destination (Join-Path $dist 'SnapPin-Portable-win-x64.zip') -Force
+# Mark the one-release compatibility apphost as hidden for Explorer users. It
+# remains available to 1.x portable updaters but is never installed by 2.0.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$payloadArchive = [System.IO.Compression.ZipFile]::Open($payload, [System.IO.Compression.ZipArchiveMode]::Update)
+try {
+    $legacyEntry = $payloadArchive.GetEntry($legacyExecutable)
+    if ($legacyEntry) { $legacyEntry.ExternalAttributes = $legacyEntry.ExternalAttributes -bor 2 }
+} finally {
+    $payloadArchive.Dispose()
+}
+Copy-Item -LiteralPath $payload -Destination (Join-Path $dist 'SnapAnchor-Portable-win-x64.zip') -Force
 
 dotnet publish $setupProject `
     -c Release -r win-x64 --self-contained true `
@@ -90,24 +108,25 @@ dotnet publish $setupProject `
     -o $setupDirectory
 if ($LASTEXITCODE -ne 0) { throw 'Installer publish failed.' }
 
-Copy-Item -LiteralPath (Join-Path $setupDirectory 'SnapPin.Setup.exe') -Destination (Join-Path $dist 'SnapPin-Setup-win-x64.exe') -Force
-Invoke-CodeSign (Join-Path $dist 'SnapPin-Setup-win-x64.exe')
-Copy-Item -LiteralPath $portableDirectory -Destination (Join-Path $dist 'SnapPin-Portable') -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $setupDirectory 'SnapAnchor.Setup.exe') -Destination (Join-Path $dist 'SnapAnchor-Setup-win-x64.exe') -Force
+Invoke-CodeSign (Join-Path $dist 'SnapAnchor-Setup-win-x64.exe')
+Remove-Item -LiteralPath (Join-Path $portableDirectory $legacyExecutable) -Force
+Copy-Item -LiteralPath $portableDirectory -Destination (Join-Path $dist 'SnapAnchor-Portable') -Recurse -Force
 
 $manifest = [ordered]@{
     version = $Version
     publishedUtc = [DateTime]::UtcNow.ToString('O')
-    portableFile = 'SnapPin-Portable-win-x64.zip'
-    portableSha256 = (Get-FileHash (Join-Path $dist 'SnapPin-Portable-win-x64.zip') -Algorithm SHA256).Hash
-    installerFile = 'SnapPin-Setup-win-x64.exe'
-    installerSha256 = (Get-FileHash (Join-Path $dist 'SnapPin-Setup-win-x64.exe') -Algorithm SHA256).Hash
-    portableSize = (Get-Item (Join-Path $dist 'SnapPin-Portable-win-x64.zip')).Length
-    installerSize = (Get-Item (Join-Path $dist 'SnapPin-Setup-win-x64.exe')).Length
+    portableFile = 'SnapAnchor-Portable-win-x64.zip'
+    portableSha256 = (Get-FileHash (Join-Path $dist 'SnapAnchor-Portable-win-x64.zip') -Algorithm SHA256).Hash
+    installerFile = 'SnapAnchor-Setup-win-x64.exe'
+    installerSha256 = (Get-FileHash (Join-Path $dist 'SnapAnchor-Setup-win-x64.exe') -Algorithm SHA256).Hash
+    portableSize = (Get-Item (Join-Path $dist 'SnapAnchor-Portable-win-x64.zip')).Length
+    installerSize = (Get-Item (Join-Path $dist 'SnapAnchor-Setup-win-x64.exe')).Length
     minimumWindowsBuild = 17763
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
-    downloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Setup-win-x64.exe'
-    portableDownloadUrl = 'https://github.com/coolman1232004/SnapPin/releases/latest/download/SnapPin-Portable-win-x64.zip'
-    releaseNotes = 'Added a Cancel action for selectable OCR text on pinned images. Escape and clicking empty image space also clear the current selection without closing the pin or disabling OCR selection.'
+    downloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Setup-win-x64.exe'
+    portableDownloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Portable-win-x64.zip'
+    releaseNotes = 'SnapPin is now SnapAnchor. This major release preserves existing local settings and pin history, introduces a lighter 34 px vector toolbar, and updates portable and installer packaging for the new product identity.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

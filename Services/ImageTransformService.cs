@@ -2,7 +2,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Runtime.CompilerServices;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class ImageTransformService
 {

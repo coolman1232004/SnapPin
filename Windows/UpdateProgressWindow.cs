@@ -1,10 +1,10 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 internal sealed class UpdateProgressWindow : Window
 {
@@ -22,7 +22,7 @@ internal sealed class UpdateProgressWindow : Window
     {
         Owner = owner;
         _update = update;
-        Title = LocalizationService.Current("SnapPin update");
+        Title = LocalizationService.Current("SnapAnchor update");
         Width = 490;
         Height = 235;
         MinWidth = 420;
@@ -35,7 +35,7 @@ internal sealed class UpdateProgressWindow : Window
 
         _status = new TextBlock
         {
-            Text = LocalizationService.Format("Downloading SnapPin {0}...", update.Version),
+            Text = LocalizationService.Format("Downloading SnapAnchor {0}...", update.Version),
             FontSize = 16,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 0, 7)

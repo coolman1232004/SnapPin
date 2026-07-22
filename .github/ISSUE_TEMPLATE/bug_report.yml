@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible SnapPin problem
+description: Report a reproducible SnapAnchor problem
 title: "[Bug]: "
 labels:
   - bug
@@ -11,7 +11,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: SnapPin version
+      label: SnapAnchor version
       placeholder: "1.2.2"
     validations:
       required: true

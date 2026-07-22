@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal enum UpdatePackageKind
 {
@@ -44,7 +44,7 @@ internal sealed record PreparedUpdate(UpdateCheckResult Update, string PackagePa
 
 internal static class UpdateService
 {
-    private const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\SnapPin";
+    private const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\SnapAnchor";
     private const string PendingFileName = "pending-update.json";
     private static readonly HttpClient Client = new() { Timeout = TimeSpan.FromMinutes(10) };
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
@@ -70,12 +70,12 @@ internal static class UpdateService
     {
         var current = Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0, 0);
         if (string.IsNullOrWhiteSpace(feedUrl))
-            return new UpdateCheckResult(false, LocalizationService.Format("SnapPin {0} is installed. The official GitHub update source is unavailable.", current.ToString(3)));
+            return new UpdateCheckResult(false, LocalizationService.Format("SnapAnchor {0} is installed. The official GitHub update source is unavailable.", current.ToString(3)));
         if (!Uri.TryCreate(feedUrl.Trim(), UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
             return new UpdateCheckResult(false, LocalizationService.Current("The official update source is not a valid HTTPS address."));
 
         using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        request.Headers.UserAgent.ParseAdd($"SnapPin/{current.ToString(3)}");
+        request.Headers.UserAgent.ParseAdd($"SnapAnchor/{current.ToString(3)}");
         using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -83,7 +83,7 @@ internal static class UpdateService
         if (manifest is null || !Version.TryParse(manifest.Version, out var published))
             return new UpdateCheckResult(false, LocalizationService.Current("The GitHub release did not contain a valid version."));
         if (published <= current)
-            return new UpdateCheckResult(false, LocalizationService.Format("SnapPin {0} is up to date.", current.ToString(3)));
+            return new UpdateCheckResult(false, LocalizationService.Format("SnapAnchor {0} is up to date.", current.ToString(3)));
 
         var portable = IsPortableInstallation();
         var packageKind = portable ? UpdatePackageKind.Portable : UpdatePackageKind.Installer;
@@ -96,7 +96,7 @@ internal static class UpdateService
         var notes = LocalizationService.CurrentLanguage == LocalizationService.English
             ? manifest.ReleaseNotes ?? string.Empty
             : LocalizationService.Current("See the GitHub release page for full release notes.");
-        var message = $"{LocalizationService.Format("SnapPin {0} is available for this {1}.", published.ToString(3), edition)}\n\n{notes}".Trim();
+        var message = $"{LocalizationService.Format("SnapAnchor {0} is available for this {1}.", published.ToString(3), edition)}\n\n{notes}".Trim();
         if (string.IsNullOrWhiteSpace(downloadUrl))
             message += "\n\n" + LocalizationService.Current("The required update package is not attached to this GitHub release.");
         return new UpdateCheckResult(true, message, downloadUrl, published.ToString(3), sha256 ?? string.Empty,
@@ -121,12 +121,12 @@ internal static class UpdateService
         try
         {
             await ExtractArchiveSafelyAsync(package, stagingDirectory, cancellationToken);
-            var stagedExecutable = Path.Combine(stagingDirectory, "SnapPin.exe");
+            var stagedExecutable = Path.Combine(stagingDirectory, "SnapAnchor.exe");
             if (!File.Exists(stagedExecutable))
-                throw new InvalidDataException(LocalizationService.Current("The portable GitHub package did not contain SnapPin.exe."));
+                throw new InvalidDataException(LocalizationService.Current("The portable GitHub package did not contain SnapAnchor.exe."));
             var actualVersion = FileVersionInfo.GetVersionInfo(stagedExecutable).FileVersion ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(update.Version) && !actualVersion.StartsWith(update.Version + ".", StringComparison.Ordinal))
-                throw new InvalidDataException(LocalizationService.Format("The downloaded SnapPin version ({0}) did not match the expected version ({1}).", actualVersion, update.Version));
+                throw new InvalidDataException(LocalizationService.Format("The downloaded SnapAnchor version ({0}) did not match the expected version ({1}).", actualVersion, update.Version));
             var prepared = new PreparedUpdate(update, package, stagingDirectory);
             SavePending(prepared);
             return prepared;
@@ -147,8 +147,8 @@ internal static class UpdateService
         Directory.CreateDirectory(root);
         var version = string.IsNullOrWhiteSpace(update.Version) ? "update" : update.Version;
         var fileName = update.PackageKind == UpdatePackageKind.Portable
-            ? $"SnapPin-Portable-{version}.zip"
-            : $"SnapPin-Setup-{version}.exe";
+            ? $"SnapAnchor-Portable-{version}.zip"
+            : $"SnapAnchor-Setup-{version}.exe";
         var finalPath = Path.Combine(root, fileName);
         var temporaryPath = finalPath + ".download";
 
@@ -210,12 +210,12 @@ internal static class UpdateService
         var root = Path.GetPathRoot(targetDirectory)?.TrimEnd(Path.DirectorySeparatorChar);
         if (targetDirectory.Equals(root, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException(LocalizationService.Current("A portable update cannot replace files in a drive root."));
-        var stagedExecutable = Path.Combine(prepared.StagingDirectory, "SnapPin.exe");
+        var stagedExecutable = Path.Combine(prepared.StagingDirectory, "SnapAnchor.exe");
         if (!File.Exists(stagedExecutable))
             throw new InvalidDataException(LocalizationService.Current("The prepared portable update is no longer available. Download it again."));
 
         var backupDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "SnapPin", "PortableRollback", DateTime.UtcNow.ToString("yyyyMMdd-HHmmss"));
+            "SnapAnchor", "PortableRollback", DateTime.UtcNow.ToString("yyyyMMdd-HHmmss"));
         var currentVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "unknown";
         var info = new ProcessStartInfo(stagedExecutable)
         {
@@ -248,7 +248,7 @@ internal static class UpdateService
                 data.PackageKind != update.PackageKind || !IsUnderUpdateRoot(data.PackagePath) || !File.Exists(data.PackagePath))
                 return false;
             if (update.PackageKind == UpdatePackageKind.Portable &&
-                (!IsUnderUpdateRoot(data.StagingDirectory) || !File.Exists(Path.Combine(data.StagingDirectory, "SnapPin.exe"))))
+                (!IsUnderUpdateRoot(data.StagingDirectory) || !File.Exists(Path.Combine(data.StagingDirectory, "SnapAnchor.exe"))))
                 return false;
             prepared = new PreparedUpdate(update, data.PackagePath, data.StagingDirectory);
             return true;
@@ -283,7 +283,7 @@ internal static class UpdateService
                 foreach (var directory in Directory.EnumerateDirectories(root, "Portable-*"))
                     if (Directory.GetCreationTimeUtc(directory) < DateTime.UtcNow.AddDays(-7)) TryDeleteDirectory(directory);
 
-            var rollbackRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapPin", "PortableRollback");
+            var rollbackRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapAnchor", "PortableRollback");
             if (Directory.Exists(rollbackRoot))
                 foreach (var directory in Directory.EnumerateDirectories(rollbackRoot).OrderByDescending(Directory.GetCreationTimeUtc).Skip(2))
                     TryDeleteDirectory(directory);
@@ -322,7 +322,7 @@ internal static class UpdateService
     {
         try
         {
-            var probe = Path.Combine(directory, $".snappin-write-{Guid.NewGuid():N}.tmp");
+            var probe = Path.Combine(directory, $".snapanchor-write-{Guid.NewGuid():N}.tmp");
             File.WriteAllText(probe, string.Empty);
             File.Delete(probe);
             return true;
@@ -361,7 +361,7 @@ internal static class UpdateService
     {
         var marker = "/releases/";
         var index = feed.AbsoluteUri.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
-        return index > 0 ? feed.AbsoluteUri[..(index + marker.Length)] + "tag/v" + version : "https://github.com/coolman1232004/SnapPin/releases";
+        return index > 0 ? feed.AbsoluteUri[..(index + marker.Length)] + "tag/v" + version : "https://github.com/coolman1232004/SnapAnchor/releases";
     }
 
     private static bool IsUnderUpdateRoot(string? path)
@@ -377,7 +377,7 @@ internal static class UpdateService
     }
 
     internal static string UpdateRoot() => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapPin", "Updates");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapAnchor", "Updates");
 
     private sealed record PendingUpdateData(string Version, UpdatePackageKind PackageKind,
         string PackagePath, string StagingDirectory, DateTime PreparedUtc);

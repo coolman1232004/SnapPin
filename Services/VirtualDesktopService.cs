@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class VirtualDesktopService
 {

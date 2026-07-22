@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record ScrollingCaptureProgress(int FrameCount, int RejectedFrames, string Message);
 internal sealed record ScrollingCaptureResult(BitmapSource Image, int FrameCount, bool Cancelled, int RejectedFrames = 0, string StopReason = "Completed");

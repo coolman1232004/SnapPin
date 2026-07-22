@@ -1,6 +1,6 @@
 using Forms = System.Windows.Forms;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record DisplayCompatibilityInfo(
     string DeviceName,

@@ -12,20 +12,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SnapPin Preferences" xml:space="preserve">
-    <value>SnapPin 首选项</value>
+  <data name="SnapAnchor Preferences" xml:space="preserve">
+    <value>SnapAnchor 首选项</value>
   </data>
-  <data name="SnapPin History" xml:space="preserve">
-    <value>SnapPin 历史记录</value>
+  <data name="SnapAnchor History" xml:space="preserve">
+    <value>SnapAnchor 历史记录</value>
   </data>
-  <data name="SnapPin Capture" xml:space="preserve">
-    <value>SnapPin 截图</value>
+  <data name="SnapAnchor Capture" xml:space="preserve">
+    <value>SnapAnchor 截图</value>
   </data>
-  <data name="SnapPin Pin" xml:space="preserve">
-    <value>SnapPin 贴图</value>
+  <data name="SnapAnchor Pin" xml:space="preserve">
+    <value>SnapAnchor 贴图</value>
   </data>
-  <data name="SnapPin Whiteboard" xml:space="preserve">
-    <value>SnapPin 白板</value>
+  <data name="SnapAnchor Whiteboard" xml:space="preserve">
+    <value>SnapAnchor 白板</value>
   </data>
   <data name="Capture it. Keep it in sight." xml:space="preserve">
     <value>截图并置顶，随时查看。</value>
@@ -141,20 +141,20 @@
   <data name="Interface language" xml:space="preserve">
     <value>界面语言</value>
   </data>
-  <data name="Run SnapPin on system startup" xml:space="preserve">
-    <value>系统启动时运行 SnapPin</value>
+  <data name="Run SnapAnchor on system startup" xml:space="preserve">
+    <value>系统启动时运行 SnapAnchor</value>
   </data>
-  <data name="Always launch SnapPin as administrator" xml:space="preserve">
-    <value>始终以管理员身份启动 SnapPin</value>
+  <data name="Always launch SnapAnchor as administrator" xml:space="preserve">
+    <value>始终以管理员身份启动 SnapAnchor</value>
   </data>
-  <data name="Applies the next time SnapPin starts. Windows will show a UAC confirmation prompt." xml:space="preserve">
-    <value>下次启动 SnapPin 时生效。Windows 将显示用户账户控制确认提示。</value>
+  <data name="Applies the next time SnapAnchor starts. Windows will show a UAC confirmation prompt." xml:space="preserve">
+    <value>下次启动 SnapAnchor 时生效。Windows 将显示用户账户控制确认提示。</value>
   </data>
   <data name="Back up open pins and settings automatically" xml:space="preserve">
     <value>自动备份打开的贴图和设置</value>
   </data>
-  <data name="Keep SnapPin running in the notification area when the dashboard closes" xml:space="preserve">
-    <value>关闭主界面后仍在通知区域运行 SnapPin</value>
+  <data name="Keep SnapAnchor running in the notification area when the dashboard closes" xml:space="preserve">
+    <value>关闭主界面后仍在通知区域运行 SnapAnchor</value>
   </data>
   <data name="Configuration storage" xml:space="preserve">
     <value>配置存储</value>
@@ -198,8 +198,8 @@
   <data name="Wheel clicks per frame" xml:space="preserve">
     <value>每帧滚轮格数</value>
   </data>
-  <data name="Exclude SnapPin pins and controls from screenshots and recordings" xml:space="preserve">
-    <value>在截图和录屏中排除 SnapPin 贴图及控件</value>
+  <data name="Exclude SnapAnchor pins and controls from screenshots and recordings" xml:space="preserve">
+    <value>在截图和录屏中排除 SnapAnchor 贴图及控件</value>
   </data>
   <data name="Excluded apps" xml:space="preserve">
     <value>排除的应用</value>
@@ -351,8 +351,8 @@
   <data name="Pin groups" xml:space="preserve">
     <value>贴图分组</value>
   </data>
-  <data name="Manage named groups from the Pins tab on the SnapPin dashboard" xml:space="preserve">
-    <value>在 SnapPin 主界面的“贴图”选项卡中管理命名分组</value>
+  <data name="Manage named groups from the Pins tab on the SnapAnchor dashboard" xml:space="preserve">
+    <value>在 SnapAnchor 主界面的“贴图”选项卡中管理命名分组</value>
   </data>
   <data name="Default image format" xml:space="preserve">
     <value>默认图片格式</value>
@@ -507,8 +507,8 @@
   <data name="GitHub updates" xml:space="preserve">
     <value>GitHub 更新</value>
   </data>
-  <data name="Check for updates when SnapPin starts" xml:space="preserve">
-    <value>SnapPin 启动时检查更新</value>
+  <data name="Check for updates when SnapAnchor starts" xml:space="preserve">
+    <value>SnapAnchor 启动时检查更新</value>
   </data>
   <data name="Check for updates every day" xml:space="preserve">
     <value>每天检查更新</value>
@@ -528,11 +528,11 @@
   <data name="Covered in still screenshots" xml:space="preserve">
     <value>在静态截图中覆盖</value>
   </data>
-  <data name="Windows lets SnapPin hide its own windows from video capture. Other applications are securely covered in still screenshots; video exclusion also requires privacy support from that application." xml:space="preserve">
-    <value>Windows 可让 SnapPin 在录屏中隐藏自己的窗口。其他应用会在静态截图中被安全覆盖；若要在录屏中排除，还需要该应用支持隐私保护。</value>
+  <data name="Windows lets SnapAnchor hide its own windows from video capture. Other applications are securely covered in still screenshots; video exclusion also requires privacy support from that application." xml:space="preserve">
+    <value>Windows 可让 SnapAnchor 在录屏中隐藏自己的窗口。其他应用会在静态截图中被安全覆盖；若要在录屏中排除，还需要该应用支持隐私保护。</value>
   </data>
-  <data name="Windows will display a User Account Control prompt when SnapPin starts" xml:space="preserve">
-    <value>SnapPin 启动时 Windows 将显示用户账户控制提示</value>
+  <data name="Windows will display a User Account Control prompt when SnapAnchor starts" xml:space="preserve">
+    <value>SnapAnchor 启动时 Windows 将显示用户账户控制提示</value>
   </data>
   <data name="Global shortcuts are ready" xml:space="preserve">
     <value>全局快捷键已就绪</value>
@@ -942,8 +942,8 @@
   <data name="Preferences…" xml:space="preserve">
     <value>首选项…</value>
   </data>
-  <data name="Open SnapPin" xml:space="preserve">
-    <value>打开 SnapPin</value>
+  <data name="Open SnapAnchor" xml:space="preserve">
+    <value>打开 SnapAnchor</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>退出</value>
@@ -972,13 +972,13 @@
   <data name="Restart required" xml:space="preserve">
     <value>需要重新启动</value>
   </data>
-  <data name="The interface language has changed. Restart SnapPin now to apply it throughout the app?&#xA;&#xA;Choose No to apply it the next time SnapPin starts." xml:space="preserve">
-    <value>界面语言已更改。是否立即重新启动 SnapPin，以在整个应用中应用新语言？
+  <data name="The interface language has changed. Restart SnapAnchor now to apply it throughout the app?&#xA;&#xA;Choose No to apply it the next time SnapAnchor starts." xml:space="preserve">
+    <value>界面语言已更改。是否立即重新启动 SnapAnchor，以在整个应用中应用新语言？
 
-选择“否”将在下次启动 SnapPin 时应用。</value>
+选择“否”将在下次启动 SnapAnchor 时应用。</value>
   </data>
-  <data name="SnapPin could not restart automatically. Please close and open it again." xml:space="preserve">
-    <value>SnapPin 无法自动重新启动，请关闭后再次打开。</value>
+  <data name="SnapAnchor could not restart automatically. Please close and open it again." xml:space="preserve">
+    <value>SnapAnchor 无法自动重新启动，请关闭后再次打开。</value>
   </data>
   <data name="Open" xml:space="preserve">
     <value>打开</value>
@@ -1232,14 +1232,14 @@
   <data name="Download and install it now?" xml:space="preserve">
     <value>是否立即下载并安装？</value>
   </data>
-  <data name="SnapPin update available" xml:space="preserve">
-    <value>SnapPin 有可用更新</value>
+  <data name="SnapAnchor update available" xml:space="preserve">
+    <value>SnapAnchor 有可用更新</value>
   </data>
-  <data name="SnapPin update" xml:space="preserve">
-    <value>SnapPin 更新</value>
+  <data name="SnapAnchor update" xml:space="preserve">
+    <value>SnapAnchor 更新</value>
   </data>
-  <data name="SnapPin {0} is installed. The official GitHub update source is unavailable." xml:space="preserve">
-    <value>已安装 SnapPin {0}，但官方 GitHub 更新源当前不可用。</value>
+  <data name="SnapAnchor {0} is installed. The official GitHub update source is unavailable." xml:space="preserve">
+    <value>已安装 SnapAnchor {0}，但官方 GitHub 更新源当前不可用。</value>
   </data>
   <data name="The official update source is not a valid HTTPS address." xml:space="preserve">
     <value>官方更新源不是有效的 HTTPS 地址。</value>
@@ -1247,11 +1247,11 @@
   <data name="The GitHub release did not contain a valid version." xml:space="preserve">
     <value>GitHub 版本中没有有效的版本号。</value>
   </data>
-  <data name="SnapPin {0} is up to date." xml:space="preserve">
-    <value>SnapPin {0} 已是最新版本。</value>
+  <data name="SnapAnchor {0} is up to date." xml:space="preserve">
+    <value>SnapAnchor {0} 已是最新版本。</value>
   </data>
-  <data name="SnapPin {0} is available for this {1}." xml:space="preserve">
-    <value>此{1}可更新至 SnapPin {0}。</value>
+  <data name="SnapAnchor {0} is available for this {1}." xml:space="preserve">
+    <value>此{1}可更新至 SnapAnchor {0}。</value>
   </data>
   <data name="portable copy" xml:space="preserve">
     <value>便携版</value>
@@ -1268,8 +1268,8 @@
   <data name="The diagnostic summary was copied." xml:space="preserve">
     <value>诊断摘要已复制。</value>
   </data>
-  <data name="SnapPin diagnostics" xml:space="preserve">
-    <value>SnapPin 诊断</value>
+  <data name="SnapAnchor diagnostics" xml:space="preserve">
+    <value>SnapAnchor 诊断</value>
   </data>
   <data name="Update check failed: {0}" xml:space="preserve">
     <value>检查更新失败：{0}</value>
@@ -1280,8 +1280,8 @@
   <data name="Version {0}" xml:space="preserve">
     <value>版本 {0}</value>
   </data>
-  <data name="Choose a SnapPin output folder" xml:space="preserve">
-    <value>选择 SnapPin 输出文件夹</value>
+  <data name="Choose a SnapAnchor output folder" xml:space="preserve">
+    <value>选择 SnapAnchor 输出文件夹</value>
   </data>
   <data name="Select" xml:space="preserve">
     <value>选择</value>
@@ -1340,8 +1340,8 @@
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
-  <data name="SnapPin long capture" xml:space="preserve">
-    <value>SnapPin 长截图</value>
+  <data name="SnapAnchor long capture" xml:space="preserve">
+    <value>SnapAnchor 长截图</value>
   </data>
   <data name="Preparing long capture..." xml:space="preserve">
     <value>正在准备长截图...</value>
@@ -1367,28 +1367,28 @@
   <data name="Later" xml:space="preserve">
     <value>稍后</value>
   </data>
-  <data name="The interface language has changed. Restart SnapPin now to apply it throughout the app?&#xA;&#xA;Choose Later to apply it the next time SnapPin starts." xml:space="preserve">
-    <value>界面语言已更改。是否立即重新启动 SnapPin，以在整个应用中应用新语言？
+  <data name="The interface language has changed. Restart SnapAnchor now to apply it throughout the app?&#xA;&#xA;Choose Later to apply it the next time SnapAnchor starts." xml:space="preserve">
+    <value>界面语言已更改。是否立即重新启动 SnapAnchor，以在整个应用中应用新语言？
 
-选择“稍后”将在下次启动 SnapPin 时应用。</value>
+选择“稍后”将在下次启动 SnapAnchor 时应用。</value>
   </data>
-  <data name="SnapPin recovered from an unexpected error.&#xA;&#xA;{0}&#xA;&#xA;A diagnostic log was saved locally." xml:space="preserve"><value>SnapPin 已从意外错误中恢复。
+  <data name="SnapAnchor recovered from an unexpected error.&#xA;&#xA;{0}&#xA;&#xA;A diagnostic log was saved locally." xml:space="preserve"><value>SnapAnchor 已从意外错误中恢复。
 
 {0}
 
 诊断日志已保存在本机。</value></data>
-  <data name="SnapPin recovered" xml:space="preserve"><value>SnapPin 已恢复</value></data>
-  <data name="SnapPin command" xml:space="preserve"><value>SnapPin 命令</value></data>
-  <data name="Unknown SnapPin command: {0}" xml:space="preserve"><value>未知的 SnapPin 命令：{0}</value></data>
+  <data name="SnapAnchor recovered" xml:space="preserve"><value>SnapAnchor 已恢复</value></data>
+  <data name="SnapAnchor command" xml:space="preserve"><value>SnapAnchor 命令</value></data>
+  <data name="Unknown SnapAnchor command: {0}" xml:space="preserve"><value>未知的 SnapAnchor 命令：{0}</value></data>
   <data name="Invalid or incomplete option: {0}" xml:space="preserve"><value>无效或不完整的选项：{0}</value></data>
-  <data name="SnapPin administrator mode" xml:space="preserve"><value>SnapPin 管理员模式</value></data>
-  <data name="SnapPin could not determine its executable path." xml:space="preserve"><value>SnapPin 无法确定其可执行文件路径。</value></data>
-  <data name="Administrator launch was cancelled. SnapPin will continue with normal permissions for this session." xml:space="preserve"><value>已取消管理员启动。SnapPin 将在本次会话中以普通权限继续运行。</value></data>
-  <data name="SnapPin could not restart as administrator: {0}" xml:space="preserve"><value>SnapPin 无法以管理员身份重新启动：{0}</value></data>
-  <data name="SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.&#xA;&#xA;You can review the local diagnostic log in Preferences &gt; About." xml:space="preserve"><value>SnapPin 已从上次意外关闭中恢复。打开的贴图已从最近验证的备份中还原。
+  <data name="SnapAnchor administrator mode" xml:space="preserve"><value>SnapAnchor 管理员模式</value></data>
+  <data name="SnapAnchor could not determine its executable path." xml:space="preserve"><value>SnapAnchor 无法确定其可执行文件路径。</value></data>
+  <data name="Administrator launch was cancelled. SnapAnchor will continue with normal permissions for this session." xml:space="preserve"><value>已取消管理员启动。SnapAnchor 将在本次会话中以普通权限继续运行。</value></data>
+  <data name="SnapAnchor could not restart as administrator: {0}" xml:space="preserve"><value>SnapAnchor 无法以管理员身份重新启动：{0}</value></data>
+  <data name="SnapAnchor recovered after the previous unexpected close. Open pins were restored from the last verified backup.&#xA;&#xA;You can review the local diagnostic log in Preferences &gt; About." xml:space="preserve"><value>SnapAnchor 已从上次意外关闭中恢复。打开的贴图已从最近验证的备份中还原。
 
 您可以在“首选项 &gt; 关于”中查看本地诊断日志。</value></data>
-  <data name="SnapPin recovery" xml:space="preserve"><value>SnapPin 恢复</value></data>
+  <data name="SnapAnchor recovery" xml:space="preserve"><value>SnapAnchor 恢复</value></data>
   <data name="The recording was not added to history, but Windows kept the temporary file open:&#xA;&#xA;{0}" xml:space="preserve"><value>录制未添加到历史记录，但 Windows 仍占用该临时文件：
 
 {0}</value></data>
@@ -1396,7 +1396,7 @@
   <data name="The GitHub update package must use HTTPS." xml:space="preserve"><value>GitHub 更新包必须使用 HTTPS。</value></data>
   <data name="The downloaded GitHub package failed its SHA-256 integrity check." xml:space="preserve"><value>下载的 GitHub 更新包未通过 SHA-256 完整性检查。</value></data>
   <data name="A portable update cannot replace files in a drive root." xml:space="preserve"><value>便携版更新不能替换磁盘根目录中的文件。</value></data>
-  <data name="The portable GitHub package did not contain SnapPin.exe." xml:space="preserve"><value>GitHub 便携版更新包中不包含 SnapPin.exe。</value></data>
+  <data name="The portable GitHub package did not contain SnapAnchor.exe." xml:space="preserve"><value>GitHub 便携版更新包中不包含 SnapAnchor.exe。</value></data>
   <data name="Windows could not start the portable update helper." xml:space="preserve"><value>Windows 无法启动便携版更新助手。</value></data>
   <data name="The portable update contained an unsafe path." xml:space="preserve"><value>便携版更新包含不安全的路径。</value></data>
   <data name="Unsupported image format: {0}" xml:space="preserve"><value>不支持的图像格式：{0}</value></data>
@@ -1404,7 +1404,7 @@
   <data name="WebP encoding failed." xml:space="preserve"><value>WebP 编码失败。</value></data>
   <data name="Windows could not trim this recording ({0})." xml:space="preserve"><value>Windows 无法裁剪此录制（{0}）。</value></data>
   <data name="OCR language files are missing." xml:space="preserve"><value>缺少 OCR 语言文件。</value></data>
-  <data name="Downloading SnapPin update…" xml:space="preserve"><value>正在下载 SnapPin 更新…</value></data>
+  <data name="Downloading SnapAnchor update…" xml:space="preserve"><value>正在下载 SnapAnchor 更新…</value></data>
   <data name="Downloading {0}" xml:space="preserve"><value>正在下载 {0}</value></data>
   <data name="{0}% downloaded" xml:space="preserve"><value>已下载 {0}%</value></data>
   <data name="Preparing update…" xml:space="preserve"><value>正在准备更新…</value></data>
@@ -1417,51 +1417,51 @@
   <data name="Creating rollback backup..." xml:space="preserve"><value>正在创建回退备份...</value></data>
   <data name="Do not close this window while the portable files are being replaced." xml:space="preserve"><value>替换便携版文件时请勿关闭此窗口。</value></data>
   <data name="Download size: {0}" xml:space="preserve"><value>下载大小：{0}</value></data>
-  <data name="Download SnapPin {0} update..." xml:space="preserve"><value>下载 SnapPin {0} 更新...</value></data>
+  <data name="Download SnapAnchor {0} update..." xml:space="preserve"><value>下载 SnapAnchor {0} 更新...</value></data>
   <data name="Download update" xml:space="preserve"><value>下载更新</value></data>
-  <data name="Downloading SnapPin {0}..." xml:space="preserve"><value>正在下载 SnapPin {0}...</value></data>
+  <data name="Downloading SnapAnchor {0}..." xml:space="preserve"><value>正在下载 SnapAnchor {0}...</value></data>
   <data name="Extracting and validating the update in a temporary folder." xml:space="preserve"><value>正在临时文件夹中解压并验证更新。</value></data>
   <data name="Installing updated files..." xml:space="preserve"><value>正在安装更新文件...</value></data>
   <data name="Open update log" xml:space="preserve"><value>打开更新日志</value></data>
   <data name="Portable update failed" xml:space="preserve"><value>便携版更新失败</value></data>
   <data name="Preparing portable update..." xml:space="preserve"><value>正在准备便携版更新...</value></data>
-  <data name="Restart and update to SnapPin {0}..." xml:space="preserve"><value>重启并更新至 SnapPin {0}...</value></data>
-  <data name="SnapPin {0} is available" xml:space="preserve"><value>SnapPin {0} 已发布</value></data>
-  <data name="SnapPin {0} is available. Click to review and download it." xml:space="preserve"><value>SnapPin {0} 已发布。点击查看并下载。</value></data>
-  <data name="SnapPin {0} is downloaded and ready. Click to choose when to restart." xml:space="preserve"><value>SnapPin {0} 已下载并准备就绪。点击选择重启时间。</value></data>
-  <data name="SnapPin {0} is ready" xml:space="preserve"><value>SnapPin {0} 已准备就绪</value></data>
-  <data name="SnapPin could not apply update {0}. The previous version was restored.&#xA;&#xA;{1}" xml:space="preserve"><value>SnapPin 无法应用更新 {0}。已恢复之前的版本。
+  <data name="Restart and update to SnapAnchor {0}..." xml:space="preserve"><value>重启并更新至 SnapAnchor {0}...</value></data>
+  <data name="SnapAnchor {0} is available" xml:space="preserve"><value>SnapAnchor {0} 已发布</value></data>
+  <data name="SnapAnchor {0} is available. Click to review and download it." xml:space="preserve"><value>SnapAnchor {0} 已发布。点击查看并下载。</value></data>
+  <data name="SnapAnchor {0} is downloaded and ready. Click to choose when to restart." xml:space="preserve"><value>SnapAnchor {0} 已下载并准备就绪。点击选择重启时间。</value></data>
+  <data name="SnapAnchor {0} is ready" xml:space="preserve"><value>SnapAnchor {0} 已准备就绪</value></data>
+  <data name="SnapAnchor could not apply update {0}. The previous version was restored.&#xA;&#xA;{1}" xml:space="preserve"><value>SnapAnchor 无法应用更新 {0}。已恢复之前的版本。
 
 {1}</value></data>
-  <data name="SnapPin updated successfully" xml:space="preserve"><value>SnapPin 更新成功</value></data>
-  <data name="SnapPin was updated from {0} to {1}." xml:space="preserve"><value>SnapPin 已从 {0} 更新至 {1}。</value></data>
-  <data name="The downloaded SnapPin version ({0}) did not match the expected version ({1})." xml:space="preserve"><value>下载的 SnapPin 版本（{0}）与预期版本（{1}）不一致。</value></data>
+  <data name="SnapAnchor updated successfully" xml:space="preserve"><value>SnapAnchor 更新成功</value></data>
+  <data name="SnapAnchor was updated from {0} to {1}." xml:space="preserve"><value>SnapAnchor 已从 {0} 更新至 {1}。</value></data>
+  <data name="The downloaded SnapAnchor version ({0}) did not match the expected version ({1})." xml:space="preserve"><value>下载的 SnapAnchor 版本（{0}）与预期版本（{1}）不一致。</value></data>
   <data name="The installer is downloaded and verified. Install it now, or choose Later to keep using this version." xml:space="preserve"><value>安装程序已下载并通过验证。现在安装，或选择“稍后”继续使用此版本。</value></data>
-  <data name="The portable SnapPin folder is not writable." xml:space="preserve"><value>便携版 SnapPin 文件夹不可写。</value></data>
+  <data name="The portable SnapAnchor folder is not writable." xml:space="preserve"><value>便携版 SnapAnchor 文件夹不可写。</value></data>
   <data name="The portable update needs at least {0} of free space." xml:space="preserve"><value>便携版更新至少需要 {0} 可用空间。</value></data>
   <data name="The portable update request is incomplete." xml:space="preserve"><value>便携版更新请求不完整。</value></data>
   <data name="The portable update request is invalid: {0}" xml:space="preserve"><value>便携版更新请求无效：{0}</value></data>
   <data name="The portable update request is not safe to apply." xml:space="preserve"><value>此便携版更新请求无法安全应用。</value></data>
   <data name="The prepared portable update is no longer available. Download it again." xml:space="preserve"><value>已准备的便携版更新不再可用。请重新下载。</value></data>
-  <data name="The previous version was restored. Reopening SnapPin..." xml:space="preserve"><value>已恢复之前的版本。正在重新打开 SnapPin...</value></data>
-  <data name="The staged SnapPin executable is missing." xml:space="preserve"><value>暂存的 SnapPin 可执行文件缺失。</value></data>
+  <data name="The previous version was restored. Reopening SnapAnchor..." xml:space="preserve"><value>已恢复之前的版本。正在重新打开 SnapAnchor...</value></data>
+  <data name="The staged SnapAnchor executable is missing." xml:space="preserve"><value>暂存的 SnapAnchor 可执行文件缺失。</value></data>
   <data name="The update helper is not running from the verified staging folder." xml:space="preserve"><value>更新助手未从已验证的暂存文件夹运行。</value></data>
-  <data name="The update is downloaded, verified, and prepared. Restart SnapPin now to replace the portable files, or choose Later to keep using this version." xml:space="preserve"><value>更新已下载、验证并准备完毕。立即重启 SnapPin 以替换便携版文件，或选择“稍后”继续使用此版本。</value></data>
+  <data name="The update is downloaded, verified, and prepared. Restart SnapAnchor now to replace the portable files, or choose Later to keep using this version." xml:space="preserve"><value>更新已下载、验证并准备完毕。立即重启 SnapAnchor 以替换便携版文件，或选择“稍后”继续使用此版本。</value></data>
   <data name="Unknown size" xml:space="preserve"><value>大小未知</value></data>
-  <data name="Update completed. Restarting SnapPin..." xml:space="preserve"><value>更新完成。正在重启 SnapPin...</value></data>
+  <data name="Update completed. Restarting SnapAnchor..." xml:space="preserve"><value>更新完成。正在重启 SnapAnchor...</value></data>
   <data name="Update failed. Restoring the previous version..." xml:space="preserve"><value>更新失败。正在恢复之前的版本...</value></data>
   <data name="Update log: {0}" xml:space="preserve"><value>更新日志：{0}</value></data>
   <data name="Update ready" xml:space="preserve"><value>更新已准备就绪</value></data>
   <data name="Verifying download..." xml:space="preserve"><value>正在验证下载内容...</value></data>
   <data name="Verifying the updated version..." xml:space="preserve"><value>正在验证更新后的版本...</value></data>
   <data name="View release on GitHub" xml:space="preserve"><value>在 GitHub 查看版本</value></data>
-  <data name="Waiting for SnapPin to close..." xml:space="preserve"><value>正在等待 SnapPin 关闭...</value></data>
+  <data name="Waiting for SnapAnchor to close..." xml:space="preserve"><value>正在等待 SnapAnchor 关闭...</value></data>
   <data name="What's new" xml:space="preserve"><value>更新内容</value></data>
   <data name="Copy version information" xml:space="preserve"><value>复制版本信息</value></data>
   <data name="Edition: {0}" xml:space="preserve"><value>版本类型：{0}</value></data>
   <data name="Version information copied." xml:space="preserve"><value>版本信息已复制。</value></data>
   <data name="Administrator approval was cancelled. The previous version will reopen." xml:space="preserve"><value>已取消管理员授权。将重新打开之前的版本。</value></data>
   <data name="Administrator permission is required. Waiting for approval..." xml:space="preserve"><value>需要管理员权限。正在等待授权...</value></data>
-  <data name="SnapPin will retry the portable update with administrator permission." xml:space="preserve"><value>SnapPin 将使用管理员权限重试便携版更新。</value></data>
-  <data name="SnapPin could not restart the portable updater as administrator: {0}" xml:space="preserve"><value>SnapPin 无法以管理员身份重新启动便携版更新程序：{0}</value></data>
+  <data name="SnapAnchor will retry the portable update with administrator permission." xml:space="preserve"><value>SnapAnchor 将使用管理员权限重试便携版更新。</value></data>
+  <data name="SnapAnchor could not restart the portable updater as administrator: {0}" xml:space="preserve"><value>SnapAnchor 无法以管理员身份重新启动便携版更新程序：{0}</value></data>
 </root>

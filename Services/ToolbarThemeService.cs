@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class ToolbarThemeService
 {
@@ -22,9 +22,9 @@ internal static class ToolbarThemeService
         var normalized = mode is null ? _currentMode : Normalize(mode);
         var metrics = normalized switch
         {
-            "Large" => new Metrics(36, 24, 18, 24, new Thickness(4), new Thickness(1.5), new Thickness(4, 2, 4, 2), new Thickness(4, 6, 4, 6)),
-            "Standard" => new Metrics(30, 20, 16, 20, new Thickness(3), new Thickness(1), new Thickness(3, 2, 3, 2), new Thickness(3, 5, 3, 5)),
-            _ => new Metrics(26, 18, 14, 18, new Thickness(2), new Thickness(1), new Thickness(3, 1, 3, 1), new Thickness(3, 4, 3, 4))
+            "Large" => new Metrics(36, 22, 18, 22, new Thickness(5), new Thickness(1.5, 0, 1.5, 0), new Thickness(7, 3, 7, 3), new Thickness(4, 7, 4, 7)),
+            "Standard" => new Metrics(32, 20, 16, 20, new Thickness(4), new Thickness(1, 0, 1, 0), new Thickness(6, 2, 6, 2), new Thickness(3, 6, 3, 6)),
+            _ => new Metrics(28, 18, 14, 18, new Thickness(4), new Thickness(1, 0, 1, 0), new Thickness(6, 2, 6, 2), new Thickness(3, 5, 3, 5))
         };
         resources["ToolbarButtonSize"] = metrics.Button;
         resources["ToolbarIconSize"] = metrics.Icon;

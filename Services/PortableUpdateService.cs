@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record PortableUpdateRequest(
     int ParentProcessId,
@@ -39,7 +39,7 @@ internal sealed record PortableUpdateRequest(
             source = Path.GetFullPath(source).TrimEnd(Path.DirectorySeparatorChar);
             target = Path.GetFullPath(target).TrimEnd(Path.DirectorySeparatorChar);
             backup = Path.GetFullPath(backup).TrimEnd(Path.DirectorySeparatorChar);
-            var sourceExe = Path.Combine(source, "SnapPin.exe");
+            var sourceExe = Path.Combine(source, "SnapAnchor.exe");
             var driveRoot = Path.GetPathRoot(target)?.TrimEnd(Path.DirectorySeparatorChar);
             if (!File.Exists(sourceExe) || target.Equals(driveRoot, StringComparison.OrdinalIgnoreCase) ||
                 source.Equals(target, StringComparison.OrdinalIgnoreCase))
@@ -65,7 +65,7 @@ internal sealed record UpdateStartupNotice(bool Success, string PreviousVersion,
 
 internal static class PortableUpdateService
 {
-    private const string PackageManifestName = ".snappin-package.json";
+    private const string PackageManifestName = ".snapanchor-package.json";
     private const string SuccessArgument = "--updated-from";
     private const string FailureArgument = "--update-failed";
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
@@ -83,7 +83,7 @@ internal static class PortableUpdateService
         try
         {
             Log(logPath, $"Preparing portable update {request.PreviousVersion} -> {request.ExpectedVersion}.");
-            progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Waiting for SnapPin to close..."), 0.03));
+            progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Waiting for SnapAnchor to close..."), 0.03));
             await WaitForParentAsync(request.ParentProcessId, cancellationToken);
             ValidateRequest(request);
 
@@ -137,16 +137,16 @@ internal static class PortableUpdateService
             }
 
             progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Verifying the updated version..."), 0.92));
-            var targetExe = Path.Combine(request.TargetDirectory, "SnapPin.exe");
+            var targetExe = Path.Combine(request.TargetDirectory, "SnapAnchor.exe");
             var actualVersion = FileVersionInfo.GetVersionInfo(targetExe).FileVersion ?? string.Empty;
             if (!actualVersion.StartsWith(request.ExpectedVersion + ".", StringComparison.Ordinal))
                 throw new InvalidDataException($"Updated version {actualVersion} did not match {request.ExpectedVersion}.");
 
-            var successMessage = LocalizationService.Format("SnapPin was updated from {0} to {1}.", request.PreviousVersion, request.ExpectedVersion);
+            var successMessage = LocalizationService.Format("SnapAnchor was updated from {0} to {1}.", request.PreviousVersion, request.ExpectedVersion);
             Log(logPath, successMessage + $" Rollback: {request.BackupDirectory}");
             var result = new UpdateOutcome(true, request.PreviousVersion, request.ExpectedVersion, successMessage, logPath, request.BackupDirectory);
             AtomicFileService.WriteJson(resultPath, result);
-            progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Update completed. Restarting SnapPin..."), 1));
+            progress?.Report(new PortableUpdateProgress(LocalizationService.Current("Update completed. Restarting SnapAnchor..."), 1));
             return new PortableUpdateResult(true, successMessage, logPath, resultPath);
         }
         catch (Exception ex)
@@ -157,7 +157,7 @@ internal static class PortableUpdateService
             var message = rollbackError is null ? ex.Message : ex.Message + Environment.NewLine + rollbackError.Message;
             var result = new UpdateOutcome(false, request.PreviousVersion, request.ExpectedVersion, message, logPath, request.BackupDirectory);
             AtomicFileService.WriteJson(resultPath, result);
-            progress?.Report(new PortableUpdateProgress(LocalizationService.Current("The previous version was restored. Reopening SnapPin..."), 1));
+            progress?.Report(new PortableUpdateProgress(LocalizationService.Current("The previous version was restored. Reopening SnapAnchor..."), 1));
             var retryAsAdministrator = ShouldRetryAsAdministrator(ex, rollbackError,
                 ElevationService.IsCurrentProcessElevated());
             if (retryAsAdministrator)
@@ -169,7 +169,7 @@ internal static class PortableUpdateService
     internal static bool TryRestartAsAdministrator(PortableUpdateRequest request, out string error)
     {
         error = string.Empty;
-        var executable = Path.Combine(request.SourceDirectory, "SnapPin.exe");
+        var executable = Path.Combine(request.SourceDirectory, "SnapAnchor.exe");
         var retryRequest = request with
         {
             ParentProcessId = Environment.ProcessId,
@@ -196,7 +196,7 @@ internal static class PortableUpdateService
         }
         catch (Exception ex)
         {
-            error = LocalizationService.Format("SnapPin could not restart the portable updater as administrator: {0}", ex.Message);
+            error = LocalizationService.Format("SnapAnchor could not restart the portable updater as administrator: {0}", ex.Message);
             return false;
         }
     }
@@ -236,7 +236,7 @@ internal static class PortableUpdateService
 
     internal static Process? RestartTarget(PortableUpdateRequest request, PortableUpdateResult result)
     {
-        var executable = Path.Combine(request.TargetDirectory, "SnapPin.exe");
+        var executable = Path.Combine(request.TargetDirectory, "SnapAnchor.exe");
         if (!File.Exists(executable)) return null;
         var info = new ProcessStartInfo(executable) { UseShellExecute = true, WorkingDirectory = request.TargetDirectory };
         info.ArgumentList.Add(result.Success ? SuccessArgument : FailureArgument);
@@ -255,7 +255,7 @@ internal static class PortableUpdateService
                 var previous = arguments[++index];
                 var current = typeof(PortableUpdateService).Assembly.GetName().Version?.ToString(3) ?? string.Empty;
                 notice = new UpdateStartupNotice(true, previous, current,
-                    LocalizationService.Format("SnapPin was updated from {0} to {1}.", previous, current), string.Empty);
+                    LocalizationService.Format("SnapAnchor was updated from {0} to {1}.", previous, current), string.Empty);
                 continue;
             }
             if (arguments[index].Equals(FailureArgument, StringComparison.OrdinalIgnoreCase) && index + 1 < arguments.Count)
@@ -291,7 +291,7 @@ internal static class PortableUpdateService
         catch (ArgumentException) { }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            throw new TimeoutException("SnapPin did not close within 60 seconds.");
+            throw new TimeoutException("SnapAnchor did not close within 60 seconds.");
         }
     }
 
@@ -300,12 +300,12 @@ internal static class PortableUpdateService
         var runningDirectory = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd(Path.DirectorySeparatorChar);
         if (!runningDirectory.Equals(request.SourceDirectory, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException(LocalizationService.Current("The update helper is not running from the verified staging folder."));
-        if (!File.Exists(Path.Combine(request.SourceDirectory, "SnapPin.exe")))
-            throw new FileNotFoundException(LocalizationService.Current("The staged SnapPin executable is missing."));
+        if (!File.Exists(Path.Combine(request.SourceDirectory, "SnapAnchor.exe")))
+            throw new FileNotFoundException(LocalizationService.Current("The staged SnapAnchor executable is missing."));
         Directory.CreateDirectory(request.TargetDirectory);
-        var probe = Path.Combine(request.TargetDirectory, $".snappin-update-{Guid.NewGuid():N}.tmp");
+        var probe = Path.Combine(request.TargetDirectory, $".snapanchor-update-{Guid.NewGuid():N}.tmp");
         try { File.WriteAllText(probe, string.Empty); }
-        catch (Exception ex) { throw new UnauthorizedAccessException(LocalizationService.Current("The portable SnapPin folder is not writable."), ex); }
+        catch (Exception ex) { throw new UnauthorizedAccessException(LocalizationService.Current("The portable SnapAnchor folder is not writable."), ex); }
         finally { try { File.Delete(probe); } catch { } }
     }
 
@@ -352,7 +352,7 @@ internal static class PortableUpdateService
     private static void CopyAtomically(string source, string destination)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-        var temporary = destination + $".snappin-{Guid.NewGuid():N}.tmp";
+        var temporary = destination + $".snapanchor-{Guid.NewGuid():N}.tmp";
         try
         {
             File.Copy(source, temporary, true);

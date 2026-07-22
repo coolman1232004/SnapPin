@@ -1,7 +1,7 @@
 param(
-    [string]$OutputIco = (Join-Path $PSScriptRoot '..\Assets\SnapPin.ico'),
-    [string]$PreviewPng = (Join-Path $PSScriptRoot '..\Assets\SnapPin-tray-icon-preview.png'),
-    [string]$DashboardPng = (Join-Path $PSScriptRoot '..\Assets\SnapPin-icon-512.png')
+    [string]$OutputIco = (Join-Path $PSScriptRoot '..\Assets\SnapAnchor.ico'),
+    [string]$PreviewPng = (Join-Path $PSScriptRoot '..\Assets\SnapAnchor-tray-icon-preview.png'),
+    [string]$DashboardPng = (Join-Path $PSScriptRoot '..\Assets\SnapAnchor-icon-512.png')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -18,7 +18,7 @@ function New-RoundedRectanglePath([float]$x, [float]$y, [float]$width, [float]$h
     return $path
 }
 
-function New-SnapPinPng([int]$size) {
+function New-SnapAnchorPng([int]$size) {
     $bitmap = [System.Drawing.Bitmap]::new($size, $size, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
     $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
     $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
@@ -63,8 +63,8 @@ function New-SnapPinPng([int]$size) {
     return $bytes
 }
 
-function New-SnapPinDib([int]$size) {
-    $pngBytes = New-SnapPinPng $size
+function New-SnapAnchorDib([int]$size) {
+    $pngBytes = New-SnapAnchorPng $size
     $pngStream = [System.IO.MemoryStream]::new($pngBytes)
     $bitmap = [System.Drawing.Bitmap]::FromStream($pngStream)
     $dibStream = [System.IO.MemoryStream]::new()
@@ -110,7 +110,7 @@ function New-SnapPinDib([int]$size) {
 
 $sizes = @(16, 20, 24, 32, 40, 48, 64, 128, 256)
 $images = [System.Collections.Generic.List[byte[]]]::new()
-foreach ($size in $sizes) { $images.Add((New-SnapPinDib $size)) }
+foreach ($size in $sizes) { $images.Add((New-SnapAnchorDib $size)) }
 $outputDirectory = Split-Path -Parent $OutputIco
 [System.IO.Directory]::CreateDirectory($outputDirectory) | Out-Null
 
@@ -136,9 +136,9 @@ foreach ($image in $images) { $writer.Write($image) }
 $writer.Dispose()
 $stream.Dispose()
 
-[System.IO.File]::WriteAllBytes($PreviewPng, (New-SnapPinPng 256))
-[System.IO.File]::WriteAllBytes($DashboardPng, (New-SnapPinPng 512))
-[System.IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent $DashboardPng) 'SnapPin-icon.png'), (New-SnapPinPng 512))
-[System.IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent $DashboardPng) 'SnapPin-icon-source.png'), (New-SnapPinPng 512))
-[System.IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent $DashboardPng) 'SnapPin-exe-icon-preview.png'), (New-SnapPinPng 32))
-Write-Output "Generated synchronized SnapPin ICO, tray preview, dashboard, and source icons"
+[System.IO.File]::WriteAllBytes($PreviewPng, (New-SnapAnchorPng 256))
+[System.IO.File]::WriteAllBytes($DashboardPng, (New-SnapAnchorPng 512))
+[System.IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent $DashboardPng) 'SnapAnchor-icon.png'), (New-SnapAnchorPng 512))
+[System.IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent $DashboardPng) 'SnapAnchor-icon-source.png'), (New-SnapAnchorPng 512))
+[System.IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent $DashboardPng) 'SnapAnchor-exe-icon-preview.png'), (New-SnapAnchorPng 32))
+Write-Output "Generated synchronized SnapAnchor ICO, tray preview, dashboard, and source icons"

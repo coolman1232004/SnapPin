@@ -9,7 +9,7 @@ using Forms = System.Windows.Forms;
 using Drawing = System.Drawing;
 using DrawingImaging = System.Drawing.Imaging;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static partial class CaptureService
 {

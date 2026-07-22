@@ -1,17 +1,17 @@
-using SnapPin.Models;
+using SnapAnchor.Models;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class HistoryService
 {
     private static readonly object Sync = new();
-    private static string Root => Environment.GetEnvironmentVariable("SNAPPIN_HISTORY_ROOT") is { Length: > 0 } testRoot
+    private static string Root => Environment.GetEnvironmentVariable("SNAPANCHOR_HISTORY_ROOT") is { Length: > 0 } testRoot
         ? Path.GetFullPath(testRoot)
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapPin", "History");
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapAnchor", "History");
     private static string IndexPath => Path.Combine(Root, "history.json");
 
     public static string HistoryDirectory => Root;

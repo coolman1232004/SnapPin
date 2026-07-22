@@ -1,11 +1,11 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 internal sealed class LongCaptureProgressWindow : Window
 {
@@ -14,7 +14,7 @@ internal sealed class LongCaptureProgressWindow : Window
 
     internal LongCaptureProgressWindow()
     {
-        Title = LocalizationService.Current("SnapPin long capture");
+        Title = LocalizationService.Current("SnapAnchor long capture");
         Width = 310;
         Height = 58;
         WindowStyle = WindowStyle.None;
