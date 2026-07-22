@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.3] - 2026-07-22
+
+- Replaced the cross-desktop pinned-image annotation window with an overlay scoped to the pin's current monitor
+- The toolbar viewport now comes directly from that monitor's native pixel bounds and DPI
+- Moving a pin across displays rehomes and realigns the overlay on the destination monitor when movement finishes
+- Added regression coverage verifying that the overlay exactly matches the owner pin's monitor
+
 ## [2.1.2] - 2026-07-22
 
 - Fixed pinned-image toolbar placement on secondary monitors with a different Windows display scale

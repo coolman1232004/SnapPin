@@ -271,7 +271,7 @@ internal static class Program
                 overlay = (PinnedAnnotationOverlayWindow?)typeof(PinnedImageWindow)
                     .GetField("_annotationOverlay", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                     .GetValue(pin);
-                if (overlay is null) return (ReceivesPointer: false, Aligned: false, CoversVirtualDesktop: false);
+                if (overlay is null) return (ReceivesPointer: false, Aligned: false, MatchesOwnerMonitor: false);
 
                 overlay.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
                 var editor = (AnnotationEditorControl)typeof(PinnedAnnotationOverlayWindow)
@@ -288,15 +288,14 @@ internal static class Program
                 });
                 var overlayHandle = new System.Windows.Interop.WindowInteropHelper(overlay).Handle;
                 NativeMethods.GetWindowRect(overlayHandle, out var overlayPixels);
-                var virtualPixels = System.Windows.Forms.SystemInformation.VirtualScreen;
                 return (
                     ReceivesPointer: topWindow == overlayHandle,
                     Aligned: Math.Abs(pinTopLeft.X - surfaceTopLeft.X) < 2 &&
                         Math.Abs(pinTopLeft.Y - surfaceTopLeft.Y) < 2,
-                    CoversVirtualDesktop: Math.Abs(overlayPixels.Left - virtualPixels.Left) <= 1 &&
-                        Math.Abs(overlayPixels.Top - virtualPixels.Top) <= 1 &&
-                        Math.Abs(overlayPixels.Width - virtualPixels.Width) <= 1 &&
-                        Math.Abs(overlayPixels.Height - virtualPixels.Height) <= 1);
+                    MatchesOwnerMonitor: Math.Abs(overlayPixels.Left - targetScreen.Bounds.Left) <= 1 &&
+                        Math.Abs(overlayPixels.Top - targetScreen.Bounds.Top) <= 1 &&
+                        Math.Abs(overlayPixels.Width - targetScreen.Bounds.Width) <= 1 &&
+                        Math.Abs(overlayPixels.Height - targetScreen.Bounds.Height) <= 1);
             }
             finally
             {
@@ -304,7 +303,7 @@ internal static class Program
                 pin.Close();
             }
         });
-        if (!livePinOverlay.ReceivesPointer || !livePinOverlay.Aligned || !livePinOverlay.CoversVirtualDesktop) return 83;
+        if (!livePinOverlay.ReceivesPointer || !livePinOverlay.Aligned || !livePinOverlay.MatchesOwnerMonitor) return 83;
 
         var mixedDpiOverlayBounds = PinnedAnnotationOverlayWindow.PhysicalBoundsToOverlay(
             new NativeMethods.NativeRect { Left = 1920, Top = 120, Right = 2560, Bottom = 480 },
@@ -315,7 +314,7 @@ internal static class Program
             Math.Abs(mixedDpiOverlayBounds.Y - 80) > 0.01 ||
             Math.Abs(mixedDpiOverlayBounds.Width - 426.6667) > 0.01 ||
             Math.Abs(mixedDpiOverlayBounds.Height - 240) > 0.01) return 83;
-        Console.WriteLine("PIN TOOLBAR: physical mixed-DPI multi-monitor placement, move-first tool state, toggle-off tools and lossless editing verified");
+        Console.WriteLine("PIN TOOLBAR: owner-monitor-scoped mixed-DPI placement, move-first tool state, toggle-off tools and lossless editing verified");
 
         var dashboardPaletteMatches = RunSta(() =>
         {
