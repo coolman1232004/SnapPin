@@ -20,6 +20,7 @@ internal static class BrandMigrationService
 
             MigrateSettingsProperty(target);
             MigrateStartupEntry();
+            RemoveLegacyExecutableBesideCurrentProcess();
         }
         catch
         {
@@ -45,6 +46,14 @@ internal static class BrandMigrationService
         if (key?.GetValue(CurrentName) is null && key?.GetValue(LegacyName) is string command)
             key.SetValue(CurrentName, command.Replace(LegacyName, CurrentName, StringComparison.OrdinalIgnoreCase));
         key?.DeleteValue(LegacyName, false);
+    }
+
+    private static void RemoveLegacyExecutableBesideCurrentProcess()
+    {
+        var legacyExecutable = Path.Combine(AppContext.BaseDirectory, LegacyName + ".exe");
+        if (!File.Exists(legacyExecutable) ||
+            legacyExecutable.Equals(Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)) return;
+        File.Delete(legacyExecutable);
     }
 
     private static void CopyDirectory(string source, string target)

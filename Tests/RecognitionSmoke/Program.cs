@@ -28,6 +28,23 @@ internal static class Program
         CompatibilitySmoke.Run(CreatePatternImage);
         UpdateUiSmoke.Run();
 
+        var portableCleanupRoot = Path.Combine(Path.GetTempPath(), $"snapanchor-portable-cleanup-{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(portableCleanupRoot);
+            var legacyExecutable = string.Concat("Snap", "Pin", ".exe");
+            File.WriteAllText(Path.Combine(portableCleanupRoot, legacyExecutable), "obsolete apphost");
+            var obsoleteFiles = PortableUpdateService.DetermineObsoleteFiles(
+                ["obsolete-runtime.dll"], new HashSet<string>(["SnapAnchor.exe"], StringComparer.OrdinalIgnoreCase), portableCleanupRoot);
+            if (!obsoleteFiles.Contains(legacyExecutable, StringComparer.OrdinalIgnoreCase) ||
+                !obsoleteFiles.Contains("obsolete-runtime.dll", StringComparer.OrdinalIgnoreCase)) return 15;
+            Console.WriteLine("PORTABLE CLEANUP: unmanaged previous-name executable is removed during in-place updates");
+        }
+        finally
+        {
+            if (Directory.Exists(portableCleanupRoot)) Directory.Delete(portableCleanupRoot, recursive: true);
+        }
+
         var textImage = CreateTextImage("SNAPANCHOR OCR TEST 2026");
         var textResult = await RecognitionService.RecognizeAsync(textImage, "eng");
         Console.WriteLine($"OCR: {textResult.Text.Replace(Environment.NewLine, " | ")} ERROR: {textResult.ErrorMessage}");
