@@ -57,10 +57,13 @@ public partial class PinnedImageWindow : Window
     private readonly DispatcherTimer _refreshTimer = new();
     private readonly DispatcherTimer _textAutoScrollTimer = new() { Interval = TimeSpan.FromMilliseconds(28) };
     private readonly DispatcherTimer _longScrollAnimationTimer = new() { Interval = TimeSpan.FromMilliseconds(16) };
+    private readonly DispatcherTimer _screenPixelBoundsTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
     private readonly BitmapCache _zoomBitmapCache = new() { RenderAtScale = 1 };
     private Rect _targetZoomBounds;
     private bool _zoomAnimating;
     private System.Drawing.Rectangle? _initialScreenPixelBounds;
+    private int _screenPixelBoundsPasses;
+    private int _screenPixelBoundsStablePasses;
     private bool _shadowEnabled;
     private string _sourceFilePath = string.Empty;
     private CancellationTokenSource? _selectableTextCancellation;
@@ -107,6 +110,7 @@ public partial class PinnedImageWindow : Window
         _refreshTimer.Tick += (_, _) => RefreshScreenshot(silent: true);
         _textAutoScrollTimer.Tick += TextAutoScrollTimer_Tick;
         _longScrollAnimationTimer.Tick += LongScrollAnimationTimer_Tick;
+        _screenPixelBoundsTimer.Tick += ScreenPixelBoundsTimer_Tick;
         ShowImageSurface();
         SizeChanged += (_, _) =>
         {
@@ -122,8 +126,8 @@ public partial class PinnedImageWindow : Window
         };
         DpiChanged += (_, _) =>
         {
-            if (_initialScreenPixelBounds is not null)
-                Dispatcher.BeginInvoke(ApplyInitialScreenPixelBounds, DispatcherPriority.Render);
+            if (_initialScreenPixelBounds is { } bounds)
+                Dispatcher.BeginInvoke(() => BeginScreenPixelBoundsStabilization(bounds), DispatcherPriority.Render);
         };
         ContentRendered += (_, _) =>
         {
@@ -133,8 +137,7 @@ public partial class PinnedImageWindow : Window
                 ApplyInitialScreenPixelBounds();
                 Dispatcher.BeginInvoke(() =>
                 {
-                    ApplyInitialScreenPixelBounds();
-                    _initialScreenPixelBounds = null;
+                    if (_initialScreenPixelBounds is { } bounds) BeginScreenPixelBoundsStabilization(bounds);
                 }, DispatcherPriority.ContextIdle);
             }, DispatcherPriority.Render);
         };
@@ -147,6 +150,7 @@ public partial class PinnedImageWindow : Window
             _refreshTimer.Stop();
             _textAutoScrollTimer.Stop();
             _longScrollAnimationTimer.Stop();
+            _screenPixelBoundsTimer.Stop();
             _selectableTextCancellation?.Cancel();
             _selectableTextCancellation?.Dispose();
             OpenPins.Remove(this);
@@ -441,12 +445,51 @@ public partial class PinnedImageWindow : Window
     public void SetScreenPixelBounds(System.Drawing.Rectangle bounds)
     {
         StopZoomAnimation(false);
-        ApplyScreenPixelBounds(bounds);
+        BeginScreenPixelBoundsStabilization(bounds);
     }
 
     private void ApplyInitialScreenPixelBounds()
     {
-        if (_initialScreenPixelBounds is { } bounds) ApplyScreenPixelBounds(bounds);
+        if (_initialScreenPixelBounds is { } bounds) BeginScreenPixelBoundsStabilization(bounds);
+    }
+
+    private void BeginScreenPixelBoundsStabilization(System.Drawing.Rectangle bounds)
+    {
+        _initialScreenPixelBounds = bounds;
+        _screenPixelBoundsPasses = 16;
+        _screenPixelBoundsStablePasses = 0;
+        ApplyScreenPixelBounds(bounds);
+        _screenPixelBoundsTimer.Start();
+    }
+
+    private void StopScreenPixelBoundsStabilization()
+    {
+        _screenPixelBoundsTimer.Stop();
+        _initialScreenPixelBounds = null;
+    }
+
+    private void ScreenPixelBoundsTimer_Tick(object? sender, EventArgs e)
+    {
+        if (_initialScreenPixelBounds is not { } bounds)
+        {
+            _screenPixelBoundsTimer.Stop();
+            return;
+        }
+
+        ApplyScreenPixelBounds(bounds);
+        var handle = new WindowInteropHelper(this).Handle;
+        var stable = handle != IntPtr.Zero && NativeMethods.GetWindowRect(handle, out var actual) &&
+            Math.Abs(actual.Left - bounds.Left) <= 1 && Math.Abs(actual.Top - bounds.Top) <= 1 &&
+            Math.Abs(actual.Width - bounds.Width) <= 1 && Math.Abs(actual.Height - bounds.Height) <= 1;
+        _screenPixelBoundsStablePasses = stable ? _screenPixelBoundsStablePasses + 1 : 0;
+        _screenPixelBoundsPasses--;
+        if (_screenPixelBoundsStablePasses < 5 && _screenPixelBoundsPasses > 0) return;
+
+        _screenPixelBoundsTimer.Stop();
+        _initialScreenPixelBounds = null;
+        _normalHeight = Height;
+        _targetZoomBounds = new Rect(Left, Top, Width, Height);
+        UpdateLongImageWidth();
     }
 
     private void ApplyScreenPixelBounds(System.Drawing.Rectangle bounds)
@@ -458,8 +501,8 @@ public partial class PinnedImageWindow : Window
             IntPtr.Zero,
             bounds.Left,
             bounds.Top,
-            Math.Max(80, bounds.Width),
-            Math.Max(60, bounds.Height),
+            Math.Max(1, bounds.Width),
+            Math.Max(1, bounds.Height),
             NativeMethods.SwpNoZOrder | NativeMethods.SwpNoActivate);
         Dispatcher.BeginInvoke(() =>
         {
@@ -908,7 +951,7 @@ public partial class PinnedImageWindow : Window
 
     private void SetZoom(double scale)
     {
-        var dpi = VisualTreeHelper.GetDpi(this);
+        var dpi = DpiLayoutService.WindowScale(this);
         var logicalSize = DpiLayoutService.LogicalSizeForPhysicalPixels(
             _source.PixelWidth, _source.PixelHeight, dpi.DpiScaleX, dpi.DpiScaleY);
         var centerX = Left + Width / 2; var centerY = Top + Height / 2;

@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.5] - 2026-07-22
+
+- Stabilized a new pin's physical bounds across several monitor-DPI layout passes instead of accepting Windows' first suggested size
+- Made pinned images fill the exact captured native-pixel area and retained precise placement for small captures
+- Moved the shadow effect off the screenshot layer so WPF no longer rasterizes and softens the image
+- Positioned the pinned-image toolbar from the overlay window's native DPI before its first render, then kept it aligned while DPI settles
+- Cancelled automatic placement stabilization immediately when the user starts moving or resizing a pin
+
 ## [2.1.4] - 2026-07-22
 
 - Preserved a captured region's physical pixel size and original screen position when it is pinned on a mixed-DPI monitor
