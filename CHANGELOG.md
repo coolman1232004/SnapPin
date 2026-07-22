@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.5] - 2026-07-22
+
+- Pinned-image editing now opens with no annotation tool selected, so the pin can be dragged immediately
+- Clicking the currently active annotation tool again returns to pin-move mode
+- The annotation surface now moves the original pinned window and keeps its toolbar attached
+- Pinned toolbars now use the same measured-width placement calculation as capture toolbars
+- Added localized move-mode guidance and regression coverage for placement, movement, toggle-off tools, and lossless editing
+
 ## [2.0.4] - 2026-07-22
 
 - Replaced the Text toolbar icon with a clean, plain upright **T** matching the supplied reference
