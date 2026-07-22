@@ -633,8 +633,11 @@ public partial class CaptureOverlayWindow : Window
         if (sender is not Button { Tag: string tool }) return;
         if (_annotationMode)
         {
-            CaptureInlineEditor.ActivateConfiguredTool(tool);
-            SetCaptureAnnotationActiveTool(tool);
+            CaptureInlineEditor.ToggleConfiguredTool(tool);
+            SetCaptureAnnotationActiveTool(
+                CaptureInlineEditor.ActiveTool.Equals("None", StringComparison.OrdinalIgnoreCase)
+                    ? null
+                    : CaptureInlineEditor.ActiveTool);
             CaptureInlineEditor.Focus();
             return;
         }
@@ -691,7 +694,7 @@ public partial class CaptureOverlayWindow : Window
         CaptureInlineEditor.LoadImage(SelectedImage());
         CaptureInlineEditor.ConfigureCaptureOverlay(_selection, new Size(ActualWidth, ActualHeight), _selection,
             showActions: false, toolbarLeft: actionBounds.Left, toolbarTop: actionBounds.Bottom + 2,
-            showPrimaryToolbar: false);
+            showPrimaryToolbar: false, allowToolToggleOff: true);
         UpdateCaptureAnnotationHistoryButtons();
         RenderSelection();
         initialTool ??= CaptureAnnotationToolPanel.Children.OfType<Button>()

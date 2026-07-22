@@ -207,6 +207,7 @@ internal static class Program
             editor.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             editor.UpdateLayout();
             var surfaceHost = (Border)editor.FindName("SurfaceHost");
+            var annotationCanvas = (Canvas)editor.FindName("AnnotationCanvas");
             var background = (Image)editor.FindName("BackgroundImage");
             var cancel = (Button)editor.FindName("CancelActionButton");
             var toolbar = (Grid)editor.FindName("ToolbarHost");
@@ -225,6 +226,8 @@ internal static class Program
             return (Border: surfaceHost.BorderThickness,
                 Scaling: RenderOptions.GetBitmapScalingMode(background),
                 ExternalBackgroundHidden: background.Visibility == Visibility.Collapsed,
+                ExternalSurfaceReceivesInput: surfaceHost.Background is SolidColorBrush { Color.A: > 0 } &&
+                    annotationCanvas.Background is SolidColorBrush { Color.A: > 0 },
                 CancelVisible: cancel.Visibility == Visibility.Visible,
                 FlattenedSizeMatches: flattened.PixelWidth == source.PixelWidth && flattened.PixelHeight == source.PixelHeight,
                 ExactToolbarPlacement: Math.Abs(toolbarPosition.X - expectedToolbarPosition.X) < 1 &&
@@ -237,8 +240,58 @@ internal static class Program
             sharpnessPolicy.Scaling != BitmapScalingMode.NearestNeighbor ||
             !sharpnessPolicy.ExternalBackgroundHidden || !sharpnessPolicy.CancelVisible ||
             !sharpnessPolicy.FlattenedSizeMatches || !sharpnessPolicy.ExactToolbarPlacement ||
+            !sharpnessPolicy.ExternalSurfaceReceivesInput ||
             !sharpnessPolicy.StartsInMoveMode || !sharpnessPolicy.ActivatesTool ||
             !sharpnessPolicy.TogglesBackToMoveMode) return 35;
+
+        var livePinOverlay = RunSta(() =>
+        {
+            var pin = new PinnedImageWindow(CreatePatternImage(320, 180), applyTextSelectableDefault: false)
+            {
+                Left = SystemParameters.VirtualScreenLeft + 48,
+                Top = SystemParameters.VirtualScreenTop + 48,
+                Width = 320,
+                Height = 180,
+                ShowActivated = false
+            };
+            PinnedAnnotationOverlayWindow? overlay = null;
+            try
+            {
+                pin.Show();
+                pin.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+                pin.BeginEditMode();
+                pin.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+                overlay = (PinnedAnnotationOverlayWindow?)typeof(PinnedImageWindow)
+                    .GetField("_annotationOverlay", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                    .GetValue(pin);
+                if (overlay is null) return (ReceivesPointer: false, Aligned: false);
+
+                overlay.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+                var editor = (AnnotationEditorControl)typeof(PinnedAnnotationOverlayWindow)
+                    .GetField("_editor", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                    .GetValue(overlay)!;
+                var surface = (Border)editor.FindName("SurfaceHost");
+                var pinTopLeft = pin.PointToScreen(new Point());
+                var surfaceTopLeft = surface.PointToScreen(new Point());
+                var pinCenter = pin.PointToScreen(new Point(pin.ActualWidth / 2, pin.ActualHeight / 2));
+                var topWindow = NativeMethods.WindowFromPoint(new NativeMethods.NativePoint
+                {
+                    X = (int)Math.Round(pinCenter.X),
+                    Y = (int)Math.Round(pinCenter.Y)
+                });
+                var overlayHandle = new System.Windows.Interop.WindowInteropHelper(overlay).Handle;
+                return (
+                    ReceivesPointer: topWindow == overlayHandle,
+                    Aligned: Math.Abs(pinTopLeft.X - surfaceTopLeft.X) < 2 &&
+                        Math.Abs(pinTopLeft.Y - surfaceTopLeft.Y) < 2);
+            }
+            finally
+            {
+                overlay?.Close();
+                pin.Close();
+            }
+        });
+        if (!livePinOverlay.ReceivesPointer || !livePinOverlay.Aligned) return 83;
         Console.WriteLine("PIN TOOLBAR: capture-identical placement, move-first tool state, toggle-off tools and lossless editing verified");
 
         var dashboardPaletteMatches = RunSta(() =>
@@ -846,11 +899,24 @@ internal static class Program
             overlayType.GetMethod("RenderSelection", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .Invoke(overlay, null);
             var finalizedSelectionHidesDetection = detectionRect.Visibility == Visibility.Collapsed;
+            overlay.Measure(new Size(320, 180));
+            overlay.Arrange(new Rect(0, 0, 320, 180));
+            overlay.UpdateLayout();
+            overlayType.GetMethod("BeginInlineAnnotation", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(overlay, new object?[] { "Ellipse" });
+            var inlineEditor = (AnnotationEditorControl)overlay.FindName("CaptureInlineEditor");
+            var ellipseButton = panel.Children.OfType<Button>()
+                .First(button => string.Equals(button.Tag as string, "Ellipse", StringComparison.OrdinalIgnoreCase));
+            var annotationStartsActive = inlineEditor.ActiveTool == "Ellipse";
+            overlayType.GetMethod("QuickAnnotation_Click", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(overlay, new object[] { ellipseButton, new RoutedEventArgs() });
+            var captureToolTogglesOff = inlineEditor.ActiveTool == "None" &&
+                ellipseButton.Background == Brushes.Transparent;
             overlay.Close();
             return visibleTags.SequenceEqual(new[] { "Ellipse", "Line", "Magnify" }) &&
                 !allTags.Contains("Select") && !allTags.Contains("Number") && !allTags.Contains("Callout") &&
                 reviewHeader.Cursor == System.Windows.Input.Cursors.SizeAll && savePath is not null && hasRecordingIcons &&
-                finalizedSelectionHidesDetection;
+                finalizedSelectionHidesDetection && annotationStartsActive && captureToolTogglesOff;
         });
         if (!captureAnnotationToolbarMatches) return 47;
         Console.WriteLine("CAPTURE ANNOTATION: direct first-row tools, movable review header, save path and recording icons verified");
