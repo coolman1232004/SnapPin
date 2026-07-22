@@ -1,10 +1,10 @@
-# Publishing SnapPin on GitHub
+# Publishing SnapAnchor on GitHub
 
 This checklist keeps the source repository small, protects local development data, and distributes the installer and portable package in the normal GitHub way.
 
 ## 1. License
 
-SnapPin is published under the MIT License. Keep the repository's `LICENSE` file with source distributions and retain required third-party notices in binary packages.
+SnapAnchor is published under the MIT License. Keep the repository's `LICENSE` file with source distributions and retain required third-party notices in binary packages.
 
 ## 2. Publish the correct files
 
@@ -30,17 +30,17 @@ The repository `.gitignore` already excludes these paths. Keep the existing loca
 
 ## 3. Create the repository
 
-Create an empty GitHub repository named `SnapPin` (or another name after a trademark/name check). Do not ask GitHub to generate a README or license if local versions already exist.
+Create an empty GitHub repository named `SnapAnchor` (or another name after a trademark/name check). Do not ask GitHub to generate a README or license if local versions already exist.
 
-From the SnapPin source folder:
+From the SnapAnchor source folder:
 
 ```powershell
 git init
 git branch -M main
 git add .
 git status
-git commit -m "Initial public release of SnapPin"
-git remote add origin https://github.com/YOUR-NAME/SnapPin.git
+git commit -m "Initial public release of SnapAnchor"
+git remote add origin https://github.com/YOUR-NAME/SnapAnchor.git
 git push -u origin main
 ```
 
@@ -48,19 +48,19 @@ Before committing, carefully review `git status` and confirm that no backup, bui
 
 ## 4. Create a release for downloads
 
-Do not commit the compiled ZIP or installer into Git history. GitHub blocks ordinary repository files larger than 100 MiB, and the SnapPin installer is larger than that. Use a GitHub Release instead.
+Do not commit the compiled ZIP or installer into Git history. GitHub blocks ordinary repository files larger than 100 MiB, and the SnapAnchor installer is larger than that. Use a GitHub Release instead.
 
 1. Build and test the chosen version:
 
    ```powershell
    .\Tests\Run-Smoke.ps1
-   .\packaging\Build-Packages.ps1 -Version 1.2.15
+   .\packaging\Build-Packages.ps1 -Version 2.0.0
    ```
 
-2. Create a version tag such as `v1.2.15` and a matching release title.
+2. Create a version tag such as `v2.0.0` and a matching release title.
 3. Upload these files from `dist\` as release assets:
-   - `SnapPin-Setup-win-x64.exe`
-   - `SnapPin-Portable-win-x64.zip`
+   - `SnapAnchor-Setup-win-x64.exe`
+   - `SnapAnchor-Portable-win-x64.zip`
    - `release.json`
 4. State clearly that the build is currently unsigned and may trigger Windows SmartScreen.
 5. Describe major changes, known limitations, minimum Windows version, and upgrade notes.
@@ -68,7 +68,7 @@ Do not commit the compiled ZIP or installer into Git history. GitHub blocks ordi
 Example release notes:
 
 ```markdown
-## SnapPin 1.2.2
+## SnapAnchor 1.2.2
 
 ### Highlights
 - Local-first screenshot capture, inline annotation, pins, OCR, and screen recording
@@ -76,8 +76,8 @@ Example release notes:
 - Searchable history, pin groups, configurable toolbars, and mixed-DPI support
 
 ### Downloads
-- **Installer:** `SnapPin-Setup-win-x64.exe`
-- **Portable:** `SnapPin-Portable-win-x64.zip`
+- **Installer:** `SnapAnchor-Setup-win-x64.exe`
+- **Portable:** `SnapAnchor-Portable-win-x64.zip`
 
 ### Requirements
 - Windows 10 version 1809 or later, x64
@@ -98,10 +98,10 @@ This release is not code-signed. Verify the SHA-256 values in `release.json` bef
 
 ## 6. Legal and identity checks
 
-- Keep SnapPin's name, icon, screenshots, wording, and toolbar artwork distinct from commercial products.
+- Keep SnapAnchor's name, icon, screenshots, wording, and toolbar artwork distinct from commercial products.
 - Do not upload the downloaded Snipaste portable folder, binaries, configuration, screenshots used as reference, or any Snipaste/PixPin assets.
-- Avoid advertising SnapPin as an “exact clone,” official edition, cracked version, or replacement containing paid/proprietary features.
-- Describe public behaviour factually and say that SnapPin is independent and unaffiliated.
+- Avoid advertising SnapAnchor as an “exact clone,” official edition, cracked version, or replacement containing paid/proprietary features.
+- Describe public behaviour factually and say that SnapAnchor is independent and unaffiliated.
 - Run a proper trademark/name search before a broad public launch; a normal web search is not a legal clearance search.
 - If commercial distribution, donations, or a large user base are planned, obtain professional advice on licensing, trademarks, privacy, and software distribution.
 

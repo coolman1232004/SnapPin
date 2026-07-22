@@ -2,7 +2,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class AtomicFileService
 {

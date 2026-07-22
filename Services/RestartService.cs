@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Windows;
-using SnapPin.Windows;
+using SnapAnchor.Windows;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class RestartService
 {
@@ -63,7 +63,7 @@ internal static class RestartService
         catch (Exception ex)
         {
             DiagnosticsService.Log("restart", ex.Message, ex);
-            MessageBox.Show(LocalizationService.Current("SnapPin could not restart automatically. Please close and open it again."),
+            MessageBox.Show(LocalizationService.Current("SnapAnchor could not restart automatically. Please close and open it again."),
                 LocalizationService.Current("Restart required"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }

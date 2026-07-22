@@ -1,4 +1,4 @@
-<UserControl x:Class="SnapPin.Controls.RecognitionControl"
+<UserControl x:Class="SnapAnchor.Controls.RecognitionControl"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Focusable="True" Background="White">

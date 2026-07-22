@@ -1,12 +1,12 @@
-using SnapPin.Controls;
-using SnapPin.Services;
+using SnapAnchor.Controls;
+using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Forms = System.Windows.Forms;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 public partial class WhiteboardWindow : Window
 {
@@ -16,7 +16,7 @@ public partial class WhiteboardWindow : Window
     {
         InitializeComponent();
         _transparent = transparent;
-        Title = transparent ? "SnapPin Transparent Whiteboard" : "SnapPin Whiteboard";
+        Title = transparent ? "SnapAnchor Transparent Whiteboard" : "SnapAnchor Whiteboard";
         var bounds = Forms.SystemInformation.VirtualScreen;
         Left = SystemParameters.VirtualScreenLeft;
         Top = SystemParameters.VirtualScreenTop;

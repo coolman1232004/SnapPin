@@ -1,11 +1,11 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 internal sealed class PortableUpdateWindow : Window
 {
@@ -24,7 +24,7 @@ internal sealed class PortableUpdateWindow : Window
         ResizeMode = ResizeMode.NoResize;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         ShowInTaskbar = true;
-        Icon = BitmapFrame.Create(new Uri("pack://application:,,,/SnapPin;component/Assets/SnapPin-icon-512.png"));
+        Icon = BitmapFrame.Create(new Uri("pack://application:,,,/SnapAnchor;component/Assets/SnapAnchor-icon-512.png"));
         Topmost = true;
         Background = Brushes.White;
         Foreground = new SolidColorBrush(Color.FromRgb(17, 24, 29));
@@ -33,7 +33,7 @@ internal sealed class PortableUpdateWindow : Window
         var panel = new StackPanel { Margin = new Thickness(30, 26, 30, 24) };
         _status = new TextBlock
         {
-            Text = LocalizationService.Current("Waiting for SnapPin to close..."),
+            Text = LocalizationService.Current("Waiting for SnapAnchor to close..."),
             FontSize = 18,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 0, 8)
@@ -79,7 +79,7 @@ internal sealed class PortableUpdateWindow : Window
         if (!result.Success && result.RetryAsAdministrator)
         {
             _status.Text = LocalizationService.Current("Administrator permission is required. Waiting for approval...");
-            _detail.Text = LocalizationService.Current("SnapPin will retry the portable update with administrator permission.");
+            _detail.Text = LocalizationService.Current("SnapAnchor will retry the portable update with administrator permission.");
             _progress.IsIndeterminate = true;
             if (PortableUpdateService.TryRestartAsAdministrator(_request, out var elevationError))
             {

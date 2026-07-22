@@ -3,7 +3,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Forms = System.Windows.Forms;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class DpiLayoutService
 {

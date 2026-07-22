@@ -1,4 +1,4 @@
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal readonly record struct AnnotationToolbarDefinition(string Key, string Label);
 

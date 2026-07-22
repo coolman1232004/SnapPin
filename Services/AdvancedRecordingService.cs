@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Forms = System.Windows.Forms;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record AdvancedRecordingResult(string FilePath, BitmapSource Preview, TimeSpan Duration, int FrameCount);
 internal sealed record RecordingDeviceOption(string DeviceName, string DisplayName);
@@ -77,7 +77,7 @@ internal sealed class AdvancedRecordingSession : IDisposable
             LogOptions = new LogOptions { IsLogEnabled = false }
         };
 
-        var output = SettingsService.CreateOutputPath(settings.RecordingFolder, "SnapPin_$yyyy-MM-dd_HH-mm-ss.mp4", ".mp4");
+        var output = SettingsService.CreateOutputPath(settings.RecordingFolder, "SnapAnchor_$yyyy-MM-dd_HH-mm-ss.mp4", ".mp4");
         var preview = CapturePreview(previewBounds, settings.RecordingIncludeCursor);
         var recorder = Recorder.CreateRecorder(options);
         if (overlayHandle != IntPtr.Zero) Recorder.SetExcludeFromCapture(overlayHandle, true);

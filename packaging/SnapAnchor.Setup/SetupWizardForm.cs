@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace SnapPin.Setup;
+namespace SnapAnchor.Setup;
 
 internal sealed class SetupWizardForm : Form
 {
@@ -25,7 +25,7 @@ internal sealed class SetupWizardForm : Form
 
     internal SetupWizardForm(string suggestedDirectory)
     {
-        Text = "SnapPin Setup";
+        Text = "SnapAnchor Setup";
         StartPosition = FormStartPosition.CenterScreen;
         ClientSize = new Size(720, 500);
         MinimumSize = new Size(680, 470);
@@ -46,7 +46,7 @@ internal sealed class SetupWizardForm : Form
         var header = new Panel { Dock = DockStyle.Fill, BackColor = Color.White, Padding = new Padding(28, 18, 28, 12) };
         root.Controls.Add(header, 0, 0);
         _stepLabel = new Label { AutoSize = true, Text = "Step 1 of 4", ForeColor = Color.FromArgb(47, 128, 237), Font = new Font("Segoe UI Semibold", 9F), Location = new Point(29, 15) };
-        _headerTitle = new Label { AutoSize = false, Text = "Welcome to SnapPin Setup", ForeColor = Color.FromArgb(17, 24, 39), Font = new Font("Segoe UI Semibold", 18F), Location = new Point(27, 35), Size = new Size(660, 34) };
+        _headerTitle = new Label { AutoSize = false, Text = "Welcome to SnapAnchor Setup", ForeColor = Color.FromArgb(17, 24, 39), Font = new Font("Segoe UI Semibold", 18F), Location = new Point(27, 35), Size = new Size(660, 34) };
         _headerSubtitle = new Label { AutoSize = false, Text = "Review the information below before continuing.", ForeColor = Color.FromArgb(91, 101, 116), Font = new Font("Segoe UI", 9.5F), Location = new Point(30, 70), Size = new Size(650, 23) };
         header.Controls.AddRange([_stepLabel, _headerTitle, _headerSubtitle]);
 
@@ -65,7 +65,7 @@ internal sealed class SetupWizardForm : Form
         _progressStatus = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 46, Text = "Preparing installation...", ForeColor = Color.FromArgb(75, 85, 99), Padding = new Padding(0, 12, 0, 0) };
         var progressPage = CreateProgressPage();
 
-        _launchBox = new CheckBox { AutoSize = true, Text = "Launch SnapPin", Checked = true, Font = new Font("Segoe UI Semibold", 10F), Margin = new Padding(0, 12, 0, 4) };
+        _launchBox = new CheckBox { AutoSize = true, Text = "Launch SnapAnchor", Checked = true, Font = new Font("Segoe UI Semibold", 10F), Margin = new Padding(0, 12, 0, 4) };
         _readmeBox = new CheckBox { AutoSize = true, Text = "Open README", Checked = false, Font = new Font("Segoe UI", 10F), Margin = new Padding(0, 5, 0, 0) };
         var completePage = CreateCompletePage();
 
@@ -113,7 +113,7 @@ internal sealed class SetupWizardForm : Form
         var intro = new Label
         {
             AutoSize = false, Dock = DockStyle.Fill,
-            Text = "SnapPin is a local-first screenshot and floating-reference utility for Windows.",
+            Text = "SnapAnchor is a local-first screenshot and floating-reference utility for Windows.",
             ForeColor = Color.FromArgb(52, 64, 84), Font = new Font("Segoe UI", 10F)
         };
         var terms = new RichTextBox
@@ -122,9 +122,9 @@ internal sealed class SetupWizardForm : Form
             Dock = DockStyle.Fill, Font = new Font("Segoe UI", 9.5F), TabStop = false,
             WordWrap = true, ScrollBars = RichTextBoxScrollBars.Vertical,
             Text = "IMPORTANT INFORMATION\n\n" +
-                   "SnapPin is provided as-is, without warranty. You are responsible for ensuring you have permission to capture, store, and share screen content.\n\n" +
-                   "SnapPin stores settings and capture history locally on this computer. OCR is processed locally. The installer creates only the shortcuts you select and registers an uninstaller in Windows.\n\n" +
-                   "Close any older SnapPin instance before installation; Setup will also attempt to close the installed copy automatically."
+                   "SnapAnchor is provided as-is, without warranty. You are responsible for ensuring you have permission to capture, store, and share screen content.\n\n" +
+                   "SnapAnchor stores settings and capture history locally on this computer. OCR is processed locally. The installer creates only the shortcuts you select and registers an uninstaller in Windows.\n\n" +
+                   "Close any older SnapAnchor instance before installation; Setup will also attempt to close the installed copy automatically."
         };
         acceptBox.Anchor = AnchorStyles.Left;
         layout.Controls.Add(intro, 0, 0);
@@ -146,7 +146,7 @@ internal sealed class SetupWizardForm : Form
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 34));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 34));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
-        var title = new Label { AutoSize = true, Text = "Install SnapPin to:", Font = new Font("Segoe UI Semibold", 11F), ForeColor = Color.FromArgb(17, 24, 39), Anchor = AnchorStyles.Left };
+        var title = new Label { AutoSize = true, Text = "Install SnapAnchor to:", Font = new Font("Segoe UI Semibold", 11F), ForeColor = Color.FromArgb(17, 24, 39), Anchor = AnchorStyles.Left };
         layout.Controls.Add(title, 0, 0); layout.SetColumnSpan(title, 2);
         layout.Controls.Add(_destinationBox, 0, 1);
         var browse = CreateButton("Browse...", 96, false); browse.Anchor = AnchorStyles.Right; browse.Click += Browse_Click; layout.Controls.Add(browse, 1, 1);
@@ -163,8 +163,8 @@ internal sealed class SetupWizardForm : Form
     private Panel CreateProgressPage()
     {
         var page = new Panel();
-        var title = new Label { AutoSize = true, Dock = DockStyle.Top, Text = "Installing SnapPin", Font = new Font("Segoe UI Semibold", 16F), ForeColor = Color.FromArgb(17, 24, 39), Padding = new Padding(0, 5, 0, 12) };
-        var message = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 58, Text = "Please wait while Setup installs SnapPin. This may take a moment because the portable runtime and local OCR models are included.", ForeColor = Color.FromArgb(75, 85, 99) };
+        var title = new Label { AutoSize = true, Dock = DockStyle.Top, Text = "Installing SnapAnchor", Font = new Font("Segoe UI Semibold", 16F), ForeColor = Color.FromArgb(17, 24, 39), Padding = new Padding(0, 5, 0, 12) };
+        var message = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 58, Text = "Please wait while Setup installs SnapAnchor. This may take a moment because the portable runtime and local OCR models are included.", ForeColor = Color.FromArgb(75, 85, 99) };
         var note = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 58, Text = "Do not close this window while files are being installed.", ForeColor = Color.FromArgb(102, 112, 133), Padding = new Padding(0, 18, 0, 0) };
         page.Controls.Add(note);
         page.Controls.Add(_progressStatus);
@@ -177,11 +177,11 @@ internal sealed class SetupWizardForm : Form
     private Panel CreateCompletePage()
     {
         var page = new Panel();
-        var title = new Label { AutoSize = true, Dock = DockStyle.Top, Text = "SnapPin is ready", Font = new Font("Segoe UI Semibold", 18F), ForeColor = Color.FromArgb(17, 24, 39), Padding = new Padding(0, 8, 0, 10) };
-        var message = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 72, Text = "Setup has installed SnapPin successfully. Click Finish to close Setup and perform the selected actions.", ForeColor = Color.FromArgb(75, 85, 99), Font = new Font("Segoe UI", 10F) };
+        var title = new Label { AutoSize = true, Dock = DockStyle.Top, Text = "SnapAnchor is ready", Font = new Font("Segoe UI Semibold", 18F), ForeColor = Color.FromArgb(17, 24, 39), Padding = new Padding(0, 8, 0, 10) };
+        var message = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 72, Text = "Setup has installed SnapAnchor successfully. Click Finish to close Setup and perform the selected actions.", ForeColor = Color.FromArgb(75, 85, 99), Font = new Font("Segoe UI", 10F) };
         var options = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 80, FlowDirection = FlowDirection.TopDown, WrapContents = false };
         options.Controls.Add(_launchBox); options.Controls.Add(_readmeBox);
-        var privacy = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 70, BackColor = Color.FromArgb(236, 253, 245), ForeColor = Color.FromArgb(22, 101, 74), Padding = new Padding(12), Text = "Local-first by design: SnapPin does not require an account or cloud connection." };
+        var privacy = new Label { AutoSize = false, Dock = DockStyle.Top, Height = 70, BackColor = Color.FromArgb(236, 253, 245), ForeColor = Color.FromArgb(22, 101, 74), Padding = new Padding(12), Text = "Local-first by design: SnapAnchor does not require an account or cloud connection." };
         page.Controls.Add(privacy);
         page.Controls.Add(options);
         page.Controls.Add(message);
@@ -210,10 +210,10 @@ internal sealed class SetupWizardForm : Form
         _stepLabel.Text = $"Step {_step + 1} of 4";
         (_headerTitle.Text, _headerSubtitle.Text) = _step switch
         {
-            0 => ("Welcome to SnapPin Setup", "Review the information below before continuing."),
-            1 => ("Choose installation options", "Select where SnapPin will be installed."),
-            2 => ("Installing SnapPin", "Setup is copying files and configuring shortcuts."),
-            _ => ("Installation complete", "SnapPin was installed successfully.")
+            0 => ("Welcome to SnapAnchor Setup", "Review the information below before continuing."),
+            1 => ("Choose installation options", "Select where SnapAnchor will be installed."),
+            2 => ("Installing SnapAnchor", "Setup is copying files and configuring shortcuts."),
+            _ => ("Installation complete", "SnapAnchor was installed successfully.")
         };
 
         _backButton.Visible = _step == 1;
@@ -253,14 +253,14 @@ internal sealed class SetupWizardForm : Form
         catch (Exception ex)
         {
             _installing = false;
-            MessageBox.Show(this, ex.Message, "SnapPin Setup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(this, ex.Message, "SnapAnchor Setup", MessageBoxButtons.OK, MessageBoxIcon.Error);
             ShowStep(1);
         }
     }
 
     private void Browse_Click(object? sender, EventArgs e)
     {
-        using var dialog = new FolderBrowserDialog { Description = "Choose the folder where SnapPin will be installed", UseDescriptionForTitle = true, ShowNewFolderButton = true, SelectedPath = Directory.Exists(_destinationBox.Text) ? _destinationBox.Text : Program.DefaultInstallDirectory };
+        using var dialog = new FolderBrowserDialog { Description = "Choose the folder where SnapAnchor will be installed", UseDescriptionForTitle = true, ShowNewFolderButton = true, SelectedPath = Directory.Exists(_destinationBox.Text) ? _destinationBox.Text : Program.DefaultInstallDirectory };
         if (dialog.ShowDialog(this) == DialogResult.OK) _destinationBox.Text = dialog.SelectedPath;
     }
 
@@ -274,7 +274,7 @@ internal sealed class SetupWizardForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "SnapPin Setup", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(ex.Message, "SnapAnchor Setup", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         Close();
     }
@@ -282,7 +282,7 @@ internal sealed class SetupWizardForm : Form
     private void Cancel_Click(object? sender, EventArgs e)
     {
         if (_installing) return;
-        if (MessageBox.Show(this, "Exit SnapPin Setup?", "SnapPin Setup", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) Close();
+        if (MessageBox.Show(this, "Exit SnapAnchor Setup?", "SnapAnchor Setup", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) Close();
     }
 
     internal void RenderPreviews(string directory)

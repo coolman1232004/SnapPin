@@ -3,7 +3,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Automation;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record DetectedScreenRegion(Rect Bounds, string Name, bool IsElement);
 

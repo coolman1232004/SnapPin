@@ -3,7 +3,7 @@ using Windows.Media.MediaProperties;
 using Windows.Media.Transcoding;
 using Windows.Storage;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class MediaTrimService
 {

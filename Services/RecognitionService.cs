@@ -1,4 +1,4 @@
-using SnapPin.Models;
+using SnapAnchor.Models;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -6,7 +6,7 @@ using Tesseract;
 using ZXing;
 using ZXing.Common;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class RecognitionService
 {

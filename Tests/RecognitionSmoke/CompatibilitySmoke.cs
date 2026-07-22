@@ -1,8 +1,8 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.RecognitionSmoke;
+namespace SnapAnchor.RecognitionSmoke;
 
 internal static class CompatibilitySmoke
 {

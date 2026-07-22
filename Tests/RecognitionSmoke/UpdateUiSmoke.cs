@@ -1,5 +1,5 @@
-using SnapPin.Services;
-using SnapPin.Windows;
+using SnapAnchor.Services;
+using SnapAnchor.Windows;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace SnapPin.RecognitionSmoke;
+namespace SnapAnchor.RecognitionSmoke;
 
 internal static class UpdateUiSmoke
 {
@@ -78,14 +78,14 @@ internal static class UpdateUiSmoke
     private static void TestArgumentsAndTransaction()
     {
         var source = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd(Path.DirectorySeparatorChar);
-        var sourceExe = Path.Combine(source, "SnapPin.exe");
-        if (!File.Exists(sourceExe)) throw new InvalidOperationException("SnapPin.exe is missing from the smoke-test output.");
+        var sourceExe = Path.Combine(source, "SnapAnchor.exe");
+        if (!File.Exists(sourceExe)) throw new InvalidOperationException("SnapAnchor.exe is missing from the smoke-test output.");
         var version = FileVersionInfo.GetVersionInfo(sourceExe).FileVersion?.Split('.').Take(3).Aggregate((left, right) => left + "." + right)
-            ?? throw new InvalidOperationException("SnapPin.exe has no file version.");
-        var root = Path.Combine(Path.GetTempPath(), "SnapPinUpdateSmoke", Guid.NewGuid().ToString("N"));
+            ?? throw new InvalidOperationException("SnapAnchor.exe has no file version.");
+        var root = Path.Combine(Path.GetTempPath(), "SnapAnchorUpdateSmoke", Guid.NewGuid().ToString("N"));
         var successTarget = Path.Combine(root, "SuccessTarget");
         var failureTarget = Path.Combine(root, "FailureTarget");
-        var sourceManifest = Path.Combine(source, ".snappin-package.json");
+        var sourceManifest = Path.Combine(source, ".snapanchor-package.json");
         var sourceProbe = Path.Combine(source, "new-only.txt");
         var originalManifest = File.Exists(sourceManifest) ? File.ReadAllText(sourceManifest) : null;
         try
@@ -94,7 +94,7 @@ internal static class UpdateUiSmoke
             File.WriteAllText(sourceManifest, JsonSerializer.Serialize(new
             {
                 version,
-                files = new[] { "SnapPin.exe", ".snappin-package.json", "new-only.txt" }
+                files = new[] { "SnapAnchor.exe", ".snapanchor-package.json", "new-only.txt" }
             }));
             PrepareOldTarget(successTarget, sourceExe);
             PrepareOldTarget(failureTarget, sourceExe);
@@ -144,12 +144,12 @@ internal static class UpdateUiSmoke
     private static void PrepareOldTarget(string target, string sourceExe)
     {
         Directory.CreateDirectory(target);
-        File.Copy(sourceExe, Path.Combine(target, "SnapPin.exe"));
+        File.Copy(sourceExe, Path.Combine(target, "SnapAnchor.exe"));
         File.WriteAllText(Path.Combine(target, "old-only.txt"), "old");
-        File.WriteAllText(Path.Combine(target, ".snappin-package.json"), JsonSerializer.Serialize(new
+        File.WriteAllText(Path.Combine(target, ".snapanchor-package.json"), JsonSerializer.Serialize(new
         {
             version = "1.0.0",
-            files = new[] { "SnapPin.exe", ".snappin-package.json", "old-only.txt" }
+            files = new[] { "SnapAnchor.exe", ".snapanchor-package.json", "old-only.txt" }
         }));
     }
 }

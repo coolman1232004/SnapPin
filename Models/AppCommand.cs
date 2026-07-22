@@ -1,7 +1,7 @@
 using System.Text.Json;
-using SnapPin.Services;
+using SnapAnchor.Services;
 
-namespace SnapPin.Models;
+namespace SnapAnchor.Models;
 
 internal enum AppCommandKind
 {
@@ -65,7 +65,7 @@ internal sealed record AppCommand(
         };
         if ((int)kind < 0)
         {
-            error = LocalizationService.Format("Unknown SnapPin command: {0}", arguments[0]);
+            error = LocalizationService.Format("Unknown SnapAnchor command: {0}", arguments[0]);
             return false;
         }
 

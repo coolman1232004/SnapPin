@@ -1,8 +1,8 @@
 using System.IO;
 using System.IO.Pipes;
-using SnapPin.Models;
+using SnapAnchor.Models;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed class SingleInstanceService : IDisposable
 {

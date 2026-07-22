@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace SnapPin.Models;
+namespace SnapAnchor.Models;
 
 internal enum AnnotationKind
 {

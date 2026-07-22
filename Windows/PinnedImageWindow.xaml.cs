@@ -1,6 +1,6 @@
 using Microsoft.Win32;
-using SnapPin.Models;
-using SnapPin.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Forms = System.Windows.Forms;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 internal sealed record PinSnapshot(Guid Id, BitmapSource Image, string Group, bool IsVisible, bool IsOnCurrentDesktop, string SizeLabel)
 {
@@ -87,7 +87,7 @@ public partial class PinnedImageWindow : Window
         _groupName = groupName ?? _settings.CurrentPinGroup;
         _backgroundMode = backgroundMode ?? _settings.DefaultPinBackground;
         _pinTitle = "Pinned image";
-        Title = $"SnapPin - {_pinTitle}";
+        Title = $"SnapAnchor - {_pinTitle}";
         _historyRecordId = historyRecordId;
         _enableSelectableTextOnLoad = applyTextSelectableDefault && !startEditing && _settings.PinTextSelectableByDefault;
         _longScrollable = source.PixelHeight > source.PixelWidth * 2.5;
@@ -398,7 +398,7 @@ public partial class PinnedImageWindow : Window
     {
         RestoreSelectableTextCache(item);
         _pinTitle = string.IsNullOrWhiteSpace(item.Title) ? "Pinned image" : item.Title.Trim();
-        Title = $"SnapPin - {_pinTitle}";
+        Title = $"SnapAnchor - {_pinTitle}";
         ShadeTitleText.Text = _pinTitle;
         _positionLocked = item.PositionLocked;
         _edgeSnapping = item.EdgeSnapping;
@@ -478,14 +478,14 @@ public partial class PinnedImageWindow : Window
         ClickThroughBadge.Visibility = Visibility.Collapsed;
     }
 
-    private void ApplyEditedImage(SnapPin.Controls.AnnotationAppliedEventArgs document)
+    private void ApplyEditedImage(SnapAnchor.Controls.AnnotationAppliedEventArgs document)
     {
         SetBaseImage(document.FlattenedImage);
         PersistEditedDocument(document);
         ExitInlineMode();
     }
 
-    private void PersistEditedDocument(SnapPin.Controls.AnnotationAppliedEventArgs document)
+    private void PersistEditedDocument(SnapAnchor.Controls.AnnotationAppliedEventArgs document)
     {
         if (string.IsNullOrWhiteSpace(_historyRecordId))
             _historyRecordId = HistoryService.Add(document.BaseImage, sourceKind: "Edited").Id;
@@ -502,7 +502,7 @@ public partial class PinnedImageWindow : Window
         ExitInlineMode();
     }
 
-    private void Recognition_Completed(object? sender, SnapPin.Controls.RecognitionCompletedEventArgs e)
+    private void Recognition_Completed(object? sender, SnapAnchor.Controls.RecognitionCompletedEventArgs e)
     {
         PersistRecognitionResult(e.Result);
     }
@@ -599,7 +599,7 @@ public partial class PinnedImageWindow : Window
     private void CommitTitleEdit()
     {
         _pinTitle = string.IsNullOrWhiteSpace(TitleEditorBox.Text) ? "Pinned image" : TitleEditorBox.Text.Trim();
-        Title = $"SnapPin - {_pinTitle}";
+        Title = $"SnapAnchor - {_pinTitle}";
         ShadeTitleText.Text = _pinTitle;
         TitleEditor.Visibility = Visibility.Collapsed;
         UpdatePinStateBadge();
@@ -661,7 +661,7 @@ public partial class PinnedImageWindow : Window
 
     private void CopyTargetsAsFiles()
     {
-        var directory = Path.Combine(Path.GetTempPath(), "SnapPin", "ClipboardFiles", Guid.NewGuid().ToString("N"));
+        var directory = Path.Combine(Path.GetTempPath(), "SnapAnchor", "ClipboardFiles", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
         var files = ExportTargets(directory, Targets().ToList(), forcePng: true);
         var dropList = new System.Collections.Specialized.StringCollection();
@@ -674,7 +674,7 @@ public partial class PinnedImageWindow : Window
         using var dialog = new Forms.FolderBrowserDialog
         {
             UseDescriptionForTitle = true,
-            Description = "Choose a folder for the selected SnapPin images"
+            Description = "Choose a folder for the selected SnapAnchor images"
         };
         if (dialog.ShowDialog() != Forms.DialogResult.OK) return;
         ExportTargets(dialog.SelectedPath, Targets().ToList(), forcePng: false);
@@ -690,7 +690,7 @@ public partial class PinnedImageWindow : Window
         var paths = new List<string>(pins.Count);
         for (var index = 0; index < pins.Count; index++)
         {
-            var path = Path.Combine(directory, $"SnapPin_{stamp}_{index + 1:D2}{extension}");
+            var path = Path.Combine(directory, $"SnapAnchor_{stamp}_{index + 1:D2}{extension}");
             CaptureService.SaveImage(pins[index]._source, path, settings.ImageQuality, settings);
             paths.Add(path);
         }
@@ -766,7 +766,7 @@ public partial class PinnedImageWindow : Window
         NotifyPinsChanged();
     }
 
-    private void ApplyCaptureAffinityToWindow() => ApplyCaptureAffinityToWindow(SettingsService.Load().ExcludeSnapPinFromCapture);
+    private void ApplyCaptureAffinityToWindow() => ApplyCaptureAffinityToWindow(SettingsService.Load().ExcludeSnapAnchorFromCapture);
 
     private void ApplyCaptureAffinityToWindow(bool exclude)
     {
@@ -877,7 +877,7 @@ public partial class PinnedImageWindow : Window
             DefaultExt = CaptureService.ExtensionForFormat(_settings.OutputFormat),
             FilterIndex = CaptureService.FilterIndexForFormat(_settings.OutputFormat),
             AddExtension = true,
-            FileName = $"SnapPin_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}{CaptureService.ExtensionForFormat(_settings.OutputFormat)}"
+            FileName = $"SnapAnchor_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}{CaptureService.ExtensionForFormat(_settings.OutputFormat)}"
         };
         if (dialog.ShowDialog(this) == true)
             CaptureService.SaveImage(source, dialog.FileName, _settings.ImageQuality, applyOutputEffects ? _settings : null);
@@ -899,7 +899,7 @@ public partial class PinnedImageWindow : Window
         };
         image.Measure(new Size(image.Width, image.Height));
         image.Arrange(new Rect(0, 0, image.Width, image.Height));
-        dialog.PrintVisual(image, "SnapPin image");
+        dialog.PrintVisual(image, "SnapAnchor image");
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e)

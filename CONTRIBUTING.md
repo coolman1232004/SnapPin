@@ -1,6 +1,6 @@
-# Contributing to SnapPin
+# Contributing to SnapAnchor
 
-Thank you for helping improve SnapPin.
+Thank you for helping improve SnapAnchor.
 
 ## Bug reports
 
@@ -9,7 +9,7 @@ Before opening an issue:
 1. Test the latest release.
 2. Check whether the issue has already been reported.
 3. Reproduce it using non-sensitive sample content.
-4. Record the SnapPin version, Windows version, display scaling, monitor layout, and exact steps.
+4. Record the SnapAnchor version, Windows version, display scaling, monitor layout, and exact steps.
 
 Do not attach private screenshots, recordings, clipboard data, OCR results, configuration, history, session data, or logs without reviewing and redacting them.
 
@@ -19,7 +19,7 @@ Explain the problem or workflow first, then the proposed behaviour. Screenshots 
 
 ## Code contributions
 
-SnapPin is released under the MIT License. By submitting a contribution, you agree that it may be distributed under the same license.
+SnapAnchor is released under the MIT License. By submitting a contribution, you agree that it may be distributed under the same license.
 
 Code contributions are expected to:
 
@@ -34,6 +34,6 @@ Code contributions are expected to:
 ## Development checks
 
 ```powershell
-dotnet build .\SnapPin.csproj -c Release -p:Platform=x64
+dotnet build .\SnapAnchor.csproj -c Release -p:Platform=x64
 .\Tests\Run-Smoke.ps1
 ```

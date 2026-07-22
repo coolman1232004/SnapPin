@@ -1,9 +1,9 @@
-using SnapPin.Services;
+using SnapAnchor.Services;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 internal enum UpdateReadyDecision
 {
@@ -34,7 +34,7 @@ internal sealed class UpdateReadyWindow : Window
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         root.Children.Add(new TextBlock
         {
-            Text = LocalizationService.Format("SnapPin {0} is ready", prepared.Update.Version),
+            Text = LocalizationService.Format("SnapAnchor {0} is ready", prepared.Update.Version),
             FontSize = 22,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 0, 14)
@@ -42,7 +42,7 @@ internal sealed class UpdateReadyWindow : Window
         var body = new TextBlock
         {
             Text = prepared.Update.PackageKind == UpdatePackageKind.Portable
-                ? LocalizationService.Current("The update is downloaded, verified, and prepared. Restart SnapPin now to replace the portable files, or choose Later to keep using this version.")
+                ? LocalizationService.Current("The update is downloaded, verified, and prepared. Restart SnapAnchor now to replace the portable files, or choose Later to keep using this version.")
                 : LocalizationService.Current("The installer is downloaded and verified. Install it now, or choose Later to keep using this version."),
             TextWrapping = TextWrapping.Wrap,
             Foreground = new SolidColorBrush(Color.FromRgb(75, 85, 99)),

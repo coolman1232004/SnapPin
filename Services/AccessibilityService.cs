@@ -3,7 +3,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class AccessibilityService
 {

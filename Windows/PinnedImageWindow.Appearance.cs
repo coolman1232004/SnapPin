@@ -1,6 +1,6 @@
 using Microsoft.Win32;
-using SnapPin.Models;
-using SnapPin.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -14,7 +14,7 @@ using System.Windows.Threading;
 using Forms = System.Windows.Forms;
 
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 public partial class PinnedImageWindow
 {

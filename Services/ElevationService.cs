@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Principal;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class ElevationService
 {
@@ -20,7 +20,7 @@ internal static class ElevationService
         var executable = Environment.ProcessPath;
         if (string.IsNullOrWhiteSpace(executable))
         {
-            errorMessage = LocalizationService.Current("SnapPin could not determine its executable path.");
+            errorMessage = LocalizationService.Current("SnapAnchor could not determine its executable path.");
             return false;
         }
 
@@ -38,12 +38,12 @@ internal static class ElevationService
         }
         catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
         {
-            errorMessage = LocalizationService.Current("Administrator launch was cancelled. SnapPin will continue with normal permissions for this session.");
+            errorMessage = LocalizationService.Current("Administrator launch was cancelled. SnapAnchor will continue with normal permissions for this session.");
             return false;
         }
         catch (Exception exception)
         {
-            errorMessage = LocalizationService.Format("SnapPin could not restart as administrator: {0}", exception.Message);
+            errorMessage = LocalizationService.Format("SnapAnchor could not restart as administrator: {0}", exception.Message);
             return false;
         }
     }

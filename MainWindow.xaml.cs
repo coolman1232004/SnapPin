@@ -3,12 +3,12 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using SnapPin.Services;
-using SnapPin.Windows;
-using SnapPin.Models;
+using SnapAnchor.Services;
+using SnapAnchor.Windows;
+using SnapAnchor.Models;
 using Forms = System.Windows.Forms;
 
-namespace SnapPin;
+namespace SnapAnchor;
 
 public partial class MainWindow : Window
 {
@@ -69,7 +69,7 @@ public partial class MainWindow : Window
     private void MainWindow_SourceInitialized(object? sender, EventArgs e)
     {
         var handle = new WindowInteropHelper(this).Handle;
-        NativeMethods.SetWindowDisplayAffinity(handle, _settings.ExcludeSnapPinFromCapture ? NativeMethods.WdaExcludeFromCapture : NativeMethods.WdaNone);
+        NativeMethods.SetWindowDisplayAffinity(handle, _settings.ExcludeSnapAnchorFromCapture ? NativeMethods.WdaExcludeFromCapture : NativeMethods.WdaNone);
         _source = HwndSource.FromHwnd(handle);
         _source.AddHook(WndProc);
         UpdateHotkeyStatus(RegisterAllHotkeys());
@@ -322,7 +322,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             DiagnosticsService.Log("manual-update", ex.Message, ex);
-            MessageBox.Show(this, LocalizationService.Format("GitHub update check failed: {0}", ex.Message), L("SnapPin update"),
+            MessageBox.Show(this, LocalizationService.Format("GitHub update check failed: {0}", ex.Message), L("SnapAnchor update"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
@@ -366,8 +366,8 @@ public partial class MainWindow : Window
         UpdateHotkeyStatus(RegisterAllHotkeys());
         var handle = new WindowInteropHelper(this).Handle;
         if (handle != IntPtr.Zero)
-            NativeMethods.SetWindowDisplayAffinity(handle, _settings.ExcludeSnapPinFromCapture ? NativeMethods.WdaExcludeFromCapture : NativeMethods.WdaNone);
-        PinnedImageWindow.ApplyCaptureAffinity(_settings.ExcludeSnapPinFromCapture);
+            NativeMethods.SetWindowDisplayAffinity(handle, _settings.ExcludeSnapAnchorFromCapture ? NativeMethods.WdaExcludeFromCapture : NativeMethods.WdaNone);
+        PinnedImageWindow.ApplyCaptureAffinity(_settings.ExcludeSnapAnchorFromCapture);
         _lastDesktopId = null;
         CheckVirtualDesktop(force: true);
     }
@@ -450,7 +450,7 @@ public partial class MainWindow : Window
             var detected = ElementDetectionService.TopExternalWindow();
             if (detected is null)
             {
-                ShowError("No active window", "SnapPin could not find another visible window to capture.");
+                ShowError("No active window", "SnapAnchor could not find another visible window to capture.");
                 return;
             }
             var virtualBounds = Forms.SystemInformation.VirtualScreen;
@@ -493,7 +493,7 @@ public partial class MainWindow : Window
     {
         _trayIcon = new Forms.NotifyIcon
         {
-            Text = "SnapPin",
+            Text = "SnapAnchor",
             Visible = true,
             Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? SystemIcons.Application,
             ContextMenuStrip = new Forms.ContextMenuStrip()
@@ -511,8 +511,8 @@ public partial class MainWindow : Window
         {
             var ready = UpdateService.TryLoadPending(_availableUpdate, out _);
             var label = ready
-                ? LocalizationService.Format("Restart and update to SnapPin {0}...", _availableUpdate.Version)
-                : LocalizationService.Format("Download SnapPin {0} update...", _availableUpdate.Version);
+                ? LocalizationService.Format("Restart and update to SnapAnchor {0}...", _availableUpdate.Version)
+                : LocalizationService.Format("Download SnapAnchor {0} update...", _availableUpdate.Version);
             var updateItem = new Forms.ToolStripMenuItem(label) { Font = new Font(menu.Font, System.Drawing.FontStyle.Bold) };
             updateItem.Click += (_, _) => Dispatcher.Invoke(RunAvailableUpdate);
             menu.Items.Add(updateItem);
@@ -553,7 +553,7 @@ public partial class MainWindow : Window
         menu.Items.Add(L("Capture history…"), null, (_, _) => Dispatcher.Invoke(OpenHistory));
         menu.Items.Add(L("Check for updates…"), null, (_, _) => Dispatcher.Invoke(() => _ = CheckForUpdatesAsync()));
         menu.Items.Add(L("Preferences…"), null, (_, _) => Dispatcher.Invoke(OpenPreferences));
-        menu.Items.Add(L("Open SnapPin"), null, (_, _) => Dispatcher.Invoke(ShowDashboard));
+        menu.Items.Add(L("Open SnapAnchor"), null, (_, _) => Dispatcher.Invoke(ShowDashboard));
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(L("Exit"), null, (_, _) => Dispatcher.Invoke(ExitApplication));
     }
@@ -565,10 +565,10 @@ public partial class MainWindow : Window
         if (_trayIcon is null) return;
         var ready = UpdateService.TryLoadPending(update, out _);
         _trayIcon.ShowBalloonTip(7000,
-            L(ready ? "SnapPin update ready" : "SnapPin update available"),
+            L(ready ? "SnapAnchor update ready" : "SnapAnchor update available"),
             ready
-                ? LocalizationService.Format("SnapPin {0} is downloaded and ready. Click to choose when to restart.", update.Version)
-                : LocalizationService.Format("SnapPin {0} is available. Click to review and download it.", update.Version),
+                ? LocalizationService.Format("SnapAnchor {0} is downloaded and ready. Click to choose when to restart.", update.Version)
+                : LocalizationService.Format("SnapAnchor {0} is available. Click to review and download it.", update.Version),
             Forms.ToolTipIcon.Info);
     }
 
@@ -584,7 +584,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             DiagnosticsService.Log("update", ex.Message, ex);
-            MessageBox.Show(this, LocalizationService.Format("Update check failed: {0}", ex.Message), L("SnapPin update"),
+            MessageBox.Show(this, LocalizationService.Format("Update check failed: {0}", ex.Message), L("SnapAnchor update"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }

@@ -1,5 +1,5 @@
-using SnapPin.Models;
-using SnapPin.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows;
@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 public partial class HistoryWindow : Window
 {
@@ -148,7 +148,7 @@ public partial class HistoryWindow : Window
     private void Delete_Click(object sender, RoutedEventArgs e)
     {
         if (RecordFrom(sender) is not { } record) return;
-        if (MessageBox.Show(this, L("Move this item to the recycle bin?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Move this item to the recycle bin?"), L("SnapAnchor History"), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
         HistoryService.Delete(record.Id);
         Reload();
     }
@@ -183,14 +183,14 @@ public partial class HistoryWindow : Window
     private void DeleteForever_Click(object sender, RoutedEventArgs e)
     {
         if (RecordFrom(sender) is not { } record) return;
-        if (MessageBox.Show(this, L("Permanently delete this item and its files?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Permanently delete this item and its files?"), L("SnapAnchor History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
         HistoryService.DeletePermanently(record.Id);
         Reload();
     }
 
     private void EmptyRecycle_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show(this, L("Permanently delete every item in the recycle bin?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Permanently delete every item in the recycle bin?"), L("SnapAnchor History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
         HistoryService.EmptyRecycleBin();
         Reload();
     }
@@ -217,7 +217,7 @@ public partial class HistoryWindow : Window
 
     private void Clear_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show(this, L("Move every active item to the recycle bin?"), L("SnapPin History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, L("Move every active item to the recycle bin?"), L("SnapAnchor History"), MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
         HistoryService.Clear();
         _contextPreviewIds.Clear();
         Reload();

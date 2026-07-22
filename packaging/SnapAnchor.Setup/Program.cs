@@ -4,14 +4,17 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace SnapPin.Setup;
+namespace SnapAnchor.Setup;
 
 internal readonly record struct InstallProgress(int Percentage, string Message);
 
 internal static class Program
 {
-    internal const string AppName = "SnapPin";
-    private const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\SnapPin";
+    internal const string AppName = "SnapAnchor";
+    private const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\SnapAnchor";
+    private static readonly string LegacyAppName = string.Concat("Snap", "Pin");
+    private static readonly string LegacyUninstallKey =
+        @"Software\Microsoft\Windows\CurrentVersion\Uninstall\" + LegacyAppName;
     private const int MoveFileDelayUntilReboot = 0x4;
 
     internal static readonly string DefaultInstallDirectory = Path.Combine(
@@ -64,8 +67,11 @@ internal static class Program
     internal static string SuggestedInstallDirectory()
     {
         using var key = Registry.CurrentUser.OpenSubKey(UninstallKey);
-        return key?.GetValue("InstallLocation") as string is { Length: > 0 } registered
-            ? registered
+        if (key?.GetValue("InstallLocation") as string is { Length: > 0 } registered)
+            return registered;
+        using var legacyKey = Registry.CurrentUser.OpenSubKey(LegacyUninstallKey);
+        return legacyKey?.GetValue("InstallLocation") as string is { Length: > 0 } legacyRegistered
+            ? legacyRegistered
             : DefaultInstallDirectory;
     }
 
@@ -81,13 +87,13 @@ internal static class Program
         {
             progress.Report(new InstallProgress(2, "Preparing installation..."));
             StopInstalledApp(installDirectory);
-            var stagingDirectory = Path.Combine(Path.GetTempPath(), $"SnapPin-Install-{Guid.NewGuid():N}");
+            var stagingDirectory = Path.Combine(Path.GetTempPath(), $"SnapAnchor-Install-{Guid.NewGuid():N}");
             var rollbackDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "SnapPin", "InstallRollback", DateTime.UtcNow.ToString("yyyyMMdd-HHmmss"));
+                "SnapAnchor", "InstallRollback", DateTime.UtcNow.ToString("yyyyMMdd-HHmmss"));
             try
             {
                 Directory.CreateDirectory(stagingDirectory);
-                using var payload = Assembly.GetExecutingAssembly().GetManifestResourceStream("SnapPin.Payload.zip")
+                using var payload = Assembly.GetExecutingAssembly().GetManifestResourceStream("SnapAnchor.Payload.zip")
                     ?? throw new InvalidOperationException("The installer payload is missing.");
                 using var archive = new ZipArchive(payload, ZipArchiveMode.Read, leaveOpen: false);
                 var files = archive.Entries.Where(entry => !string.IsNullOrEmpty(entry.Name)).ToArray();
@@ -101,37 +107,38 @@ internal static class Program
                     var percentage = 5 + (int)Math.Round((index + 1) * 65d / Math.Max(1, files.Length));
                     progress.Report(new InstallProgress(percentage, $"Verifying {entry.Name}"));
                 }
-                if (!File.Exists(Path.Combine(stagingDirectory, "SnapPin.exe")))
-                    throw new InvalidDataException("The installer payload did not contain SnapPin.exe.");
+                if (!File.Exists(Path.Combine(stagingDirectory, "SnapAnchor.exe")))
+                    throw new InvalidDataException("The installer payload did not contain SnapAnchor.exe.");
 
                 if (Directory.Exists(installDirectory) && Directory.EnumerateFileSystemEntries(installDirectory).Any())
                 {
                     progress.Report(new InstallProgress(73, "Creating rollback copy..."));
                     CopyDirectory(installDirectory, rollbackDirectory, overwrite: true);
                     File.WriteAllText(Path.Combine(rollbackDirectory, "rollback.txt"),
-                        $"SnapPin rollback created {DateTime.UtcNow:O}{Environment.NewLine}Restore target: {installDirectory}");
+                        $"SnapAnchor rollback created {DateTime.UtcNow:O}{Environment.NewLine}Restore target: {installDirectory}");
                 }
 
                 progress.Report(new InstallProgress(78, "Activating verified files..."));
                 Directory.CreateDirectory(installDirectory);
                 CopyDirectory(stagingDirectory, installDirectory, overwrite: true);
+                RemoveLegacyProductFiles(installDirectory);
 
                 progress.Report(new InstallProgress(88, "Installing maintenance tools..."));
-                var installedSetup = Path.Combine(installDirectory, "SnapPin.Setup.exe");
+                var installedSetup = Path.Combine(installDirectory, "SnapAnchor.Setup.exe");
                 var currentSetup = Path.GetFullPath(Environment.ProcessPath!);
                 if (!currentSetup.Equals(Path.GetFullPath(installedSetup), StringComparison.OrdinalIgnoreCase))
                     File.Copy(currentSetup, installedSetup, overwrite: true);
 
                 progress.Report(new InstallProgress(92, "Creating shortcuts..."));
                 if (createDesktopShortcut)
-                    CreateShortcut(DesktopShortcut, Path.Combine(installDirectory, "SnapPin.exe"), installDirectory);
+                    CreateShortcut(DesktopShortcut, Path.Combine(installDirectory, "SnapAnchor.exe"), installDirectory);
                 else
                     DeleteIfPresent(DesktopShortcut);
 
                 if (createStartMenuShortcut)
                 {
                     Directory.CreateDirectory(StartMenuDirectory);
-                    CreateShortcut(StartMenuShortcut, Path.Combine(installDirectory, "SnapPin.exe"), installDirectory);
+                    CreateShortcut(StartMenuShortcut, Path.Combine(installDirectory, "SnapAnchor.exe"), installDirectory);
                 }
                 else
                 {
@@ -139,9 +146,10 @@ internal static class Program
                     DeleteEmptyStartMenuDirectory();
                 }
 
-                progress.Report(new InstallProgress(97, "Registering SnapPin..."));
+                progress.Report(new InstallProgress(97, "Registering SnapAnchor..."));
                 RegisterUninstaller(installedSetup, installDirectory,
                     Directory.Exists(rollbackDirectory) ? rollbackDirectory : string.Empty);
+                RemoveLegacyRegistration();
                 progress.Report(new InstallProgress(100, "Installation completed. A rollback copy was retained when upgrading."));
             }
             catch
@@ -162,7 +170,7 @@ internal static class Program
 
     internal static void LaunchInstalledApp(string installDirectory)
     {
-        var executable = Path.Combine(installDirectory, "SnapPin.exe");
+        var executable = Path.Combine(installDirectory, "SnapAnchor.exe");
         if (!File.Exists(executable)) return;
         Process.Start(new ProcessStartInfo(executable) { UseShellExecute = true, WorkingDirectory = installDirectory });
     }
@@ -181,7 +189,7 @@ internal static class Program
         var fullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(requestedDirectory.Trim()));
         var root = Path.GetPathRoot(fullPath)?.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         if (fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Equals(root, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("SnapPin cannot be installed directly into a drive root.");
+            throw new InvalidOperationException("SnapAnchor cannot be installed directly into a drive root.");
         return fullPath;
     }
 
@@ -204,7 +212,7 @@ internal static class Program
         var installDirectory = Path.GetDirectoryName(Path.GetFullPath(Environment.ProcessPath!))
             ?? throw new InvalidOperationException("The installed location could not be determined.");
         StopInstalledApp(installDirectory);
-        var temporaryUninstaller = Path.Combine(Path.GetTempPath(), $"SnapPin-Uninstall-{Guid.NewGuid():N}.exe");
+        var temporaryUninstaller = Path.Combine(Path.GetTempPath(), $"SnapAnchor-Uninstall-{Guid.NewGuid():N}.exe");
         File.Copy(Environment.ProcessPath!, temporaryUninstaller, overwrite: true);
         Process.Start(new ProcessStartInfo(temporaryUninstaller)
         {
@@ -235,12 +243,16 @@ internal static class Program
 
     private static void StopInstalledApp(string installDirectory)
     {
-        var expectedExecutable = Path.GetFullPath(Path.Combine(installDirectory, "SnapPin.exe"));
-        foreach (var process in Process.GetProcessesByName("SnapPin"))
+        var expectedExecutable = Path.GetFullPath(Path.Combine(installDirectory, "SnapAnchor.exe"));
+        var legacyExecutable = Path.GetFullPath(Path.Combine(installDirectory, LegacyAppName + ".exe"));
+        foreach (var processName in new[] { "SnapAnchor", LegacyAppName })
+        foreach (var process in Process.GetProcessesByName(processName))
         {
             try
             {
-                if (!Path.GetFullPath(process.MainModule?.FileName ?? "").Equals(expectedExecutable, StringComparison.OrdinalIgnoreCase)) continue;
+                var processPath = Path.GetFullPath(process.MainModule?.FileName ?? "");
+                if (!processPath.Equals(expectedExecutable, StringComparison.OrdinalIgnoreCase) &&
+                    !processPath.Equals(legacyExecutable, StringComparison.OrdinalIgnoreCase)) continue;
                 process.CloseMainWindow();
                 if (!process.WaitForExit(2_000)) process.Kill(entireProcessTree: true);
             }
@@ -267,14 +279,34 @@ internal static class Program
         using var key = Registry.CurrentUser.CreateSubKey(UninstallKey, writable: true)
             ?? throw new InvalidOperationException("Could not register the uninstaller.");
         key.SetValue("DisplayName", AppName);
-        key.SetValue("DisplayVersion", Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.2.15");
-        key.SetValue("Publisher", "SnapPin");
+        key.SetValue("DisplayVersion", Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "2.0.0");
+        key.SetValue("Publisher", "SnapAnchor");
         key.SetValue("InstallLocation", installDirectory);
-        key.SetValue("DisplayIcon", Path.Combine(installDirectory, "SnapPin.exe"));
+        key.SetValue("DisplayIcon", Path.Combine(installDirectory, "SnapAnchor.exe"));
         key.SetValue("UninstallString", $"\"{installedSetup}\" --uninstall");
         key.SetValue("RollbackLocation", rollbackDirectory);
         key.SetValue("NoModify", 1, RegistryValueKind.DWord);
         key.SetValue("NoRepair", 1, RegistryValueKind.DWord);
+    }
+
+    private static void RemoveLegacyProductFiles(string installDirectory)
+    {
+        foreach (var suffix in new[] { ".exe", ".dll", ".deps.json", ".runtimeconfig.json" })
+            DeleteIfPresent(Path.Combine(installDirectory, LegacyAppName + suffix));
+        DeleteIfPresent(Path.Combine(installDirectory, LegacyAppName + ".Setup.exe"));
+        DeleteIfPresent(Path.Combine(installDirectory, "." + LegacyAppName.ToLowerInvariant() + "-package.json"));
+        foreach (var culture in new[] { "zh-Hans", "zh-Hant" })
+            DeleteIfPresent(Path.Combine(installDirectory, culture, LegacyAppName + ".resources.dll"));
+    }
+
+    private static void RemoveLegacyRegistration()
+    {
+        Registry.CurrentUser.DeleteSubKeyTree(LegacyUninstallKey, throwOnMissingSubKey: false);
+        DeleteIfPresent(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), LegacyAppName + ".lnk"));
+        var legacyStartMenu = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), LegacyAppName);
+        DeleteIfPresent(Path.Combine(legacyStartMenu, LegacyAppName + ".lnk"));
+        if (Directory.Exists(legacyStartMenu) && !Directory.EnumerateFileSystemEntries(legacyStartMenu).Any())
+            Directory.Delete(legacyStartMenu);
     }
 
     private static void CopyDirectory(string source, string destination, bool overwrite, bool skipRollbackMarker = false)

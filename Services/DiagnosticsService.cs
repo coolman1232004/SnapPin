@@ -4,13 +4,13 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class DiagnosticsService
 {
     private static readonly object Sync = new();
     private static readonly string Root = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapPin", "Diagnostics");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapAnchor", "Diagnostics");
     private static readonly string MarkerPath = Path.Combine(Root, "running.lock");
     private static string _logPath = string.Empty;
     private static bool _started;
@@ -20,7 +20,7 @@ internal static class DiagnosticsService
     internal static string Version => Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.0.0";
 
     internal static string ProductSummary(bool portable) =>
-        $"SnapPin {Version} ({LocalizationService.Current(portable ? "portable copy" : "installed copy")}, {RuntimeInformation.ProcessArchitecture})";
+        $"SnapAnchor {Version} ({LocalizationService.Current(portable ? "portable copy" : "installed copy")}, {RuntimeInformation.ProcessArchitecture})";
 
     internal static bool Start()
     {
@@ -29,11 +29,11 @@ internal static class DiagnosticsService
             if (_started) return RecoveredPreviousCrash;
             Directory.CreateDirectory(Root);
             RecoveredPreviousCrash = File.Exists(MarkerPath);
-            _logPath = Path.Combine(Root, $"SnapPin-{DateTime.Now:yyyyMMdd}.log");
+            _logPath = Path.Combine(Root, $"SnapAnchor-{DateTime.Now:yyyyMMdd}.log");
             File.WriteAllText(MarkerPath, $"{Environment.ProcessId}|{DateTime.UtcNow:O}");
             _started = true;
             TrimOldLogs();
-            Log("startup", $"SnapPin {Version} started; previousCrash={RecoveredPreviousCrash}");
+            Log("startup", $"SnapAnchor {Version} started; previousCrash={RecoveredPreviousCrash}");
             return RecoveredPreviousCrash;
         }
     }
@@ -46,7 +46,7 @@ internal static class DiagnosticsService
             {
                 Directory.CreateDirectory(Root);
                 if (string.IsNullOrWhiteSpace(_logPath))
-                    _logPath = Path.Combine(Root, $"SnapPin-{DateTime.Now:yyyyMMdd}.log");
+                    _logPath = Path.Combine(Root, $"SnapAnchor-{DateTime.Now:yyyyMMdd}.log");
                 var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{category}] {message}";
                 if (exception is not null) line += Environment.NewLine + exception;
                 File.AppendAllText(_logPath, line + Environment.NewLine, Encoding.UTF8);
@@ -75,7 +75,7 @@ internal static class DiagnosticsService
     internal static string Summary()
     {
         var builder = new StringBuilder();
-        builder.AppendLine($"SnapPin version: {Version}");
+        builder.AppendLine($"SnapAnchor version: {Version}");
         builder.AppendLine($"Windows: {RuntimeInformation.OSDescription}");
         builder.AppendLine($"Architecture: {RuntimeInformation.ProcessArchitecture}");
         builder.AppendLine($".NET: {RuntimeInformation.FrameworkDescription}");
@@ -90,7 +90,7 @@ internal static class DiagnosticsService
     {
         try
         {
-            foreach (var file in Directory.EnumerateFiles(Root, "SnapPin-*.log")
+            foreach (var file in Directory.EnumerateFiles(Root, "SnapAnchor-*.log")
                          .OrderByDescending(File.GetLastWriteTimeUtc)
                          .Skip(14))
                 File.Delete(file);

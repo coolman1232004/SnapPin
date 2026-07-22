@@ -7,13 +7,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
-using SnapPin.Services;
-using SnapPin.Models;
-using SnapPin.Controls;
+using SnapAnchor.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Controls;
 using Forms = System.Windows.Forms;
 
 
-namespace SnapPin.Windows;
+namespace SnapAnchor.Windows;
 
 public partial class CaptureOverlayWindow
 {

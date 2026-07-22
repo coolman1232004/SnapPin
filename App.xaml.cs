@@ -1,11 +1,11 @@
 using System.Windows;
 using System.IO;
-using SnapPin.Services;
-using SnapPin.Models;
-using SnapPin.Windows;
+using SnapAnchor.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Windows;
 using System.Windows.Threading;
 
-namespace SnapPin;
+namespace SnapAnchor;
 
 public partial class App : System.Windows.Application
 {
@@ -15,6 +15,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        BrandMigrationService.MigrateLocalData();
         var settings = SettingsService.Load();
         LocalizationService.Configure(settings.UiLanguage);
         LocalizationService.EnableAutomaticLocalization();
@@ -41,8 +42,8 @@ public partial class App : System.Windows.Application
         {
             DiagnosticsService.Log("ui-error", args.Exception.Message, args.Exception);
             MessageBox.Show(LocalizationService.Format(
-                    "SnapPin recovered from an unexpected error.\n\n{0}\n\nA diagnostic log was saved locally.", args.Exception.Message),
-                LocalizationService.Current("SnapPin recovered"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "SnapAnchor recovered from an unexpected error.\n\n{0}\n\nA diagnostic log was saved locally.", args.Exception.Message),
+                LocalizationService.Current("SnapAnchor recovered"), MessageBoxButton.OK, MessageBoxImage.Warning);
             args.Handled = true;
         };
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
@@ -54,7 +55,7 @@ public partial class App : System.Windows.Application
         };
         if (!AppCommand.TryParse(startupArguments, out var startupCommand, out var commandError))
         {
-            MessageBox.Show(commandError, LocalizationService.Current("SnapPin command"), MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(commandError, LocalizationService.Current("SnapAnchor command"), MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown(2);
             return;
         }
@@ -67,11 +68,11 @@ public partial class App : System.Windows.Application
                 return;
             }
             if (!string.IsNullOrWhiteSpace(elevationError))
-                MessageBox.Show(elevationError, LocalizationService.Current("SnapPin administrator mode"), MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(elevationError, LocalizationService.Current("SnapAnchor administrator mode"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         var executablePath = Environment.ProcessPath ?? string.Empty;
         var developmentBuild = executablePath.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase);
-        _singleInstance = new SingleInstanceService(developmentBuild ? "SnapPin.Desktop.x64.Development" : "SnapPin.Desktop.x64");
+        _singleInstance = new SingleInstanceService(developmentBuild ? "SnapAnchor.Desktop.x64.Development" : "SnapAnchor.Desktop.x64");
         if (!_singleInstance.IsPrimaryInstance)
         {
             _singleInstance.SignalPrimaryInstance(startupCommand);
@@ -96,8 +97,8 @@ public partial class App : System.Windows.Application
         StartAutomaticUpdateChecks(window, settings);
         if (recoveredPreviousCrash)
             Dispatcher.BeginInvoke(() => MessageBox.Show(window,
-                LocalizationService.Current("SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.\n\nYou can review the local diagnostic log in Preferences > About."),
-                LocalizationService.Current("SnapPin recovery"), MessageBoxButton.OK, MessageBoxImage.Information));
+                LocalizationService.Current("SnapAnchor recovered after the previous unexpected close. Open pins were restored from the last verified backup.\n\nYou can review the local diagnostic log in Preferences > About."),
+                LocalizationService.Current("SnapAnchor recovery"), MessageBoxButton.OK, MessageBoxImage.Information));
         if (startupCommand.Kind != AppCommandKind.Activate)
             Dispatcher.BeginInvoke(() => window.ExecuteCommand(startupCommand));
     }
@@ -152,14 +153,14 @@ public partial class App : System.Windows.Application
     {
         if (notice.Success)
         {
-            MessageBox.Show(owner, notice.Message, LocalizationService.Current("SnapPin updated successfully"),
+            MessageBox.Show(owner, notice.Message, LocalizationService.Current("SnapAnchor updated successfully"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
         var log = string.IsNullOrWhiteSpace(notice.LogPath) ? string.Empty :
             "\n\n" + LocalizationService.Format("Update log: {0}", notice.LogPath);
         MessageBox.Show(owner,
-            LocalizationService.Format("SnapPin could not apply update {0}. The previous version was restored.\n\n{1}", notice.CurrentVersion, notice.Message) + log,
+            LocalizationService.Format("SnapAnchor could not apply update {0}. The previous version was restored.\n\n{1}", notice.CurrentVersion, notice.Message) + log,
             LocalizationService.Current("Portable update failed"), MessageBoxButton.OK, MessageBoxImage.Error);
     }
 

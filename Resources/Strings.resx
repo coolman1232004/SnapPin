@@ -12,20 +12,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SnapPin Preferences" xml:space="preserve">
-    <value>SnapPin Preferences</value>
+  <data name="SnapAnchor Preferences" xml:space="preserve">
+    <value>SnapAnchor Preferences</value>
   </data>
-  <data name="SnapPin History" xml:space="preserve">
-    <value>SnapPin History</value>
+  <data name="SnapAnchor History" xml:space="preserve">
+    <value>SnapAnchor History</value>
   </data>
-  <data name="SnapPin Capture" xml:space="preserve">
-    <value>SnapPin Capture</value>
+  <data name="SnapAnchor Capture" xml:space="preserve">
+    <value>SnapAnchor Capture</value>
   </data>
-  <data name="SnapPin Pin" xml:space="preserve">
-    <value>SnapPin Pin</value>
+  <data name="SnapAnchor Pin" xml:space="preserve">
+    <value>SnapAnchor Pin</value>
   </data>
-  <data name="SnapPin Whiteboard" xml:space="preserve">
-    <value>SnapPin Whiteboard</value>
+  <data name="SnapAnchor Whiteboard" xml:space="preserve">
+    <value>SnapAnchor Whiteboard</value>
   </data>
   <data name="Capture it. Keep it in sight." xml:space="preserve">
     <value>Capture it. Keep it in sight.</value>
@@ -141,20 +141,20 @@
   <data name="Interface language" xml:space="preserve">
     <value>Interface language</value>
   </data>
-  <data name="Run SnapPin on system startup" xml:space="preserve">
-    <value>Run SnapPin on system startup</value>
+  <data name="Run SnapAnchor on system startup" xml:space="preserve">
+    <value>Run SnapAnchor on system startup</value>
   </data>
-  <data name="Always launch SnapPin as administrator" xml:space="preserve">
-    <value>Always launch SnapPin as administrator</value>
+  <data name="Always launch SnapAnchor as administrator" xml:space="preserve">
+    <value>Always launch SnapAnchor as administrator</value>
   </data>
-  <data name="Applies the next time SnapPin starts. Windows will show a UAC confirmation prompt." xml:space="preserve">
-    <value>Applies the next time SnapPin starts. Windows will show a UAC confirmation prompt.</value>
+  <data name="Applies the next time SnapAnchor starts. Windows will show a UAC confirmation prompt." xml:space="preserve">
+    <value>Applies the next time SnapAnchor starts. Windows will show a UAC confirmation prompt.</value>
   </data>
   <data name="Back up open pins and settings automatically" xml:space="preserve">
     <value>Back up open pins and settings automatically</value>
   </data>
-  <data name="Keep SnapPin running in the notification area when the dashboard closes" xml:space="preserve">
-    <value>Keep SnapPin running in the notification area when the dashboard closes</value>
+  <data name="Keep SnapAnchor running in the notification area when the dashboard closes" xml:space="preserve">
+    <value>Keep SnapAnchor running in the notification area when the dashboard closes</value>
   </data>
   <data name="Configuration storage" xml:space="preserve">
     <value>Configuration storage</value>
@@ -198,8 +198,8 @@
   <data name="Wheel clicks per frame" xml:space="preserve">
     <value>Wheel clicks per frame</value>
   </data>
-  <data name="Exclude SnapPin pins and controls from screenshots and recordings" xml:space="preserve">
-    <value>Exclude SnapPin pins and controls from screenshots and recordings</value>
+  <data name="Exclude SnapAnchor pins and controls from screenshots and recordings" xml:space="preserve">
+    <value>Exclude SnapAnchor pins and controls from screenshots and recordings</value>
   </data>
   <data name="Excluded apps" xml:space="preserve">
     <value>Excluded apps</value>
@@ -351,8 +351,8 @@
   <data name="Pin groups" xml:space="preserve">
     <value>Pin groups</value>
   </data>
-  <data name="Manage named groups from the Pins tab on the SnapPin dashboard" xml:space="preserve">
-    <value>Manage named groups from the Pins tab on the SnapPin dashboard</value>
+  <data name="Manage named groups from the Pins tab on the SnapAnchor dashboard" xml:space="preserve">
+    <value>Manage named groups from the Pins tab on the SnapAnchor dashboard</value>
   </data>
   <data name="Default image format" xml:space="preserve">
     <value>Default image format</value>
@@ -507,8 +507,8 @@
   <data name="GitHub updates" xml:space="preserve">
     <value>GitHub updates</value>
   </data>
-  <data name="Check for updates when SnapPin starts" xml:space="preserve">
-    <value>Check for updates when SnapPin starts</value>
+  <data name="Check for updates when SnapAnchor starts" xml:space="preserve">
+    <value>Check for updates when SnapAnchor starts</value>
   </data>
   <data name="Check for updates every day" xml:space="preserve">
     <value>Check for updates every day</value>
@@ -528,11 +528,11 @@
   <data name="Covered in still screenshots" xml:space="preserve">
     <value>Covered in still screenshots</value>
   </data>
-  <data name="Windows lets SnapPin hide its own windows from video capture. Other applications are securely covered in still screenshots; video exclusion also requires privacy support from that application." xml:space="preserve">
-    <value>Windows lets SnapPin hide its own windows from video capture. Other applications are securely covered in still screenshots; video exclusion also requires privacy support from that application.</value>
+  <data name="Windows lets SnapAnchor hide its own windows from video capture. Other applications are securely covered in still screenshots; video exclusion also requires privacy support from that application." xml:space="preserve">
+    <value>Windows lets SnapAnchor hide its own windows from video capture. Other applications are securely covered in still screenshots; video exclusion also requires privacy support from that application.</value>
   </data>
-  <data name="Windows will display a User Account Control prompt when SnapPin starts" xml:space="preserve">
-    <value>Windows will display a User Account Control prompt when SnapPin starts</value>
+  <data name="Windows will display a User Account Control prompt when SnapAnchor starts" xml:space="preserve">
+    <value>Windows will display a User Account Control prompt when SnapAnchor starts</value>
   </data>
   <data name="Global shortcuts are ready" xml:space="preserve">
     <value>Global shortcuts are ready</value>
@@ -942,8 +942,8 @@
   <data name="Preferences…" xml:space="preserve">
     <value>Preferences…</value>
   </data>
-  <data name="Open SnapPin" xml:space="preserve">
-    <value>Open SnapPin</value>
+  <data name="Open SnapAnchor" xml:space="preserve">
+    <value>Open SnapAnchor</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
@@ -972,13 +972,13 @@
   <data name="Restart required" xml:space="preserve">
     <value>Restart required</value>
   </data>
-  <data name="The interface language has changed. Restart SnapPin now to apply it throughout the app?&#xA;&#xA;Choose No to apply it the next time SnapPin starts." xml:space="preserve">
-    <value>The interface language has changed. Restart SnapPin now to apply it throughout the app?
+  <data name="The interface language has changed. Restart SnapAnchor now to apply it throughout the app?&#xA;&#xA;Choose No to apply it the next time SnapAnchor starts." xml:space="preserve">
+    <value>The interface language has changed. Restart SnapAnchor now to apply it throughout the app?
 
-Choose No to apply it the next time SnapPin starts.</value>
+Choose No to apply it the next time SnapAnchor starts.</value>
   </data>
-  <data name="SnapPin could not restart automatically. Please close and open it again." xml:space="preserve">
-    <value>SnapPin could not restart automatically. Please close and open it again.</value>
+  <data name="SnapAnchor could not restart automatically. Please close and open it again." xml:space="preserve">
+    <value>SnapAnchor could not restart automatically. Please close and open it again.</value>
   </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
@@ -1232,14 +1232,14 @@ Choose No to apply it the next time SnapPin starts.</value>
   <data name="Download and install it now?" xml:space="preserve">
     <value>Download and install it now?</value>
   </data>
-  <data name="SnapPin update available" xml:space="preserve">
-    <value>SnapPin update available</value>
+  <data name="SnapAnchor update available" xml:space="preserve">
+    <value>SnapAnchor update available</value>
   </data>
-  <data name="SnapPin update" xml:space="preserve">
-    <value>SnapPin update</value>
+  <data name="SnapAnchor update" xml:space="preserve">
+    <value>SnapAnchor update</value>
   </data>
-  <data name="SnapPin {0} is installed. The official GitHub update source is unavailable." xml:space="preserve">
-    <value>SnapPin {0} is installed. The official GitHub update source is unavailable.</value>
+  <data name="SnapAnchor {0} is installed. The official GitHub update source is unavailable." xml:space="preserve">
+    <value>SnapAnchor {0} is installed. The official GitHub update source is unavailable.</value>
   </data>
   <data name="The official update source is not a valid HTTPS address." xml:space="preserve">
     <value>The official update source is not a valid HTTPS address.</value>
@@ -1247,11 +1247,11 @@ Choose No to apply it the next time SnapPin starts.</value>
   <data name="The GitHub release did not contain a valid version." xml:space="preserve">
     <value>The GitHub release did not contain a valid version.</value>
   </data>
-  <data name="SnapPin {0} is up to date." xml:space="preserve">
-    <value>SnapPin {0} is up to date.</value>
+  <data name="SnapAnchor {0} is up to date." xml:space="preserve">
+    <value>SnapAnchor {0} is up to date.</value>
   </data>
-  <data name="SnapPin {0} is available for this {1}." xml:space="preserve">
-    <value>SnapPin {0} is available for this {1}.</value>
+  <data name="SnapAnchor {0} is available for this {1}." xml:space="preserve">
+    <value>SnapAnchor {0} is available for this {1}.</value>
   </data>
   <data name="portable copy" xml:space="preserve">
     <value>portable copy</value>
@@ -1268,8 +1268,8 @@ Choose No to apply it the next time SnapPin starts.</value>
   <data name="The diagnostic summary was copied." xml:space="preserve">
     <value>The diagnostic summary was copied.</value>
   </data>
-  <data name="SnapPin diagnostics" xml:space="preserve">
-    <value>SnapPin diagnostics</value>
+  <data name="SnapAnchor diagnostics" xml:space="preserve">
+    <value>SnapAnchor diagnostics</value>
   </data>
   <data name="Update check failed: {0}" xml:space="preserve">
     <value>Update check failed: {0}</value>
@@ -1280,8 +1280,8 @@ Choose No to apply it the next time SnapPin starts.</value>
   <data name="Version {0}" xml:space="preserve">
     <value>Version {0}</value>
   </data>
-  <data name="Choose a SnapPin output folder" xml:space="preserve">
-    <value>Choose a SnapPin output folder</value>
+  <data name="Choose a SnapAnchor output folder" xml:space="preserve">
+    <value>Choose a SnapAnchor output folder</value>
   </data>
   <data name="Select" xml:space="preserve">
     <value>Select</value>
@@ -1340,8 +1340,8 @@ Choose No to apply it the next time SnapPin starts.</value>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="SnapPin long capture" xml:space="preserve">
-    <value>SnapPin long capture</value>
+  <data name="SnapAnchor long capture" xml:space="preserve">
+    <value>SnapAnchor long capture</value>
   </data>
   <data name="Preparing long capture..." xml:space="preserve">
     <value>Preparing long capture...</value>
@@ -1367,28 +1367,28 @@ Choose No to apply it the next time SnapPin starts.</value>
   <data name="Later" xml:space="preserve">
     <value>Later</value>
   </data>
-  <data name="The interface language has changed. Restart SnapPin now to apply it throughout the app?&#xA;&#xA;Choose Later to apply it the next time SnapPin starts." xml:space="preserve">
-    <value>The interface language has changed. Restart SnapPin now to apply it throughout the app?
+  <data name="The interface language has changed. Restart SnapAnchor now to apply it throughout the app?&#xA;&#xA;Choose Later to apply it the next time SnapAnchor starts." xml:space="preserve">
+    <value>The interface language has changed. Restart SnapAnchor now to apply it throughout the app?
 
-Choose Later to apply it the next time SnapPin starts.</value>
+Choose Later to apply it the next time SnapAnchor starts.</value>
   </data>
-  <data name="SnapPin recovered from an unexpected error.&#xA;&#xA;{0}&#xA;&#xA;A diagnostic log was saved locally." xml:space="preserve"><value>SnapPin recovered from an unexpected error.
+  <data name="SnapAnchor recovered from an unexpected error.&#xA;&#xA;{0}&#xA;&#xA;A diagnostic log was saved locally." xml:space="preserve"><value>SnapAnchor recovered from an unexpected error.
 
 {0}
 
 A diagnostic log was saved locally.</value></data>
-  <data name="SnapPin recovered" xml:space="preserve"><value>SnapPin recovered</value></data>
-  <data name="SnapPin command" xml:space="preserve"><value>SnapPin command</value></data>
-  <data name="Unknown SnapPin command: {0}" xml:space="preserve"><value>Unknown SnapPin command: {0}</value></data>
+  <data name="SnapAnchor recovered" xml:space="preserve"><value>SnapAnchor recovered</value></data>
+  <data name="SnapAnchor command" xml:space="preserve"><value>SnapAnchor command</value></data>
+  <data name="Unknown SnapAnchor command: {0}" xml:space="preserve"><value>Unknown SnapAnchor command: {0}</value></data>
   <data name="Invalid or incomplete option: {0}" xml:space="preserve"><value>Invalid or incomplete option: {0}</value></data>
-  <data name="SnapPin administrator mode" xml:space="preserve"><value>SnapPin administrator mode</value></data>
-  <data name="SnapPin could not determine its executable path." xml:space="preserve"><value>SnapPin could not determine its executable path.</value></data>
-  <data name="Administrator launch was cancelled. SnapPin will continue with normal permissions for this session." xml:space="preserve"><value>Administrator launch was cancelled. SnapPin will continue with normal permissions for this session.</value></data>
-  <data name="SnapPin could not restart as administrator: {0}" xml:space="preserve"><value>SnapPin could not restart as administrator: {0}</value></data>
-  <data name="SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.&#xA;&#xA;You can review the local diagnostic log in Preferences &gt; About." xml:space="preserve"><value>SnapPin recovered after the previous unexpected close. Open pins were restored from the last verified backup.
+  <data name="SnapAnchor administrator mode" xml:space="preserve"><value>SnapAnchor administrator mode</value></data>
+  <data name="SnapAnchor could not determine its executable path." xml:space="preserve"><value>SnapAnchor could not determine its executable path.</value></data>
+  <data name="Administrator launch was cancelled. SnapAnchor will continue with normal permissions for this session." xml:space="preserve"><value>Administrator launch was cancelled. SnapAnchor will continue with normal permissions for this session.</value></data>
+  <data name="SnapAnchor could not restart as administrator: {0}" xml:space="preserve"><value>SnapAnchor could not restart as administrator: {0}</value></data>
+  <data name="SnapAnchor recovered after the previous unexpected close. Open pins were restored from the last verified backup.&#xA;&#xA;You can review the local diagnostic log in Preferences &gt; About." xml:space="preserve"><value>SnapAnchor recovered after the previous unexpected close. Open pins were restored from the last verified backup.
 
 You can review the local diagnostic log in Preferences &gt; About.</value></data>
-  <data name="SnapPin recovery" xml:space="preserve"><value>SnapPin recovery</value></data>
+  <data name="SnapAnchor recovery" xml:space="preserve"><value>SnapAnchor recovery</value></data>
   <data name="The recording was not added to history, but Windows kept the temporary file open:&#xA;&#xA;{0}" xml:space="preserve"><value>The recording was not added to history, but Windows kept the temporary file open:
 
 {0}</value></data>
@@ -1396,7 +1396,7 @@ You can review the local diagnostic log in Preferences &gt; About.</value></data
   <data name="The GitHub update package must use HTTPS." xml:space="preserve"><value>The GitHub update package must use HTTPS.</value></data>
   <data name="The downloaded GitHub package failed its SHA-256 integrity check." xml:space="preserve"><value>The downloaded GitHub package failed its SHA-256 integrity check.</value></data>
   <data name="A portable update cannot replace files in a drive root." xml:space="preserve"><value>A portable update cannot replace files in a drive root.</value></data>
-  <data name="The portable GitHub package did not contain SnapPin.exe." xml:space="preserve"><value>The portable GitHub package did not contain SnapPin.exe.</value></data>
+  <data name="The portable GitHub package did not contain SnapAnchor.exe." xml:space="preserve"><value>The portable GitHub package did not contain SnapAnchor.exe.</value></data>
   <data name="Windows could not start the portable update helper." xml:space="preserve"><value>Windows could not start the portable update helper.</value></data>
   <data name="The portable update contained an unsafe path." xml:space="preserve"><value>The portable update contained an unsafe path.</value></data>
   <data name="Unsupported image format: {0}" xml:space="preserve"><value>Unsupported image format: {0}</value></data>
@@ -1404,7 +1404,7 @@ You can review the local diagnostic log in Preferences &gt; About.</value></data
   <data name="WebP encoding failed." xml:space="preserve"><value>WebP encoding failed.</value></data>
   <data name="Windows could not trim this recording ({0})." xml:space="preserve"><value>Windows could not trim this recording ({0}).</value></data>
   <data name="OCR language files are missing." xml:space="preserve"><value>OCR language files are missing.</value></data>
-  <data name="Downloading SnapPin update…" xml:space="preserve"><value>Downloading SnapPin update…</value></data>
+  <data name="Downloading SnapAnchor update…" xml:space="preserve"><value>Downloading SnapAnchor update…</value></data>
   <data name="Downloading {0}" xml:space="preserve"><value>Downloading {0}</value></data>
   <data name="{0}% downloaded" xml:space="preserve"><value>{0}% downloaded</value></data>
   <data name="Preparing update…" xml:space="preserve"><value>Preparing update…</value></data>
@@ -1417,51 +1417,51 @@ You can review the local diagnostic log in Preferences &gt; About.</value></data
   <data name="Creating rollback backup..." xml:space="preserve"><value>Creating rollback backup...</value></data>
   <data name="Do not close this window while the portable files are being replaced." xml:space="preserve"><value>Do not close this window while the portable files are being replaced.</value></data>
   <data name="Download size: {0}" xml:space="preserve"><value>Download size: {0}</value></data>
-  <data name="Download SnapPin {0} update..." xml:space="preserve"><value>Download SnapPin {0} update...</value></data>
+  <data name="Download SnapAnchor {0} update..." xml:space="preserve"><value>Download SnapAnchor {0} update...</value></data>
   <data name="Download update" xml:space="preserve"><value>Download update</value></data>
-  <data name="Downloading SnapPin {0}..." xml:space="preserve"><value>Downloading SnapPin {0}...</value></data>
+  <data name="Downloading SnapAnchor {0}..." xml:space="preserve"><value>Downloading SnapAnchor {0}...</value></data>
   <data name="Extracting and validating the update in a temporary folder." xml:space="preserve"><value>Extracting and validating the update in a temporary folder.</value></data>
   <data name="Installing updated files..." xml:space="preserve"><value>Installing updated files...</value></data>
   <data name="Open update log" xml:space="preserve"><value>Open update log</value></data>
   <data name="Portable update failed" xml:space="preserve"><value>Portable update failed</value></data>
   <data name="Preparing portable update..." xml:space="preserve"><value>Preparing portable update...</value></data>
-  <data name="Restart and update to SnapPin {0}..." xml:space="preserve"><value>Restart and update to SnapPin {0}...</value></data>
-  <data name="SnapPin {0} is available" xml:space="preserve"><value>SnapPin {0} is available</value></data>
-  <data name="SnapPin {0} is available. Click to review and download it." xml:space="preserve"><value>SnapPin {0} is available. Click to review and download it.</value></data>
-  <data name="SnapPin {0} is downloaded and ready. Click to choose when to restart." xml:space="preserve"><value>SnapPin {0} is downloaded and ready. Click to choose when to restart.</value></data>
-  <data name="SnapPin {0} is ready" xml:space="preserve"><value>SnapPin {0} is ready</value></data>
-  <data name="SnapPin could not apply update {0}. The previous version was restored.&#xA;&#xA;{1}" xml:space="preserve"><value>SnapPin could not apply update {0}. The previous version was restored.
+  <data name="Restart and update to SnapAnchor {0}..." xml:space="preserve"><value>Restart and update to SnapAnchor {0}...</value></data>
+  <data name="SnapAnchor {0} is available" xml:space="preserve"><value>SnapAnchor {0} is available</value></data>
+  <data name="SnapAnchor {0} is available. Click to review and download it." xml:space="preserve"><value>SnapAnchor {0} is available. Click to review and download it.</value></data>
+  <data name="SnapAnchor {0} is downloaded and ready. Click to choose when to restart." xml:space="preserve"><value>SnapAnchor {0} is downloaded and ready. Click to choose when to restart.</value></data>
+  <data name="SnapAnchor {0} is ready" xml:space="preserve"><value>SnapAnchor {0} is ready</value></data>
+  <data name="SnapAnchor could not apply update {0}. The previous version was restored.&#xA;&#xA;{1}" xml:space="preserve"><value>SnapAnchor could not apply update {0}. The previous version was restored.
 
 {1}</value></data>
-  <data name="SnapPin updated successfully" xml:space="preserve"><value>SnapPin updated successfully</value></data>
-  <data name="SnapPin was updated from {0} to {1}." xml:space="preserve"><value>SnapPin was updated from {0} to {1}.</value></data>
-  <data name="The downloaded SnapPin version ({0}) did not match the expected version ({1})." xml:space="preserve"><value>The downloaded SnapPin version ({0}) did not match the expected version ({1}).</value></data>
+  <data name="SnapAnchor updated successfully" xml:space="preserve"><value>SnapAnchor updated successfully</value></data>
+  <data name="SnapAnchor was updated from {0} to {1}." xml:space="preserve"><value>SnapAnchor was updated from {0} to {1}.</value></data>
+  <data name="The downloaded SnapAnchor version ({0}) did not match the expected version ({1})." xml:space="preserve"><value>The downloaded SnapAnchor version ({0}) did not match the expected version ({1}).</value></data>
   <data name="The installer is downloaded and verified. Install it now, or choose Later to keep using this version." xml:space="preserve"><value>The installer is downloaded and verified. Install it now, or choose Later to keep using this version.</value></data>
-  <data name="The portable SnapPin folder is not writable." xml:space="preserve"><value>The portable SnapPin folder is not writable.</value></data>
+  <data name="The portable SnapAnchor folder is not writable." xml:space="preserve"><value>The portable SnapAnchor folder is not writable.</value></data>
   <data name="The portable update needs at least {0} of free space." xml:space="preserve"><value>The portable update needs at least {0} of free space.</value></data>
   <data name="The portable update request is incomplete." xml:space="preserve"><value>The portable update request is incomplete.</value></data>
   <data name="The portable update request is invalid: {0}" xml:space="preserve"><value>The portable update request is invalid: {0}</value></data>
   <data name="The portable update request is not safe to apply." xml:space="preserve"><value>The portable update request is not safe to apply.</value></data>
   <data name="The prepared portable update is no longer available. Download it again." xml:space="preserve"><value>The prepared portable update is no longer available. Download it again.</value></data>
-  <data name="The previous version was restored. Reopening SnapPin..." xml:space="preserve"><value>The previous version was restored. Reopening SnapPin...</value></data>
-  <data name="The staged SnapPin executable is missing." xml:space="preserve"><value>The staged SnapPin executable is missing.</value></data>
+  <data name="The previous version was restored. Reopening SnapAnchor..." xml:space="preserve"><value>The previous version was restored. Reopening SnapAnchor...</value></data>
+  <data name="The staged SnapAnchor executable is missing." xml:space="preserve"><value>The staged SnapAnchor executable is missing.</value></data>
   <data name="The update helper is not running from the verified staging folder." xml:space="preserve"><value>The update helper is not running from the verified staging folder.</value></data>
-  <data name="The update is downloaded, verified, and prepared. Restart SnapPin now to replace the portable files, or choose Later to keep using this version." xml:space="preserve"><value>The update is downloaded, verified, and prepared. Restart SnapPin now to replace the portable files, or choose Later to keep using this version.</value></data>
+  <data name="The update is downloaded, verified, and prepared. Restart SnapAnchor now to replace the portable files, or choose Later to keep using this version." xml:space="preserve"><value>The update is downloaded, verified, and prepared. Restart SnapAnchor now to replace the portable files, or choose Later to keep using this version.</value></data>
   <data name="Unknown size" xml:space="preserve"><value>Unknown size</value></data>
-  <data name="Update completed. Restarting SnapPin..." xml:space="preserve"><value>Update completed. Restarting SnapPin...</value></data>
+  <data name="Update completed. Restarting SnapAnchor..." xml:space="preserve"><value>Update completed. Restarting SnapAnchor...</value></data>
   <data name="Update failed. Restoring the previous version..." xml:space="preserve"><value>Update failed. Restoring the previous version...</value></data>
   <data name="Update log: {0}" xml:space="preserve"><value>Update log: {0}</value></data>
   <data name="Update ready" xml:space="preserve"><value>Update ready</value></data>
   <data name="Verifying download..." xml:space="preserve"><value>Verifying download...</value></data>
   <data name="Verifying the updated version..." xml:space="preserve"><value>Verifying the updated version...</value></data>
   <data name="View release on GitHub" xml:space="preserve"><value>View release on GitHub</value></data>
-  <data name="Waiting for SnapPin to close..." xml:space="preserve"><value>Waiting for SnapPin to close...</value></data>
+  <data name="Waiting for SnapAnchor to close..." xml:space="preserve"><value>Waiting for SnapAnchor to close...</value></data>
   <data name="What's new" xml:space="preserve"><value>What's new</value></data>
   <data name="Copy version information" xml:space="preserve"><value>Copy version information</value></data>
   <data name="Edition: {0}" xml:space="preserve"><value>Edition: {0}</value></data>
   <data name="Version information copied." xml:space="preserve"><value>Version information copied.</value></data>
   <data name="Administrator approval was cancelled. The previous version will reopen." xml:space="preserve"><value>Administrator approval was cancelled. The previous version will reopen.</value></data>
   <data name="Administrator permission is required. Waiting for approval..." xml:space="preserve"><value>Administrator permission is required. Waiting for approval...</value></data>
-  <data name="SnapPin will retry the portable update with administrator permission." xml:space="preserve"><value>SnapPin will retry the portable update with administrator permission.</value></data>
-  <data name="SnapPin could not restart the portable updater as administrator: {0}" xml:space="preserve"><value>SnapPin could not restart the portable updater as administrator: {0}</value></data>
+  <data name="SnapAnchor will retry the portable update with administrator permission." xml:space="preserve"><value>SnapAnchor will retry the portable update with administrator permission.</value></data>
+  <data name="SnapAnchor could not restart the portable updater as administrator: {0}" xml:space="preserve"><value>SnapAnchor could not restart the portable updater as administrator: {0}</value></data>
 </root>

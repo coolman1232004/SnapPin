@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace SnapPin;
+namespace SnapAnchor;
 
 internal static class NativeMethods
 {

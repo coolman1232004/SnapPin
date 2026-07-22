@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class OverlayLayoutService
 {

@@ -1,7 +1,7 @@
 using System.Windows;
 using DrawingRectangle = System.Drawing.Rectangle;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal static class CaptureCoordinateService
 {

@@ -1,6 +1,6 @@
 using Microsoft.Win32;
-using SnapPin.Models;
-using SnapPin.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using Shapes = System.Windows.Shapes;
 
 
-namespace SnapPin.Controls;
+namespace SnapAnchor.Controls;
 
 public partial class AnnotationEditorControl
 {

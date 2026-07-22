@@ -1,6 +1,6 @@
 using Microsoft.Win32;
-using SnapPin.Models;
-using SnapPin.Services;
+using SnapAnchor.Models;
+using SnapAnchor.Services;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +11,7 @@ using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using Shapes = System.Windows.Shapes;
 
-namespace SnapPin.Controls;
+namespace SnapAnchor.Controls;
 
 internal sealed record AnnotationAppliedEventArgs(BitmapSource BaseImage, BitmapSource FlattenedImage, IReadOnlyList<AnnotationItem> Items);
 
@@ -233,10 +233,10 @@ public partial class AnnotationEditorControl : UserControl
         foreach (var button in ToolPanel.Children.OfType<Button>())
         {
             button.Background = Brushes.Transparent;
-            button.Foreground = new SolidColorBrush(Color.FromRgb(16, 24, 40));
+            button.Foreground = TryFindResource("ToolbarInkBrush") as Brush ?? new SolidColorBrush(Color.FromRgb(51, 65, 85));
         }
-        activeButton.Background = new SolidColorBrush(Color.FromRgb(47, 128, 237));
-        activeButton.Foreground = Brushes.White;
+        activeButton.Background = TryFindResource("ToolbarActiveBrush") as Brush ?? new SolidColorBrush(Color.FromRgb(204, 251, 241));
+        activeButton.Foreground = TryFindResource("ToolbarActiveInkBrush") as Brush ?? new SolidColorBrush(Color.FromRgb(13, 148, 136));
         _tool = tool;
         var wasLoading = _loadingStyle;
         _loadingStyle = true;

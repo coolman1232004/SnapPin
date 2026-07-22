@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace SnapPin.Services;
+namespace SnapAnchor.Services;
 
 internal sealed record UpdateCheckScheduleState(DateTimeOffset LastCheckedUtc);
 
