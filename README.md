@@ -12,7 +12,7 @@
 <p align="center">
   <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows">
   <img alt=".NET 8" src="https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet">
-  <img alt="Current version" src="https://img.shields.io/badge/version-2.1.6-292524">
+  <img alt="Current version" src="https://img.shields.io/badge/version-2.1.7-292524">
   <img alt="Local first" src="https://img.shields.io/badge/privacy-local--first-57534E">
   <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-E7E5E4">
 </p>
@@ -32,6 +32,9 @@ Other useful capabilities include:
 
 - Configurable global hotkeys and per-application hotkey exclusions
 - Physical-pixel, mixed-DPI multi-monitor capture
+- Rollback-safe scrolling capture with feature-matched seams and sticky-header tolerance
+- HDR-display colour correction and cached UI-element detection
+- Hot-start local OCR with contrast preprocessing and rotated-text detection
 - Searchable local history with favourites, tags, recycle bin, and repeat-last-region
 - PNG, JPEG, and WebP export, quick save, auto-save, printing, and copy-as-file
 - English, Simplified Chinese, and Traditional Chinese interfaces
@@ -106,7 +109,7 @@ After starting a capture:
 3. Choose an annotation tool directly from the toolbar, or select Copy, Pin, Save, OCR, Record, or Recapture.
 4. The capture is completed only when you choose an output action.
 
-Pinned images support mouse-wheel resizing, `Ctrl` + wheel opacity, right-click tools, and double-click close. Preferences can change the hotkeys, toolbar layout, output folders, OCR defaults, pin behaviour, recording options, and capture hints.
+Pinned images support mouse-wheel resizing (including while their toolbar is open), `Ctrl` + wheel opacity, right-click tools, and double-click close. Preferences can change the hotkeys, toolbar layout, output folders, OCR defaults, pin behaviour, recording options, and capture hints.
 
 ## Privacy
 
@@ -145,7 +148,7 @@ Run the regression suite:
 Create the portable ZIP and installer:
 
 ```powershell
-.\packaging\Build-Packages.ps1 -Version 2.1.6
+.\packaging\Build-Packages.ps1 -Version 2.1.7
 ```
 
 Generated packages are written to `dist\`. That directory is intentionally excluded from Git and should be uploaded as GitHub Release assets.

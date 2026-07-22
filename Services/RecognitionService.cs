@@ -1,5 +1,7 @@
 using SnapAnchor.Models;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Tesseract;
@@ -10,6 +12,35 @@ namespace SnapAnchor.Services;
 
 internal static class RecognitionService
 {
+    private sealed class EngineHolder : IDisposable
+    {
+        internal readonly object Sync = new();
+        internal readonly TesseractEngine Engine;
+        internal EngineHolder(string dataPath, string language)
+        {
+            Engine = new TesseractEngine(dataPath, language, EngineMode.LstmOnly);
+            Engine.SetVariable("preserve_interword_spaces", "1");
+            Engine.SetVariable("user_defined_dpi", "300");
+        }
+
+        public void Dispose()
+        {
+            lock (Sync) Engine.Dispose();
+        }
+    }
+
+    private sealed record OcrCandidate(string Text, IReadOnlyList<RecognizedWord> Words, double Score);
+    private static readonly ConcurrentDictionary<string, EngineHolder> Engines = new(StringComparer.OrdinalIgnoreCase);
+
+    static RecognitionService()
+    {
+        AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+        {
+            foreach (var holder in Engines.Values) holder.Dispose();
+            Engines.Clear();
+        };
+    }
+
     public static Task<RecognitionResult> RecognizeAsync(BitmapSource image, string language, CancellationToken cancellationToken = default)
     {
         var frozen = image.IsFrozen ? image : Freeze(image);
@@ -31,20 +62,45 @@ internal static class RecognitionService
             if (!Directory.Exists(dataPath))
                 throw new DirectoryNotFoundException(LocalizationService.Current("OCR language files are missing."));
 
-            var png = ToPngBytes(image);
-            using var engine = new TesseractEngine(dataPath, NormalizeLanguage(language), EngineMode.LstmOnly);
-            using var pix = Pix.LoadFromMemory(png);
-            using (var page = engine.Process(pix, PageSegMode.Auto))
+            var normalizedLanguage = NormalizeLanguage(language);
+            var holder = Engines.GetOrAdd(normalizedLanguage, key => new EngineHolder(dataPath, key));
+            OcrCandidate best;
+            lock (holder.Sync)
             {
-                text = page.GetText()?.Trim() ?? string.Empty;
-                words = ExtractWords(page, cancellationToken);
+                best = Process(holder.Engine, image, PageSegMode.Auto, 1, 0, image.PixelWidth, image.PixelHeight, cancellationToken);
+                if (best.Score < 54)
+                    best = Better(best, Process(holder.Engine, image, PageSegMode.SparseText, 1, 0,
+                        image.PixelWidth, image.PixelHeight, cancellationToken));
+
+                if (best.Score < 60)
+                {
+                    var threshold = Threshold(image);
+                    best = Better(best, Process(holder.Engine, threshold, PageSegMode.Auto, 1, 0,
+                        image.PixelWidth, image.PixelHeight, cancellationToken));
+                }
+
+                // Small glyphs benefit considerably from a lossless 2x OCR
+                // surface. Word boxes are mapped back to the original pixels.
+                if (best.Score < 52 && image.PixelWidth <= 1800 && image.PixelHeight <= 1400)
+                {
+                    var scaled = Scale(image, 2);
+                    best = Better(best, Process(holder.Engine, scaled, PageSegMode.Auto, 2, 0,
+                        image.PixelWidth, image.PixelHeight, cancellationToken));
+                }
+
+                if (best.Score < 42 && SettingsService.Load().OcrDetectOrientation)
+                {
+                    foreach (var angle in new[] { 90, 180, 270 })
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        var rotated = Rotate(image, angle);
+                        best = Better(best, Process(holder.Engine, rotated, PageSegMode.Auto, 1, angle,
+                            image.PixelWidth, image.PixelHeight, cancellationToken));
+                    }
+                }
             }
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                using var sparsePage = engine.Process(pix, PageSegMode.SparseText);
-                text = sparsePage.GetText()?.Trim() ?? string.Empty;
-                words = ExtractWords(sparsePage, cancellationToken);
-            }
+            text = best.Text;
+            words = best.Words;
         }
         catch (Exception ex)
         {
@@ -80,6 +136,45 @@ internal static class RecognitionService
         return new RecognitionResult(text, barcodeText, barcodeFormat, string.Join(Environment.NewLine, errors), words);
     }
 
+    private static OcrCandidate Process(TesseractEngine engine, BitmapSource image, PageSegMode mode, double scale,
+        int rotation, int originalWidth, int originalHeight, CancellationToken cancellationToken)
+    {
+        using var pix = Pix.LoadFromMemory(ToPngBytes(image));
+        using var page = engine.Process(pix, mode);
+        var text = page.GetText()?.Trim() ?? string.Empty;
+        var rawWords = ExtractWords(page, cancellationToken);
+        var mapped = rawWords.Select(word => MapWord(word, scale, rotation, originalWidth, originalHeight)).ToList();
+        var confidence = mapped.Count == 0 ? 0 : mapped.Average(word => word.Confidence);
+        var usefulCharacters = text.Count(character => !char.IsWhiteSpace(character));
+        var score = confidence + Math.Min(18, usefulCharacters / 8.0) + Math.Min(8, mapped.Count / 3.0);
+        return new OcrCandidate(text, mapped, score);
+    }
+
+    private static OcrCandidate Better(OcrCandidate first, OcrCandidate second)
+        => second.Score > first.Score ? second : first;
+
+    private static RecognizedWord MapWord(RecognizedWord word, double scale, int rotation, int width, int height)
+    {
+        var x = word.X / scale;
+        var y = word.Y / scale;
+        var w = word.Width / scale;
+        var h = word.Height / scale;
+        (double X, double Y, double W, double H) mapped = rotation switch
+        {
+            90 => (y, height - (x + w), h, w),
+            180 => (width - (x + w), height - (y + h), w, h),
+            270 => (width - (y + h), x, h, w),
+            _ => (x, y, w, h)
+        };
+        return word with
+        {
+            X = Math.Clamp((int)Math.Round(mapped.X), 0, Math.Max(0, width - 1)),
+            Y = Math.Clamp((int)Math.Round(mapped.Y), 0, Math.Max(0, height - 1)),
+            Width = Math.Clamp((int)Math.Round(mapped.W), 1, width),
+            Height = Math.Clamp((int)Math.Round(mapped.H), 1, height)
+        };
+    }
+
     private static IReadOnlyList<RecognizedWord> ExtractWords(Page page, CancellationToken cancellationToken)
     {
         var words = new List<RecognizedWord>();
@@ -95,17 +190,65 @@ internal static class RecognitionService
                 !iterator.TryGetBoundingBox(PageIteratorLevel.Word, out var bounds) ||
                 bounds.Width <= 0 || bounds.Height <= 0)
                 continue;
-            words.Add(new RecognizedWord(
-                value,
-                bounds.X1,
-                bounds.Y1,
-                bounds.Width,
-                bounds.Height,
-                Math.Max(0, lineIndex),
-                iterator.GetConfidence(PageIteratorLevel.Word)));
+            words.Add(new RecognizedWord(value, bounds.X1, bounds.Y1, bounds.Width, bounds.Height,
+                Math.Max(0, lineIndex), iterator.GetConfidence(PageIteratorLevel.Word)));
         }
         while (iterator.Next(PageIteratorLevel.Word));
         return words;
+    }
+
+    private static BitmapSource Threshold(BitmapSource source)
+    {
+        var gray = new FormatConvertedBitmap(source, PixelFormats.Gray8, null, 0);
+        var stride = gray.PixelWidth;
+        var pixels = new byte[stride * gray.PixelHeight];
+        gray.CopyPixels(pixels, stride, 0);
+        var histogram = new int[256];
+        foreach (var value in pixels) histogram[value]++;
+        var threshold = Otsu(histogram, pixels.Length);
+        for (var index = 0; index < pixels.Length; index++) pixels[index] = pixels[index] >= threshold ? (byte)255 : (byte)0;
+        var result = BitmapSource.Create(gray.PixelWidth, gray.PixelHeight, 96, 96, PixelFormats.Gray8, null, pixels, stride);
+        result.Freeze();
+        return result;
+    }
+
+    private static int Otsu(IReadOnlyList<int> histogram, int total)
+    {
+        long sum = 0;
+        for (var i = 0; i < 256; i++) sum += (long)i * histogram[i];
+        long backgroundSum = 0;
+        var backgroundWeight = 0;
+        double maximum = -1;
+        var chosen = 127;
+        for (var i = 0; i < 256; i++)
+        {
+            backgroundWeight += histogram[i];
+            if (backgroundWeight == 0) continue;
+            var foregroundWeight = total - backgroundWeight;
+            if (foregroundWeight == 0) break;
+            backgroundSum += (long)i * histogram[i];
+            var backgroundMean = backgroundSum / (double)backgroundWeight;
+            var foregroundMean = (sum - backgroundSum) / (double)foregroundWeight;
+            var variance = (double)backgroundWeight * foregroundWeight * Math.Pow(backgroundMean - foregroundMean, 2);
+            if (variance <= maximum) continue;
+            maximum = variance;
+            chosen = i;
+        }
+        return chosen;
+    }
+
+    private static BitmapSource Scale(BitmapSource source, double factor)
+    {
+        var transformed = new TransformedBitmap(source, new ScaleTransform(factor, factor));
+        transformed.Freeze();
+        return transformed;
+    }
+
+    private static BitmapSource Rotate(BitmapSource source, double angle)
+    {
+        var transformed = new TransformedBitmap(source, new RotateTransform(angle));
+        transformed.Freeze();
+        return transformed;
     }
 
     private static string NormalizeLanguage(string language)

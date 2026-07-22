@@ -9,6 +9,13 @@ internal sealed record DetectedScreenRegion(Rect Bounds, string Name, bool IsEle
 
 internal static class ElementDetectionService
 {
+    private static readonly object CacheSync = new();
+    private static ElementSnapshot? _snapshot;
+    private static readonly TimeSpan CacheLifetime = TimeSpan.FromSeconds(1.25);
+
+    private sealed record CachedElement(Rect Bounds, string Name, int ParentIndex, int Depth);
+    private sealed record ElementSnapshot(IntPtr Window, Rect WindowBounds, DateTime CreatedUtc, IReadOnlyList<CachedElement> Elements);
+
     public static DetectedScreenRegion? Detect(Point screenPoint, IntPtr excludedWindow)
         => DetectHierarchy(screenPoint, excludedWindow).LastOrDefault();
 
@@ -25,20 +32,29 @@ internal static class ElementDetectionService
 
         try
         {
-            var root = AutomationElement.FromHandle(window);
-            foreach (var element in ElementPath(root, screenPoint, 0))
+            var snapshot = SnapshotFor(window, windowRect);
+            var candidateIndex = snapshot.Elements
+                .Select((element, index) => (Element: element, Index: index))
+                .Where(item => item.Element.Bounds.Contains(screenPoint))
+                .OrderByDescending(item => item.Element.Depth)
+                .ThenBy(item => item.Element.Bounds.Width * item.Element.Bounds.Height)
+                .Select(item => item.Index)
+                .FirstOrDefault(-1);
+
+            if (candidateIndex >= 0)
             {
-                Rect bounds;
-                string name;
-                try
+                var path = new Stack<CachedElement>();
+                while (candidateIndex >= 0 && candidateIndex < snapshot.Elements.Count)
                 {
-                    bounds = element.Current.BoundingRectangle;
-                    name = element.Current.Name;
+                    var element = snapshot.Elements[candidateIndex];
+                    path.Push(element);
+                    candidateIndex = element.ParentIndex;
                 }
-                catch { continue; }
-                if (bounds.IsEmpty || bounds.Width < 4 || bounds.Height < 4 || !bounds.Contains(screenPoint)) continue;
-                if (regions.Any(region => NearlyEqual(region.Bounds, bounds))) continue;
-                regions.Add(new DetectedScreenRegion(bounds, string.IsNullOrWhiteSpace(name) ? "UI element" : name, true));
+                foreach (var element in path)
+                {
+                    if (!element.Bounds.Contains(screenPoint) || regions.Any(region => NearlyEqual(region.Bounds, element.Bounds))) continue;
+                    regions.Add(new DetectedScreenRegion(element.Bounds, element.Name, true));
+                }
             }
         }
         catch
@@ -93,28 +109,60 @@ internal static class ElementDetectionService
             ? new Rect(rect.Left, rect.Top, Math.Max(0, rect.Width), Math.Max(0, rect.Height))
             : Rect.Empty;
 
-    private static IReadOnlyList<AutomationElement> ElementPath(AutomationElement element, Point point, int depth)
+    private static ElementSnapshot SnapshotFor(IntPtr window, Rect windowRect)
     {
-        if (depth >= 12) return [];
+        lock (CacheSync)
+        {
+            if (_snapshot is { } existing && existing.Window == window &&
+                DateTime.UtcNow - existing.CreatedUtc <= CacheLifetime && NearlyEqual(existing.WindowBounds, windowRect))
+                return existing;
+        }
+
+        var elements = new List<CachedElement>();
         try
         {
-            var walker = TreeWalker.ControlViewWalker;
-            for (var child = walker.GetFirstChild(element); child is not null; child = walker.GetNextSibling(child))
-            {
-                Rect bounds;
-                try { bounds = child.Current.BoundingRectangle; }
-                catch { continue; }
-                if (bounds.IsEmpty || !bounds.Contains(point)) continue;
-                var path = new List<AutomationElement> { child };
-                path.AddRange(ElementPath(child, point, depth + 1));
-                return path;
-            }
+            var root = AutomationElement.FromHandle(window);
+            BuildSnapshot(root, windowRect, -1, 0, elements);
         }
-        catch
+        catch { }
+
+        var created = new ElementSnapshot(window, windowRect, DateTime.UtcNow, elements);
+        lock (CacheSync) _snapshot = created;
+        return created;
+    }
+
+    private static void BuildSnapshot(AutomationElement parent, Rect windowBounds, int parentIndex, int depth,
+        List<CachedElement> destination)
+    {
+        if (depth >= 12 || destination.Count >= 1800) return;
+        var walker = TreeWalker.ControlViewWalker;
+        AutomationElement? child;
+        try { child = walker.GetFirstChild(parent); }
+        catch { return; }
+
+        while (child is not null && destination.Count < 1800)
         {
-            return [];
+            var next = default(AutomationElement);
+            try { next = walker.GetNextSibling(child); } catch { }
+            try
+            {
+                var bounds = child.Current.BoundingRectangle;
+                if (!bounds.IsEmpty && bounds.Width >= 4 && bounds.Height >= 4 && bounds.IntersectsWith(windowBounds) &&
+                    !child.Current.IsOffscreen)
+                {
+                    var name = child.Current.Name;
+                    var currentIndex = destination.Count;
+                    destination.Add(new CachedElement(bounds,
+                        string.IsNullOrWhiteSpace(name) ? "UI element" : name, parentIndex, depth + 1));
+                    BuildSnapshot(child, windowBounds, currentIndex, depth + 1, destination);
+                }
+            }
+            catch
+            {
+                // A provider may disappear while its window is changing.
+            }
+            child = next;
         }
-        return [];
     }
 
     private static bool NearlyEqual(Rect first, Rect second) =>

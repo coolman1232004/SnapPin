@@ -29,6 +29,7 @@ internal static class ScrollingCaptureService
         var maxFrames = Math.Clamp(settings.ScrollCaptureMaxFrames, 2, 60);
         var delay = Math.Clamp(settings.ScrollCaptureDelayMs, 150, 3000);
         var wheelDelta = -120 * Math.Clamp(settings.ScrollCaptureWheelClicks, 1, 20);
+        var activeWheelDelta = wheelDelta;
 
         progress?.Report(new ScrollingCaptureProgress(1, 0, LocalizationService.Current("Captured first frame")));
         for (var attempt = 1; frames.Count < maxFrames && attempt < maxFrames * 2; attempt++)
@@ -40,7 +41,7 @@ internal static class ScrollingCaptureService
                 stopReason = "Stopped by user";
                 break;
             }
-            Scroll(scrollTarget, scrollPoint, wheelDelta, consecutiveDuplicates > 0);
+            Scroll(scrollTarget, scrollPoint, activeWheelDelta, consecutiveDuplicates > 0);
             await Task.Delay(delay, CancellationToken.None);
             var current = CaptureService.CaptureScreenRect(screenRegion);
             var previousPixels = PixelFrame.From(frames[^1]);
@@ -58,12 +59,28 @@ internal static class ScrollingCaptureService
                 continue;
             }
             consecutiveDuplicates = 0;
-            var alignment = FindVerticalShift(previousPixels, currentPixels);
+            var alignment = FindVerticalAlignment(previousPixels, currentPixels);
+            // Animated pages sometimes have not settled at the configured
+            // delay. One stationary recapture is cheaper and more reliable
+            // than accepting a bad seam.
+            if (alignment is null)
+            {
+                await Task.Delay(Math.Max(80, delay / 2), CancellationToken.None);
+                current = CaptureService.CaptureScreenRect(screenRegion);
+                currentPixels = PixelFrame.From(current);
+                alignment = FindVerticalAlignment(previousPixels, currentPixels);
+            }
             if (alignment is null)
             {
                 rejectedFrames++;
                 consecutiveAlignmentFailures++;
-                progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, LocalizationService.Current("Unmatched frame ignored; retrying")));
+                // Roll back the failed wheel move and retry with a smaller
+                // step. This prevents one transient mismatch from skipping a
+                // section of the page.
+                Scroll(scrollTarget, scrollPoint, -activeWheelDelta, true);
+                await Task.Delay(Math.Max(80, delay / 2), CancellationToken.None);
+                activeWheelDelta = Math.Sign(wheelDelta) * Math.Max(120, Math.Abs(activeWheelDelta) / 2);
+                progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, LocalizationService.Current("Unmatched frame rolled back; retrying")));
                 if (consecutiveAlignmentFailures >= 2)
                 {
                     stopReason = "Could not find a reliable overlap";
@@ -73,6 +90,8 @@ internal static class ScrollingCaptureService
             }
             consecutiveAlignmentFailures = 0;
             frames.Add(current);
+            if (Math.Abs(activeWheelDelta) < Math.Abs(wheelDelta))
+                activeWheelDelta = Math.Sign(wheelDelta) * Math.Min(Math.Abs(wheelDelta), Math.Abs(activeWheelDelta) + 120);
             progress?.Report(new ScrollingCaptureProgress(frames.Count, rejectedFrames, LocalizationService.Format("Captured {0} frames", frames.Count)));
             if (frames[0].PixelHeight + EstimateAddedHeight(frames) >= 50000)
             {
@@ -92,9 +111,9 @@ internal static class ScrollingCaptureService
         var segments = new List<(PixelFrame Frame, int StartRow, int Height)> { (pixels[0], 0, pixels[0].Height) };
         for (var index = 1; index < pixels.Count; index++)
         {
-            var shift = FindVerticalShift(pixels[index - 1], pixels[index]);
-            if (shift is null) break;
-            segments.Add((pixels[index], pixels[index].Height - shift.Value, shift.Value));
+            var alignment = FindVerticalAlignment(pixels[index - 1], pixels[index]);
+            if (alignment is null) break;
+            segments.Add((pixels[index], pixels[index].Height - alignment.Shift, alignment.Shift));
         }
 
         var width = segments.Min(segment => segment.Frame.Width);
@@ -117,45 +136,99 @@ internal static class ScrollingCaptureService
     }
 
     internal static int? FindVerticalShift(BitmapSource previous, BitmapSource current) =>
-        FindVerticalShift(PixelFrame.From(previous), PixelFrame.From(current));
+        FindVerticalAlignment(PixelFrame.From(previous), PixelFrame.From(current))?.Shift;
 
-    private static int? FindVerticalShift(PixelFrame previous, PixelFrame current)
+    private sealed record VerticalAlignment(int Shift, double Score, double Confidence);
+
+    private static VerticalAlignment? FindVerticalAlignment(PixelFrame previous, PixelFrame current)
     {
         var width = Math.Min(previous.Width, current.Width);
         var height = Math.Min(previous.Height, current.Height);
         if (width < 24 || height < 40) return null;
         var minimumShift = Math.Max(8, height / 16);
-        var maximumShift = Math.Max(minimumShift, (int)(height * 0.88));
-        var xStep = Math.Max(3, width / 150);
-        var yStep = Math.Max(3, height / 120);
-        var xMargin = Math.Min(width / 5, 20);
+        var maximumShift = Math.Max(minimumShift, (int)(height * 0.9));
+        var coarseStep = Math.Max(1, height / 260);
         double bestScore = double.MaxValue;
+        double secondScore = double.MaxValue;
         var bestShift = 0;
 
-        for (var shift = minimumShift; shift <= maximumShift; shift += Math.Max(1, height / 240))
+        for (var shift = minimumShift; shift <= maximumShift; shift += coarseStep)
         {
-            var overlap = height - shift;
-            var yMargin = Math.Min(overlap / 5, Math.Max(2, height / 16));
-            long difference = 0;
-            var samples = 0;
-            for (var y = yMargin; y < overlap - yMargin; y += yStep)
-            for (var x = xMargin; x < width - xMargin; x += xStep)
+            var score = AlignmentScore(previous, current, width, height, shift);
+            if (!double.IsFinite(score)) continue;
+            if (score < bestScore)
             {
-                var previousOffset = (y + shift) * previous.Stride + x * 4;
-                var currentOffset = y * current.Stride + x * 4;
-                difference += Math.Abs(previous.Bytes[previousOffset] - current.Bytes[currentOffset]);
-                difference += Math.Abs(previous.Bytes[previousOffset + 1] - current.Bytes[currentOffset + 1]);
-                difference += Math.Abs(previous.Bytes[previousOffset + 2] - current.Bytes[currentOffset + 2]);
-                samples += 3;
+                secondScore = bestScore;
+                bestScore = score;
+                bestShift = shift;
             }
-            if (samples == 0) continue;
-            var score = difference / (double)samples;
+            else if (score < secondScore && Math.Abs(shift - bestShift) > coarseStep * 2)
+                secondScore = score;
+        }
+
+        // Refine around the coarse winner so a one-pixel text row does not
+        // leave a visible seam.
+        var refinedStart = Math.Max(minimumShift, bestShift - coarseStep);
+        var refinedEnd = Math.Min(maximumShift, bestShift + coarseStep);
+        for (var shift = refinedStart; shift <= refinedEnd; shift++)
+        {
+            var score = AlignmentScore(previous, current, width, height, shift);
             if (score >= bestScore) continue;
             bestScore = score;
             bestShift = shift;
         }
 
-        return bestScore <= 38 ? bestShift : null;
+        var confidence = double.IsFinite(secondScore)
+            ? Math.Clamp((secondScore - bestScore) / Math.Max(1, secondScore), 0, 1)
+            : 1;
+        // Highly similar frames can have several neighbouring candidates;
+        // score is authoritative there. Ambiguous, noisy frames require a
+        // stronger margin over the runner-up.
+        if (bestScore > 34 || (bestScore > 18 && confidence < 0.025)) return null;
+        return new VerticalAlignment(bestShift, bestScore, confidence);
+    }
+
+    private static double AlignmentScore(PixelFrame previous, PixelFrame current, int width, int height, int shift)
+    {
+        var overlap = height - shift;
+        if (overlap < Math.Max(24, height / 12)) return double.PositiveInfinity;
+        var xMargin = Math.Min(width / 6, 28);
+        var yMargin = Math.Min(overlap / 6, Math.Max(3, height / 18));
+        var xStep = Math.Max(3, width / 180);
+        var yStep = Math.Max(2, overlap / 120);
+        double total = 0;
+        double weightTotal = 0;
+
+        for (var y = yMargin; y < overlap - yMargin; y += yStep)
+        {
+            double rowTotal = 0;
+            double rowGradient = 0;
+            var rowSamples = 0;
+            for (var x = xMargin; x < width - xMargin; x += xStep)
+            {
+                var a = Luma(previous, x, y + shift);
+                var b = Luma(current, x, y);
+                var gradientA = Math.Abs(a - Luma(previous, Math.Min(width - 1, x + xStep), y + shift));
+                var gradientB = Math.Abs(b - Luma(current, Math.Min(width - 1, x + xStep), y));
+                // Truncation prevents a blinking caret or small animation from
+                // dominating an otherwise exact page match.
+                rowTotal += Math.Min(64, Math.Abs(a - b));
+                rowTotal += 0.35 * Math.Min(64, Math.Abs(gradientA - gradientB));
+                rowGradient += Math.Max(gradientA, gradientB);
+                rowSamples++;
+            }
+            if (rowSamples == 0) continue;
+            var textureWeight = Math.Clamp(rowGradient / (rowSamples * 12.0), 0.2, 1.0);
+            total += (rowTotal / rowSamples) * textureWeight;
+            weightTotal += textureWeight;
+        }
+        return weightTotal <= 0 ? double.PositiveInfinity : total / weightTotal;
+    }
+
+    private static int Luma(PixelFrame frame, int x, int y)
+    {
+        var offset = y * frame.Stride + x * 4;
+        return (frame.Bytes[offset] * 29 + frame.Bytes[offset + 1] * 150 + frame.Bytes[offset + 2] * 77) >> 8;
     }
 
     private static double AverageDifference(PixelFrame first, PixelFrame second)
@@ -182,7 +255,8 @@ internal static class ScrollingCaptureService
     private static int EstimateAddedHeight(IReadOnlyList<BitmapSource> frames)
     {
         var total = 0;
-        for (var index = 1; index < frames.Count; index++) total += FindVerticalShift(frames[index - 1], frames[index]) ?? 0;
+        for (var index = 1; index < frames.Count; index++)
+            total += FindVerticalAlignment(PixelFrame.From(frames[index - 1]), PixelFrame.From(frames[index]))?.Shift ?? 0;
         return total;
     }
 

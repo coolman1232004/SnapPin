@@ -88,6 +88,12 @@ internal static class Program
         if (initialTextToolbar != scrolledTextToolbar) return 57;
         Console.WriteLine($"PIN TEXT SELECTION: {textResult.RecognizedWords.Count} positioned OCR words and multiline copy order verified");
 
+        var rotatedText = new TransformedBitmap(textImage, new RotateTransform(90));
+        rotatedText.Freeze();
+        var rotatedTextResult = await RecognitionService.RecognizeAsync(rotatedText, "eng");
+        if (!rotatedTextResult.Text.Contains("SNAPANCHOR", StringComparison.OrdinalIgnoreCase)) return 86;
+        Console.WriteLine("OCR ORIENTATION: rotated local text recognition verified");
+
         var japaneseModel = Path.Combine(AppContext.BaseDirectory, "tessdata", "jpn.traineddata");
         if (!File.Exists(japaneseModel) || new FileInfo(japaneseModel).Length < 1_000_000) return 31;
         var japaneseProbe = await RecognitionService.RecognizeAsync(CreatePatternImage(160, 80), "jpn");

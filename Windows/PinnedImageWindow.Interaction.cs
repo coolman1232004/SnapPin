@@ -78,17 +78,30 @@ public partial class PinnedImageWindow
     private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
     {
         if (_inlineMode != "None") return;
+        HandleWheelZoom(e.Delta, Keyboard.Modifiers);
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// The pin annotation surface is a separate transparent top-level window,
+    /// so wheel messages over the visible pin belong to that surface while the
+    /// toolbar is open. Keep pin zoom/opacity available by forwarding those
+    /// messages through this single implementation.
+    /// </summary>
+    internal void HandleAnnotationOverlayWheel(int delta, ModifierKeys modifiers)
+        => HandleWheelZoom(delta, modifiers);
+
+    private void HandleWheelZoom(int delta, ModifierKeys modifiers)
+    {
         StopScreenPixelBoundsStabilization();
         var targets = SelectedPins.Contains(this) && SelectedPins.Count > 1 ? SelectedPins.ToArray() : [this];
-        if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+        if ((modifiers & ModifierKeys.Control) != 0)
         {
-            foreach (var pin in targets) pin.Opacity = Math.Clamp(pin.Opacity + (e.Delta > 0 ? 0.08 : -0.08), 0.15, 1);
-            e.Handled = true;
+            foreach (var pin in targets) pin.Opacity = Math.Clamp(pin.Opacity + (delta > 0 ? 0.08 : -0.08), 0.15, 1);
             return;
         }
-        var factor = Math.Pow(1.045, e.Delta / 120.0);
+        var factor = Math.Pow(1.045, delta / 120.0);
         foreach (var pin in targets) pin.QueueSmoothResize(factor);
-        e.Handled = true;
     }
 
     private void QueueSmoothResize(double factor)
