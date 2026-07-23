@@ -117,9 +117,10 @@ public partial class PinnedImageWindow
     private void QueueSmoothResizeTo(double width, double height, double centerX, double centerY)
     {
         _targetZoomBounds = new Rect(centerX - width / 2, centerY - height / 2, width, height);
-        if (!_longScrollable) PinnedImage.CacheMode = _zoomBitmapCache;
-        RenderOptions.SetBitmapScalingMode(PinnedImage, BitmapScalingMode.NearestNeighbor);
-        RenderOptions.SetBitmapScalingMode(LongPinnedImage, BitmapScalingMode.NearestNeighbor);
+        // Always redraw from the source bitmap. Scaling a cached intermediate
+        // frame makes text progressively softer after repeated wheel steps,
+        // while nearest-neighbour makes letter edges jagged.
+        ApplyImageScalingMode(animating: true);
         _zoomAnimating = true;
         _zoomAnimationTimer.Start();
         ShowZoomPercent(width);
@@ -152,10 +153,19 @@ public partial class PinnedImageWindow
         }
         _zoomAnimating = false;
         _zoomAnimationTimer.Stop();
-        RenderOptions.SetBitmapScalingMode(PinnedImage, BitmapScalingMode.NearestNeighbor);
-        RenderOptions.SetBitmapScalingMode(LongPinnedImage, BitmapScalingMode.NearestNeighbor);
-        PinnedImage.CacheMode = null;
+        ApplyImageScalingMode(animating: false);
         _targetZoomBounds = new Rect(Left, Top, Width, Height);
+    }
+
+    private void ApplyImageScalingMode(bool animating)
+    {
+        var dpi = DpiLayoutService.WindowScale(this);
+        var normalWidth = ActualWidth > 1 ? ActualWidth : Width;
+        var longWidth = LongPinnedImage.Width > 1 ? LongPinnedImage.Width : normalWidth;
+        RenderOptions.SetBitmapScalingMode(PinnedImage,
+            PinScalingQuality.ModeFor(normalWidth, dpi.DpiScaleX, _source.PixelWidth, animating));
+        RenderOptions.SetBitmapScalingMode(LongPinnedImage,
+            PinScalingQuality.ModeFor(longWidth, dpi.DpiScaleX, _source.PixelWidth, animating));
     }
 
     private void ApplyShadow()

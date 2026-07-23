@@ -58,7 +58,6 @@ public partial class PinnedImageWindow : Window
     private readonly DispatcherTimer _textAutoScrollTimer = new() { Interval = TimeSpan.FromMilliseconds(28) };
     private readonly DispatcherTimer _longScrollAnimationTimer = new() { Interval = TimeSpan.FromMilliseconds(16) };
     private readonly DispatcherTimer _screenPixelBoundsTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
-    private readonly BitmapCache _zoomBitmapCache = new() { RenderAtScale = 1 };
     private Rect _targetZoomBounds;
     private bool _zoomAnimating;
     private System.Drawing.Rectangle? _initialScreenPixelBounds;
@@ -115,6 +114,7 @@ public partial class PinnedImageWindow : Window
         SizeChanged += (_, _) =>
         {
             UpdateLongImageWidth();
+            if (!_zoomAnimating) ApplyImageScalingMode(animating: false);
             if (_textSelectable) Dispatcher.BeginInvoke(UpdateSelectableTextLayout, DispatcherPriority.Loaded);
         };
         OpenPins.Add(this);
@@ -126,6 +126,7 @@ public partial class PinnedImageWindow : Window
         };
         DpiChanged += (_, _) =>
         {
+            Dispatcher.BeginInvoke(() => ApplyImageScalingMode(animating: false), DispatcherPriority.Render);
             if (_initialScreenPixelBounds is { } bounds)
                 Dispatcher.BeginInvoke(() => BeginScreenPixelBoundsStabilization(bounds), DispatcherPriority.Render);
         };
@@ -167,6 +168,7 @@ public partial class PinnedImageWindow : Window
         Loaded += async (_, _) =>
         {
             Focus();
+            ApplyImageScalingMode(animating: false);
             if (!_groupName.Equals(_settings.CurrentPinGroup, StringComparison.OrdinalIgnoreCase)) Hide();
             if (_startEditing) BeginEditMode();
             else if (_textSelectable && _recognizedWords.Count > 0) RebuildSelectableTextLayers();
@@ -442,6 +444,7 @@ public partial class PinnedImageWindow : Window
         Width = Math.Max(80, bounds.Width); Height = Math.Max(60, bounds.Height);
         _normalHeight = Height;
         _targetZoomBounds = new Rect(Left, Top, Width, Height);
+        ApplyImageScalingMode(animating: false);
     }
 
     public void SetScreenPixelBounds(System.Drawing.Rectangle bounds)
@@ -492,6 +495,7 @@ public partial class PinnedImageWindow : Window
         _normalHeight = Height;
         _targetZoomBounds = new Rect(Left, Top, Width, Height);
         UpdateLongImageWidth();
+        ApplyImageScalingMode(animating: false);
     }
 
     private void ApplyScreenPixelBounds(System.Drawing.Rectangle bounds)

@@ -26,6 +26,11 @@ internal static class CompatibilitySmoke
         if (Math.Abs(nativeLogicalSize.Width - 800) > 0.01 || Math.Abs(nativeLogicalSize.Height - 500) > 0.01 || nativeZoom != 100)
             throw new InvalidOperationException("A native-size bitmap was not preserved at 125% display scaling.");
 
+        if (PinScalingQuality.ModeFor(800, 1.25, 1000, animating: false) != BitmapScalingMode.NearestNeighbor ||
+            PinScalingQuality.ModeFor(640, 1.25, 1000, animating: false) != BitmapScalingMode.HighQuality ||
+            PinScalingQuality.ModeFor(640, 1.25, 1000, animating: true) != BitmapScalingMode.LowQuality)
+            throw new InvalidOperationException("Pinned-image scaling did not preserve native pixels and smooth resized text.");
+
         var virtualBounds = new System.Drawing.Rectangle(-1080, -1920, 3000, 3000);
         var portraitRegion = CaptureCoordinateService.ToBitmapRegion(
             new Point(-200, 500), new Point(-1000, -1800), virtualBounds, 3000, 3000);
