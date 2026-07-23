@@ -576,13 +576,11 @@ public partial class AnnotationEditorControl : UserControl
             return;
         }
 
-        if ((Keyboard.Modifiers & ModifierKeys.Control) != 0 &&
-            FindItemId(e.OriginalSource as DependencyObject) is Guid directSelection)
+        // Snow Shot/Excalidraw-style quick selection: an existing object wins
+        // the hit test even while a drawing tool remains active. Empty image
+        // space still starts a new annotation with the current tool.
+        if (TryBeginExistingItemInteraction(e.OriginalSource as DependencyObject, point, e.ClickCount))
         {
-            _selectedId = directSelection;
-            if (_items.FirstOrDefault(item => item.Id == directSelection) is { } selected)
-                SyncStyleControls(selected);
-            RenderAnnotations();
             e.Handled = true;
             return;
         }
@@ -671,6 +669,34 @@ public partial class AnnotationEditorControl : UserControl
         Surface.CaptureMouse();
         RenderAnnotations();
         e.Handled = true;
+    }
+
+    private bool TryBeginExistingItemInteraction(DependencyObject? source, Point point, int clickCount)
+    {
+        if (FindItemId(source) is not Guid itemId ||
+            _items.FirstOrDefault(item => item.Id == itemId) is not { } selected)
+            return false;
+
+        _selectedId = itemId;
+        SyncStyleControls(selected);
+        if (clickCount >= 2 && selected.Kind is AnnotationKind.Text or AnnotationKind.Callout)
+        {
+            PushUndo();
+            _pendingTextKind = selected.Kind;
+            BeginTextEditor(new Point(selected.X, selected.Y), selected);
+            return true;
+        }
+
+        PushUndo();
+        _activeId = itemId;
+        _transformMode = "Move";
+        _transformStart = point;
+        _transformOriginal = selected.Clone();
+        _last = point;
+        _dragging = true;
+        Surface.CaptureMouse();
+        RenderAnnotations();
+        return true;
     }
 
     private void Surface_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -790,13 +816,20 @@ public partial class AnnotationEditorControl : UserControl
             e.Handled = true;
             return;
         }
-        PositionCustomToolCursor(pointer, FindHandle(e.OriginalSource as DependencyObject) is null);
+        var pointerSource = e.OriginalSource as DependencyObject;
+        PositionCustomToolCursor(pointer,
+            FindHandle(pointerSource) is null && FindItemId(pointerSource) is null);
         if (!_dragging || _activeId is null) return;
         var point = pointer;
         var item = _items.FirstOrDefault(candidate => candidate.Id == _activeId);
         if (item is null) return;
 
-        if (!string.IsNullOrWhiteSpace(_transformMode) && _transformOriginal is not null)
+        if (_transformMode == "Move")
+        {
+            MoveItem(item, point.X - _last.X, point.Y - _last.Y);
+            _last = point;
+        }
+        else if (!string.IsNullOrWhiteSpace(_transformMode) && _transformOriginal is not null)
         {
             TransformItem(item, point);
         }

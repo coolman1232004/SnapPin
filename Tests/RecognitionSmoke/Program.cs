@@ -1118,6 +1118,7 @@ internal static class Program
             };
             var editor = new AnnotationEditorControl();
             editor.LoadImage(annotationBase, [arrow]);
+            editor.ActivateConfiguredTool("Arrow");
             var type = typeof(AnnotationEditorControl);
             type.GetField("_selectedId", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .SetValue(editor, (Guid?)arrow.Id);
@@ -1132,9 +1133,29 @@ internal static class Program
             var arrowHasThreePurposeBuiltHandles = handles.Length == 3 &&
                 handles.Select(handle => handle.Handle).OrderBy(value => value).SequenceEqual(
                     new[] { "ArrowEnd", "ArrowMove", "ArrowStart" });
+            var renderedArrow = canvas.Children.OfType<FrameworkElement>()
+                .First(child => child.Tag is Guid renderedId && renderedId == arrow.Id);
+            var endpointHandles = canvas.Children.OfType<FrameworkElement>()
+                .Where(child => child.Tag is AnnotationHandleTag { Handle: "ArrowStart" or "ArrowEnd" })
+                .ToArray();
+            var quickSelectionCursorsAreDistinct = renderedArrow.Cursor == System.Windows.Input.Cursors.SizeAll &&
+                endpointHandles.Length == 2 &&
+                endpointHandles.All(handle => handle.Cursor is not null &&
+                    handle.Cursor != System.Windows.Input.Cursors.Cross);
 
             var liveArrow = ((List<AnnotationItem>)type.GetField("_items", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .GetValue(editor)!)[0];
+            var quickSelect = (bool)type.GetMethod("TryBeginExistingItemInteraction", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(editor, [renderedArrow, new Point(145, 95), 1])!;
+            var selectedOlderObjectWithoutChangingTool = quickSelect &&
+                type.GetField("_selectedId", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(editor) is Guid selectedId &&
+                selectedId == liveArrow.Id &&
+                type.GetField("_transformMode", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(editor) as string == "Move" &&
+                type.GetField("_tool", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(editor) as string == "Arrow";
+            type.GetField("_dragging", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.SetValue(editor, false);
+            type.GetField("_activeId", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.SetValue(editor, null);
+            type.GetField("_transformMode", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.SetValue(editor, string.Empty);
+
             type.GetField("_transformOriginal", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .SetValue(editor, liveArrow.Clone());
             type.GetField("_transformStart", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
@@ -1155,7 +1176,8 @@ internal static class Program
             var endpointChangesDirection = liveArrow.Points[0] == new Point(65, 85) &&
                 liveArrow.Points[1] == new Point(310, 205);
 
-            return arrowHasThreePurposeBuiltHandles && midpointMovesWholeArrow && endpointChangesDirection;
+            return arrowHasThreePurposeBuiltHandles && quickSelectionCursorsAreDistinct &&
+                selectedOlderObjectWithoutChangingTool && midpointMovesWholeArrow && endpointChangesDirection;
         });
         if (!arrowAdjustmentMatches) return 64;
         Console.WriteLine("ARROW ADJUSTMENT: draggable start, midpoint and end controls verified");

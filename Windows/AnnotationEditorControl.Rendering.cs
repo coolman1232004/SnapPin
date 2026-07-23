@@ -89,9 +89,21 @@ public partial class AnnotationEditorControl
         var start = item.Points[0];
         var end = item.Points[^1];
         var midpoint = new Point((start.X + end.X) / 2, (start.Y + end.Y) / 2);
-        AddArrowHandle(item.Id, "ArrowStart", start, Cursors.Cross, filled: false);
+        var endpointCursor = ArrowEndpointCursor(start, end);
+        AddArrowHandle(item.Id, "ArrowStart", start, endpointCursor, filled: false);
         AddArrowHandle(item.Id, "ArrowMove", midpoint, Cursors.SizeAll, filled: true);
-        AddArrowHandle(item.Id, "ArrowEnd", end, Cursors.Cross, filled: false);
+        AddArrowHandle(item.Id, "ArrowEnd", end, endpointCursor, filled: false);
+    }
+
+    private static Cursor ArrowEndpointCursor(Point start, Point end)
+    {
+        var dx = end.X - start.X;
+        var dy = end.Y - start.Y;
+        var absoluteX = Math.Abs(dx);
+        var absoluteY = Math.Abs(dy);
+        if (absoluteX >= absoluteY * 2) return Cursors.SizeWE;
+        if (absoluteY >= absoluteX * 2) return Cursors.SizeNS;
+        return dx * dy >= 0 ? Cursors.SizeNWSE : Cursors.SizeNESW;
     }
 
     private void AddArrowHandle(Guid itemId, string handle, Point point, Cursor cursor, bool filled)
@@ -203,6 +215,7 @@ public partial class AnnotationEditorControl
             element.RenderTransformOrigin = new Point(0.5, 0.5);
             element.RenderTransform = new RotateTransform(item.Rotation);
         }
+        element.Cursor = Cursors.SizeAll;
         return element;
     }
 
