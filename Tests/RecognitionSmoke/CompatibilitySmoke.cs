@@ -27,9 +27,16 @@ internal static class CompatibilitySmoke
             throw new InvalidOperationException("A native-size bitmap was not preserved at 125% display scaling.");
 
         if (PinScalingQuality.ModeFor(800, 1.25, 1000, animating: false) != BitmapScalingMode.NearestNeighbor ||
-            PinScalingQuality.ModeFor(640, 1.25, 1000, animating: false) != BitmapScalingMode.HighQuality ||
+            PinScalingQuality.ModeFor(640, 1.25, 1000, animating: false) != BitmapScalingMode.LowQuality ||
             PinScalingQuality.ModeFor(640, 1.25, 1000, animating: true) != BitmapScalingMode.LowQuality)
-            throw new InvalidOperationException("Pinned-image scaling did not preserve native pixels and smooth resized text.");
+            throw new InvalidOperationException("Pinned-image scaling did not preserve native pixels and sharp linearly sampled text.");
+
+        if (PinScalingQuality.NextWheelZoomPercent(1000, 1000, 120) != 110 ||
+            PinScalingQuality.NextWheelZoomPercent(1000, 1000, -120) != 90 ||
+            PinScalingQuality.NextWheelZoomPercent(200, 1000, -120) != 20 ||
+            PinScalingQuality.NextWheelZoomPercent(3000, 1000, 120) != 300 ||
+            PinScalingQuality.PhysicalSizeForPercent(1001, 601, 110) != new System.Drawing.Size(1101, 661))
+            throw new InvalidOperationException("Pinned-image physical zoom steps are not stable integer pixel sizes.");
 
         var virtualBounds = new System.Drawing.Rectangle(-1080, -1920, 3000, 3000);
         var portraitRegion = CaptureCoordinateService.ToBitmapRegion(

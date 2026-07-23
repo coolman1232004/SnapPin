@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '2.1.8',
+    [string]$Version = '2.1.9',
     [string]$CertificateThumbprint = $env:SNAPANCHOR_CERT_THUMBPRINT
 )
 
@@ -107,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Portable-win-x64.zip'
-    releaseNotes = 'SnapAnchor 2.1.8 keeps pinned screenshot text clear while wheel zooming: native-size pins remain pixel exact, resized pins use high-quality resampling, and repeated zoom no longer softens a cached intermediate frame.'
+    releaseNotes = 'SnapAnchor 2.1.9 sharpens resized pinned text with a Snow Shot-inspired display policy: source pixels stay untouched, wheel zoom uses exact 10% physical-pixel steps, native size remains pixel exact, and other sizes use crisp linear sampling instead of the softer Fant filter.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

@@ -100,59 +100,74 @@ public partial class PinnedImageWindow
             foreach (var pin in targets) pin.Opacity = Math.Clamp(pin.Opacity + (delta > 0 ? 0.08 : -0.08), 0.15, 1);
             return;
         }
-        var factor = Math.Pow(1.045, delta / 120.0);
-        foreach (var pin in targets) pin.QueueSmoothResize(factor);
+        foreach (var pin in targets) pin.ResizeByWheelStep(delta);
     }
 
-    private void QueueSmoothResize(double factor)
+    private void ResizeByWheelStep(int wheelDelta)
     {
-        var basis = _zoomAnimating ? _targetZoomBounds : new Rect(Left, Top, Width, Height);
-        QueueSmoothResizeTo(
-            Math.Clamp(basis.Width * factor, 60, SystemParameters.VirtualScreenWidth * 1.5),
-            Math.Clamp(basis.Height * factor, 40, SystemParameters.VirtualScreenHeight * 1.5),
-            basis.X + basis.Width / 2,
-            basis.Y + basis.Height / 2);
+        var handle = new WindowInteropHelper(this).Handle;
+        if (handle == IntPtr.Zero || !NativeMethods.GetWindowRect(handle, out var current)) return;
+        var percent = PinScalingQuality.NextWheelZoomPercent(current.Width, _source.PixelWidth, wheelDelta);
+        ResizeToPhysicalPercent(percent, current);
     }
 
-    private void QueueSmoothResizeTo(double width, double height, double centerX, double centerY)
+    private void ResizeToPhysicalPercent(int percent, NativeMethods.NativeRect? knownBounds = null)
     {
-        _targetZoomBounds = new Rect(centerX - width / 2, centerY - height / 2, width, height);
-        // Always redraw from the source bitmap. Scaling a cached intermediate
-        // frame makes text progressively softer after repeated wheel steps,
-        // while nearest-neighbour makes letter edges jagged.
-        ApplyImageScalingMode(animating: true);
-        _zoomAnimating = true;
-        _zoomAnimationTimer.Start();
-        ShowZoomPercent(width);
-    }
+        StopScreenPixelBoundsStabilization();
+        StopZoomAnimation(false);
 
-    private void ZoomAnimation_Tick(object? sender, EventArgs e)
-    {
-        const double blend = 0.42;
-        Left += (_targetZoomBounds.Left - Left) * blend;
-        Top += (_targetZoomBounds.Top - Top) * blend;
-        Width += (_targetZoomBounds.Width - Width) * blend;
-        Height += (_targetZoomBounds.Height - Height) * blend;
-        _normalHeight = Height;
-        if (Math.Abs(Left - _targetZoomBounds.Left) < 0.25 &&
-            Math.Abs(Top - _targetZoomBounds.Top) < 0.25 &&
-            Math.Abs(Width - _targetZoomBounds.Width) < 0.25 &&
-            Math.Abs(Height - _targetZoomBounds.Height) < 0.25)
-            StopZoomAnimation(true);
+        var handle = new WindowInteropHelper(this).Handle;
+        if (handle == IntPtr.Zero) return;
+        if (knownBounds is not { } current && !NativeMethods.GetWindowRect(handle, out current)) return;
+
+        percent = Math.Clamp(percent, PinScalingQuality.MinimumZoomPercent, PinScalingQuality.MaximumZoomPercent);
+        var target = PinScalingQuality.PhysicalSizeForPercent(_source.PixelWidth, _source.PixelHeight, percent);
+
+        // Match Snow Shot's physical-pixel sizing. Anchor at the mouse when it
+        // is over the image; otherwise preserve the window centre (for wheel
+        // messages forwarded by an annotation toolbar outside the image).
+        var relativeX = 0.5;
+        var relativeY = 0.5;
+        var anchorX = current.Left + current.Width / 2d;
+        var anchorY = current.Top + current.Height / 2d;
+        var cursor = new NativeMethods.CursorInfo { Size = System.Runtime.InteropServices.Marshal.SizeOf<NativeMethods.CursorInfo>() };
+        if (NativeMethods.GetCursorInfo(ref cursor) &&
+            cursor.ScreenPosition.X >= current.Left && cursor.ScreenPosition.X <= current.Right &&
+            cursor.ScreenPosition.Y >= current.Top && cursor.ScreenPosition.Y <= current.Bottom)
+        {
+            anchorX = cursor.ScreenPosition.X;
+            anchorY = cursor.ScreenPosition.Y;
+            relativeX = (anchorX - current.Left) / Math.Max(1d, current.Width);
+            relativeY = (anchorY - current.Top) / Math.Max(1d, current.Height);
+        }
+
+        var left = (int)Math.Round(anchorX - target.Width * relativeX);
+        var top = (int)Math.Round(anchorY - target.Height * relativeY);
+        NativeMethods.SetWindowPos(
+            handle,
+            IntPtr.Zero,
+            left,
+            top,
+            target.Width,
+            target.Height,
+            NativeMethods.SwpNoZOrder | NativeMethods.SwpNoActivate);
+
+        ApplyImageScalingMode(animating: false);
+        ShowZoomPercent(percent);
+        Dispatcher.BeginInvoke(() =>
+        {
+            _normalHeight = Height;
+            _targetZoomBounds = new Rect(Left, Top, Width, Height);
+            UpdateLongImageWidth();
+            ApplyImageScalingMode(animating: false);
+        }, DispatcherPriority.Render);
     }
 
     private void StopZoomAnimation(bool commitTarget)
     {
-        if (commitTarget && _zoomAnimating && !_targetZoomBounds.IsEmpty)
-        {
-            Left = _targetZoomBounds.Left;
-            Top = _targetZoomBounds.Top;
-            Width = _targetZoomBounds.Width;
-            Height = _targetZoomBounds.Height;
-            _normalHeight = Height;
-        }
-        _zoomAnimating = false;
-        _zoomAnimationTimer.Stop();
+        // Kept as the common pre-move/pre-mode-change synchronization point.
+        // Zoom is now committed atomically in physical pixels rather than
+        // passing through soft, fractional animation frames.
         ApplyImageScalingMode(animating: false);
         _targetZoomBounds = new Rect(Left, Top, Width, Height);
     }
@@ -181,7 +196,12 @@ public partial class PinnedImageWindow
     private void ShowZoomPercent(double width)
     {
         var dpi = DpiLayoutService.WindowScale(this);
-        ZoomText.Text = $"{DpiLayoutService.PhysicalZoomPercent(width, dpi.DpiScaleX, _source.PixelWidth)}%";
+        ShowZoomPercent((int)DpiLayoutService.PhysicalZoomPercent(width, dpi.DpiScaleX, _source.PixelWidth));
+    }
+
+    private void ShowZoomPercent(int percent)
+    {
+        ZoomText.Text = $"{percent}%";
         ZoomBadge.Visibility = Visibility.Visible;
         _zoomBadgeTimer.Stop();
         _zoomBadgeTimer.Start();

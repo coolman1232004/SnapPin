@@ -52,14 +52,12 @@ public partial class PinnedImageWindow : Window
     private double _rotation;
     private double _flipX = 1;
     private double _flipY = 1;
-    private readonly DispatcherTimer _zoomAnimationTimer = new() { Interval = TimeSpan.FromMilliseconds(16) };
     private readonly DispatcherTimer _zoomBadgeTimer = new() { Interval = TimeSpan.FromMilliseconds(850) };
     private readonly DispatcherTimer _refreshTimer = new();
     private readonly DispatcherTimer _textAutoScrollTimer = new() { Interval = TimeSpan.FromMilliseconds(28) };
     private readonly DispatcherTimer _longScrollAnimationTimer = new() { Interval = TimeSpan.FromMilliseconds(16) };
     private readonly DispatcherTimer _screenPixelBoundsTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
     private Rect _targetZoomBounds;
-    private bool _zoomAnimating;
     private System.Drawing.Rectangle? _initialScreenPixelBounds;
     private int _screenPixelBoundsPasses;
     private int _screenPixelBoundsStablePasses;
@@ -104,7 +102,6 @@ public partial class PinnedImageWindow : Window
         ApplyBackground();
         SizeToImage(source);
         _targetZoomBounds = new Rect(Left, Top, Width, Height);
-        _zoomAnimationTimer.Tick += ZoomAnimation_Tick;
         _zoomBadgeTimer.Tick += (_, _) => { _zoomBadgeTimer.Stop(); ZoomBadge.Visibility = Visibility.Collapsed; };
         _refreshTimer.Tick += (_, _) => RefreshScreenshot(silent: true);
         _textAutoScrollTimer.Tick += TextAutoScrollTimer_Tick;
@@ -114,7 +111,7 @@ public partial class PinnedImageWindow : Window
         SizeChanged += (_, _) =>
         {
             UpdateLongImageWidth();
-            if (!_zoomAnimating) ApplyImageScalingMode(animating: false);
+            ApplyImageScalingMode(animating: false);
             if (_textSelectable) Dispatcher.BeginInvoke(UpdateSelectableTextLayout, DispatcherPriority.Loaded);
         };
         OpenPins.Add(this);
@@ -146,7 +143,6 @@ public partial class PinnedImageWindow : Window
         {
             _annotationOverlay?.Close();
             _annotationOverlay = null;
-            _zoomAnimationTimer.Stop();
             _zoomBadgeTimer.Stop();
             _refreshTimer.Stop();
             _textAutoScrollTimer.Stop();
@@ -957,11 +953,7 @@ public partial class PinnedImageWindow : Window
 
     private void SetZoom(double scale)
     {
-        var dpi = DpiLayoutService.WindowScale(this);
-        var logicalSize = DpiLayoutService.LogicalSizeForPhysicalPixels(
-            _source.PixelWidth, _source.PixelHeight, dpi.DpiScaleX, dpi.DpiScaleY);
-        var centerX = Left + Width / 2; var centerY = Top + Height / 2;
-        QueueSmoothResizeTo(Math.Max(60, logicalSize.Width * scale), Math.Max(40, logicalSize.Height * scale), centerX, centerY);
+        ResizeToPhysicalPercent((int)Math.Round(scale * 100));
     }
 
     private void ApplyFilters()
