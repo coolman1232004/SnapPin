@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '2.1.11',
+    [string]$Version = '2.1.12',
     [string]$CertificateThumbprint = $env:SNAPANCHOR_CERT_THUMBPRINT
 )
 
@@ -107,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Portable-win-x64.zip'
-    releaseNotes = 'SnapAnchor 2.1.11 adds Snow Shot-style quick selection: click any existing annotation to select and adjust it without changing the active drawing tool. Arrow endpoints now show directional resize cursors instead of the drawing crosshair.'
+    releaseNotes = 'SnapAnchor 2.1.12 restores automatic window and UI-element outlines independently of the capture-dimensions setting. Pinned-image OCR text selection remains off by default, and its right-click toggle now persists as the default for future pins.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

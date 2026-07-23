@@ -6,7 +6,9 @@ namespace SnapAnchor.Services;
 public sealed class AppSettings
 {
     public const string DefaultUpdateFeedUrl = "https://github.com/coolman1232004/SnapAnchor/releases/latest/download/release.json";
+    internal const int CurrentSettingsSchemaVersion = 1;
 
+    public int SettingsSchemaVersion { get; set; }
     public string CaptureHotkey { get; set; } = "F1";
     public string CaptureAndCopyHotkey { get; set; } = "CtrlF1";
     public string CustomCaptureHotkey { get; set; } = "ShiftF1";
@@ -25,7 +27,7 @@ public sealed class AppSettings
     public string CaptureMaskColor { get; set; } = "#66000000";
     public bool ShowCrossLines { get; set; }
     public bool ShowCaptureSize { get; set; } = true;
-    public bool? ShowElementDetection { get; set; }
+    public bool? ShowElementDetection { get; set; } = true;
     public bool ShowCaptureHints { get; set; } = true;
     public bool ExcludeSnapAnchorFromCapture { get; set; } = true;
     public List<string> CaptureExcludedProcesses { get; set; } = [];
@@ -175,7 +177,7 @@ internal static class SettingsService
         ApplyStartup(settings.RunOnStartup);
     }
 
-    private static AppSettings Normalize(AppSettings settings)
+    internal static AppSettings Normalize(AppSettings settings)
     {
         // Updates always come from SnapAnchor's official GitHub release channel.
         // Older custom or empty feed values are migrated to the trusted source.
@@ -191,10 +193,15 @@ internal static class SettingsService
         if (PathsEqual(settings.RecordingFolder, legacyVideos))
             settings.RecordingFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "SnapAnchor");
 
-        // Older builds used the size/dimension checkbox as the closest capture-
-        // guidance preference. Preserve the user's choice when introducing the
-        // dedicated automatic-detection switch.
-        settings.ShowElementDetection ??= settings.ShowCaptureSize;
+        // The first dedicated detection preference was accidentally migrated
+        // from the unrelated size/dimension checkbox. Repair that migration
+        // once, then preserve an explicit detection choice from this version on.
+        if (settings.SettingsSchemaVersion < AppSettings.CurrentSettingsSchemaVersion)
+        {
+            settings.ShowElementDetection = true;
+            settings.SettingsSchemaVersion = AppSettings.CurrentSettingsSchemaVersion;
+        }
+        settings.ShowElementDetection ??= true;
         // The original text tool stored its default as Segoe UI at 16 px. Move
         // that untouched legacy default to the Paint-like Calibri 11 preset,
         // while preserving any font or size the user actually customized.

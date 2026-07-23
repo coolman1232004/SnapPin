@@ -18,6 +18,13 @@ namespace SnapAnchor.Windows;
 
 public partial class PinnedImageWindow
 {
+    private async Task SetTextSelectablePreferenceAsync(bool enabled)
+    {
+        _settings.PinTextSelectableByDefault = enabled;
+        SettingsService.Save(_settings);
+        await SetTextSelectableAsync(enabled);
+    }
+
     private async Task SetTextSelectableAsync(bool enabled)
     {
         if (!enabled)

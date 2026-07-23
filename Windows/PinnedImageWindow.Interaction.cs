@@ -216,7 +216,8 @@ public partial class PinnedImageWindow
         var copySelectedText = Item("Copy selected text", (_, _) => CopySelectedText());
         copySelectedText.IsEnabled = !string.IsNullOrWhiteSpace(SelectedRecognizedText());
         menu.Items.Add(copySelectedText);
-        menu.Items.Add(CheckItem("Text selectable (OCR)", _textSelectable, async (_, _) => await SetTextSelectableAsync(!_textSelectable)));
+        menu.Items.Add(CheckItem("Text selectable (OCR)", _textSelectable,
+            async (_, _) => await SetTextSelectablePreferenceAsync(!_textSelectable)));
         menu.Items.Add(new Separator());
         menu.Items.Add(Item("Copy image", (_, _) => Clipboard.SetImage(_source)));
         menu.Items.Add(Item("Copy unscaled image", (_, _) => Clipboard.SetImage(_baseSource)));

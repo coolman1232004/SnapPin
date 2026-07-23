@@ -36,6 +36,20 @@ internal static class Program
         if (physicalUnion != new Drawing.Rectangle(-1920, -200, 4480, 1440)) return 84;
         var physicalDesktop = DisplayTopologyService.VirtualBoundsPixels();
         if (physicalDesktop.Width <= 0 || physicalDesktop.Height <= 0) return 85;
+        var repairedDetectionSettings = SettingsService.Normalize(new AppSettings
+        {
+            SettingsSchemaVersion = 0,
+            ShowCaptureSize = false,
+            ShowElementDetection = false
+        });
+        var preservedDetectionSettings = SettingsService.Normalize(new AppSettings
+        {
+            SettingsSchemaVersion = AppSettings.CurrentSettingsSchemaVersion,
+            ShowElementDetection = false
+        });
+        if (repairedDetectionSettings.ShowElementDetection != true ||
+            preservedDetectionSettings.ShowElementDetection != false) return 87;
+        Console.WriteLine("DETECTION PREFERENCE: legacy dimension coupling repaired while explicit choices remain preserved");
 
         var nonStandardDpi = BitmapSource.Create(7, 5, 144, 120, PixelFormats.Bgra32, null, new byte[7 * 5 * 4], 7 * 4);
         var normalizedDpi = CaptureService.NormalizeDpi96(nonStandardDpi);
