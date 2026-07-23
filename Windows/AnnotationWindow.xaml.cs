@@ -930,6 +930,12 @@ public partial class AnnotationEditorControl : UserControl
     {
         var original = _transformOriginal;
         if (original is null) return;
+        if (item.Kind == AnnotationKind.Arrow && original.Points.Count >= 2)
+        {
+            TransformArrow(item, original, point);
+            return;
+        }
+
         var originalBounds = Bounds(original);
         if (_transformMode == "Rotate")
         {
@@ -964,6 +970,34 @@ public partial class AnnotationEditorControl : UserControl
         {
             item.X = resized.X; item.Y = resized.Y; item.Width = resized.Width; item.Height = resized.Height;
         }
+    }
+
+    private void TransformArrow(AnnotationItem item, AnnotationItem original, Point point)
+    {
+        if (_transformMode == "ArrowStart")
+        {
+            item.Points[0] = point;
+            return;
+        }
+
+        if (_transformMode == "ArrowEnd")
+        {
+            item.Points[^1] = point;
+            return;
+        }
+
+        if (_transformMode != "ArrowMove") return;
+        var dx = point.X - _transformStart.X;
+        var dy = point.Y - _transformStart.Y;
+        var minX = original.Points.Min(candidate => candidate.X);
+        var maxX = original.Points.Max(candidate => candidate.X);
+        var minY = original.Points.Min(candidate => candidate.Y);
+        var maxY = original.Points.Max(candidate => candidate.Y);
+        dx = Math.Clamp(dx, -minX, Surface.Width - maxX);
+        dy = Math.Clamp(dy, -minY, Surface.Height - maxY);
+        item.Points = original.Points
+            .Select(candidate => new Point(candidate.X + dx, candidate.Y + dy))
+            .ToList();
     }
 
     private Point Clamp(Point point) => new(

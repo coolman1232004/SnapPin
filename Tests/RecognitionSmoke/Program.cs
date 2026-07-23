@@ -1109,6 +1109,57 @@ internal static class Program
         if (!annotationInteractionMatches) return 45;
         Console.WriteLine("ANNOTATION INTERACTION: Paint-style multiline text frame, eight resize grips and direct blur brush activation verified");
 
+        var arrowAdjustmentMatches = RunSta(() =>
+        {
+            var arrow = new AnnotationItem
+            {
+                Kind = AnnotationKind.Arrow,
+                Points = [new Point(45, 55), new Point(245, 135)]
+            };
+            var editor = new AnnotationEditorControl();
+            editor.LoadImage(annotationBase, [arrow]);
+            var type = typeof(AnnotationEditorControl);
+            type.GetField("_selectedId", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(editor, (Guid?)arrow.Id);
+            type.GetMethod("RenderAnnotations", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(editor, null);
+
+            var canvas = (Canvas)editor.FindName("AnnotationCanvas");
+            var handles = canvas.Children.OfType<FrameworkElement>()
+                .Select(child => child.Tag)
+                .OfType<AnnotationHandleTag>()
+                .ToArray();
+            var arrowHasThreePurposeBuiltHandles = handles.Length == 3 &&
+                handles.Select(handle => handle.Handle).OrderBy(value => value).SequenceEqual(
+                    new[] { "ArrowEnd", "ArrowMove", "ArrowStart" });
+
+            var liveArrow = ((List<AnnotationItem>)type.GetField("_items", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .GetValue(editor)!)[0];
+            type.GetField("_transformOriginal", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(editor, liveArrow.Clone());
+            type.GetField("_transformStart", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(editor, new Point(145, 95));
+            type.GetField("_transformMode", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(editor, "ArrowMove");
+            type.GetMethod("TransformItem", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(editor, [liveArrow, new Point(165, 125)]);
+            var midpointMovesWholeArrow = liveArrow.Points[0] == new Point(65, 85) &&
+                liveArrow.Points[1] == new Point(265, 165);
+
+            type.GetField("_transformOriginal", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(editor, liveArrow.Clone());
+            type.GetField("_transformMode", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .SetValue(editor, "ArrowEnd");
+            type.GetMethod("TransformItem", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(editor, [liveArrow, new Point(310, 205)]);
+            var endpointChangesDirection = liveArrow.Points[0] == new Point(65, 85) &&
+                liveArrow.Points[1] == new Point(310, 205);
+
+            return arrowHasThreePurposeBuiltHandles && midpointMovesWholeArrow && endpointChangesDirection;
+        });
+        if (!arrowAdjustmentMatches) return 64;
+        Console.WriteLine("ARROW ADJUSTMENT: draggable start, midpoint and end controls verified");
+
         var brushEffectsMatch = RunSta(() =>
         {
             var line = new AnnotationItem

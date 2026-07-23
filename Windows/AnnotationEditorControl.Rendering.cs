@@ -46,6 +46,12 @@ public partial class AnnotationEditorControl
 
     private void AddSelectionHandles(AnnotationItem item, Rect bounds)
     {
+        if (item.Kind == AnnotationKind.Arrow && item.Points.Count >= 2)
+        {
+            AddArrowSelectionHandles(item);
+            return;
+        }
+
         var centerX = bounds.X + bounds.Width / 2;
         var centerY = bounds.Y + bounds.Height / 2;
         AddHandle(item.Id, "NW", bounds.Left, bounds.Top, Cursors.SizeNWSE);
@@ -74,6 +80,37 @@ public partial class AnnotationEditorControl
         };
         Canvas.SetLeft(grip, x - size / 2);
         Canvas.SetTop(grip, y - size / 2);
+        Panel.SetZIndex(grip, 1000);
+        AnnotationCanvas.Children.Add(grip);
+    }
+
+    private void AddArrowSelectionHandles(AnnotationItem item)
+    {
+        var start = item.Points[0];
+        var end = item.Points[^1];
+        var midpoint = new Point((start.X + end.X) / 2, (start.Y + end.Y) / 2);
+        AddArrowHandle(item.Id, "ArrowStart", start, Cursors.Cross, filled: false);
+        AddArrowHandle(item.Id, "ArrowMove", midpoint, Cursors.SizeAll, filled: true);
+        AddArrowHandle(item.Id, "ArrowEnd", end, Cursors.Cross, filled: false);
+    }
+
+    private void AddArrowHandle(Guid itemId, string handle, Point point, Cursor cursor, bool filled)
+    {
+        const double size = 9;
+        var accent = BrushFrom(_settings.CaptureBorderColor);
+        var grip = new Shapes.Ellipse
+        {
+            Width = size,
+            Height = size,
+            Fill = filled ? accent : Brushes.White,
+            Stroke = accent,
+            StrokeThickness = 1.5,
+            Cursor = cursor,
+            Tag = new AnnotationHandleTag(itemId, handle),
+            SnapsToDevicePixels = true
+        };
+        Canvas.SetLeft(grip, point.X - size / 2);
+        Canvas.SetTop(grip, point.Y - size / 2);
         Panel.SetZIndex(grip, 1000);
         AnnotationCanvas.Children.Add(grip);
     }
