@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.15] - 2026-07-24
+
+- Window/UI-element detection now uses a **spotlight mask**: the rest of the capture stays dimmed and only the hovered window or control lights up at full brightness
+- Detection outline is a clear bright frame with no dark fill over the lit region
+- Faster hover detection: spatial result cache, skip full-tree UI Automation walks, window-only path when Tab is in Window mode, and fewer re-queries while the pointer rests on the same target
+
 ## [2.1.14] - 2026-07-24
 
 - Drawing tools can annotate **inside** existing rectangles/ellipses again (blur, pencil, marker, nested shapes); filled interiors no longer steal the hit test

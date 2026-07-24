@@ -68,6 +68,8 @@ public partial class CaptureOverlayWindow : Window
     private IntPtr _recordingTargetWindow;
     private IntPtr _overlayHandle;
     private readonly Stopwatch _detectionClock = Stopwatch.StartNew();
+    private Point _lastDetectionOverlayPoint = new(double.NaN, double.NaN);
+    private Point _lastDetectionScreenPoint = new(double.NaN, double.NaN);
     private bool _annotationMode;
     private string? _annotationHistoryRecordId;
     private IReadOnlyList<AnnotationItem>? _annotationResizeItems;
@@ -188,7 +190,7 @@ public partial class CaptureOverlayWindow : Window
         SizeBadge.Visibility = _settings.ShowCaptureSize ? Visibility.Visible : Visibility.Collapsed;
         ActionBar.Visibility = Visibility.Collapsed;
         SelectionHandles.Visibility = Visibility.Collapsed;
-        DetectionRect.Visibility = Visibility.Collapsed;
+        ClearDetectionHighlight();
         CaptureMouse();
         UpdateSelection(e.GetPosition(OverlayCanvas));
     }
@@ -222,17 +224,11 @@ public partial class CaptureOverlayWindow : Window
             UpdateSelection(point);
         else if (_settings.ShowElementDetection != false && _selection.Width < 3 && _selection.Height < 3)
         {
-            // Keep hover outlines responsive like typical screenshot tools:
-            // refresh quickly while the pointer is still choosing a target.
-            if (_detectionClock.ElapsedMilliseconds >= 40)
-            {
-                _detectionClock.Restart();
-                UpdateDetectedRegion(point);
-            }
+            UpdateDetectedRegion(point);
         }
         else if (_selection.Width >= 3 || _settings.ShowElementDetection == false)
         {
-            DetectionRect.Visibility = Visibility.Collapsed;
+            ClearDetectionHighlight();
         }
     }
 
@@ -328,7 +324,7 @@ public partial class CaptureOverlayWindow : Window
             _ = RunRecordingAsync();
             return;
         }
-        DetectionRect.Visibility = Visibility.Collapsed;
+        ClearDetectionHighlight();
         ActionBar.Visibility = Visibility.Visible;
         PositionActionBar();
     }
@@ -370,7 +366,11 @@ public partial class CaptureOverlayWindow : Window
     private void RenderSelection()
     {
         if (_selection.Width >= 3 && _selection.Height >= 3)
+        {
             DetectionRect.Visibility = Visibility.Collapsed;
+            _detectedSelection = Rect.Empty;
+            _detectionCandidates = [];
+        }
         Canvas.SetLeft(SelectionRect, _selection.X);
         Canvas.SetTop(SelectionRect, _selection.Y);
         SelectionRect.Width = _selection.Width;
@@ -397,11 +397,28 @@ public partial class CaptureOverlayWindow : Window
         }
 
         var screenPoint = OverlayToScreen(overlayPoint);
-        _detectionCandidates = ElementDetectionService.DetectHierarchy(screenPoint, _overlayHandle);
+        // Skip expensive re-query while the pointer barely moved, but still
+        // keep the bright hole under the cursor when it stays inside the target.
+        var movedLittle = !double.IsNaN(_lastDetectionScreenPoint.X) &&
+            Math.Abs(screenPoint.X - _lastDetectionScreenPoint.X) < 2 &&
+            Math.Abs(screenPoint.Y - _lastDetectionScreenPoint.Y) < 2;
+        if (movedLittle && _detectionCandidates.Count > 0 && _detectionClock.ElapsedMilliseconds < 24)
+            return;
+
+        // Inside the current bright hole: re-query less often (pointer is still on target).
+        if (_detectionCandidates.Count > 0 &&
+            !_detectedSelection.IsEmpty &&
+            _detectedSelection.Contains(overlayPoint) &&
+            _detectionClock.ElapsedMilliseconds < 55)
+            return;
+
+        _lastDetectionOverlayPoint = overlayPoint;
+        _lastDetectionScreenPoint = screenPoint;
+        _detectionClock.Restart();
+        _detectionCandidates = ElementDetectionService.DetectHierarchy(screenPoint, _overlayHandle, _detectElements);
         if (_detectionCandidates.Count == 0)
         {
-            _detectedSelection = Rect.Empty;
-            DetectionRect.Visibility = Visibility.Collapsed;
+            ClearDetectionHighlight();
             return;
         }
 
@@ -417,24 +434,38 @@ public partial class CaptureOverlayWindow : Window
         if (_detectionCandidates.Count == 0) return;
         _detectionIndex = Math.Clamp(_detectionIndex, 0, _detectionCandidates.Count - 1);
         var detected = _detectionCandidates[_detectionIndex];
-        var virtualBounds = DisplayTopologyService.VirtualBoundsPixels();
 
         var topLeft = ScreenToOverlay(new Point(detected.Bounds.Left, detected.Bounds.Top));
         var bottomRight = ScreenToOverlay(new Point(detected.Bounds.Right, detected.Bounds.Bottom));
         _detectedSelection = Rect.Intersect(
             new Rect(0, 0, ActualWidth, ActualHeight),
             new Rect(topLeft, bottomRight));
-        if (_detectedSelection.IsEmpty)
+        if (_detectedSelection.IsEmpty || _detectedSelection.Width < 2 || _detectedSelection.Height < 2)
         {
-            DetectionRect.Visibility = Visibility.Collapsed;
+            ClearDetectionHighlight();
             return;
         }
+
+        // Dim everything except the detected region so that region looks like the
+        // normal screen (same approach as the finished selection spotlight mask).
+        RenderSpotlightMask(_detectedSelection);
         Canvas.SetLeft(DetectionRect, _detectedSelection.X);
         Canvas.SetTop(DetectionRect, _detectedSelection.Y);
         DetectionRect.Width = _detectedSelection.Width;
         DetectionRect.Height = _detectedSelection.Height;
         DetectionRect.Visibility = Visibility.Visible;
         DetectionModeText.Text = $"{L("Mode")}: {L(_detectElements ? "UI element" : "Window")}   •   {_detectionIndex + 1}/{_detectionCandidates.Count}   •   {detected.Name}";
+    }
+
+    private void ClearDetectionHighlight()
+    {
+        _detectedSelection = Rect.Empty;
+        DetectionRect.Visibility = Visibility.Collapsed;
+        if (_selection.Width < 3 && !_dragging && !_resizing && !_annotationMode && !_recordingRunning)
+        {
+            SelectionMask.Visibility = Visibility.Collapsed;
+            MaskLayer.Visibility = Visibility.Visible;
+        }
     }
 
     private void PositionActionBar()
@@ -484,16 +515,32 @@ public partial class CaptureOverlayWindow : Window
         SetHandle(HandleW, _selection.Left - radius, centerY - radius);
     }
 
-    private void RenderSelectionMask()
+    private void RenderSelectionMask() => RenderSpotlightMask(_selection);
+
+    /// <summary>
+    /// Dim the full-screen capture everywhere except <paramref name="lit"/>,
+    /// so the highlighted region appears at full captured brightness.
+    /// </summary>
+    private void RenderSpotlightMask(Rect lit)
     {
         MaskLayer.Visibility = Visibility.Collapsed;
         SelectionMask.Visibility = Visibility.Visible;
         SelectionMask.Width = Math.Max(1, ActualWidth);
         SelectionMask.Height = Math.Max(1, ActualHeight);
-        SetMask(MaskTop, 0, 0, ActualWidth, _selection.Top);
-        SetMask(MaskBottom, 0, _selection.Bottom, ActualWidth, Math.Max(0, ActualHeight - _selection.Bottom));
-        SetMask(MaskLeft, 0, _selection.Top, _selection.Left, _selection.Height);
-        SetMask(MaskRight, _selection.Right, _selection.Top, Math.Max(0, ActualWidth - _selection.Right), _selection.Height);
+        var hole = Rect.Intersect(new Rect(0, 0, ActualWidth, ActualHeight), lit);
+        if (hole.IsEmpty)
+        {
+            SetMask(MaskTop, 0, 0, ActualWidth, ActualHeight);
+            SetMask(MaskBottom, 0, 0, 0, 0);
+            SetMask(MaskLeft, 0, 0, 0, 0);
+            SetMask(MaskRight, 0, 0, 0, 0);
+            return;
+        }
+
+        SetMask(MaskTop, 0, 0, ActualWidth, hole.Top);
+        SetMask(MaskBottom, 0, hole.Bottom, ActualWidth, Math.Max(0, ActualHeight - hole.Bottom));
+        SetMask(MaskLeft, 0, hole.Top, hole.Left, hole.Height);
+        SetMask(MaskRight, hole.Right, hole.Top, Math.Max(0, ActualWidth - hole.Right), hole.Height);
     }
 
     private static void SetMask(FrameworkElement mask, double left, double top, double width, double height)
@@ -1012,16 +1059,17 @@ public partial class CaptureOverlayWindow : Window
         {
             if (_settings.ShowElementDetection == false)
             {
-                DetectionRect.Visibility = Visibility.Collapsed;
+                ClearDetectionHighlight();
                 e.Handled = true;
                 return;
             }
             _detectElements = !_detectElements;
-            if (_detectionCandidates.Count > 0)
-            {
-                _detectionIndex = _detectElements ? _detectionCandidates.Count - 1 : 0;
-                RenderDetectedCandidate();
-            }
+            // Force a fresh query so window mode stays fast and element mode re-resolves.
+            _lastDetectionScreenPoint = new Point(double.NaN, double.NaN);
+            _detectionClock.Reset();
+            _detectionClock.Start();
+            var pointer = Mouse.GetPosition(OverlayCanvas);
+            UpdateDetectedRegion(pointer);
             DetectionModeText.Text = $"{L("Mode")}: {L(_detectElements ? "UI element" : "Window")}";
             e.Handled = true;
             return;
@@ -1112,16 +1160,14 @@ public partial class CaptureOverlayWindow : Window
     private void ResetSelection()
     {
         _selection = Rect.Empty;
-        _detectedSelection = Rect.Empty;
         _detectionCandidates = [];
+        _lastDetectionScreenPoint = new Point(double.NaN, double.NaN);
         SelectionRect.Visibility = Visibility.Collapsed;
         SelectionHandles.Visibility = Visibility.Collapsed;
-        SelectionMask.Visibility = Visibility.Collapsed;
-        MaskLayer.Visibility = Visibility.Visible;
         SizeBadge.Visibility = Visibility.Collapsed;
         ColorSampleBadge.Visibility = Visibility.Collapsed;
         ActionBar.Visibility = Visibility.Collapsed;
-        DetectionRect.Visibility = Visibility.Collapsed;
+        ClearDetectionHighlight();
     }
 
     private static string L(string value) => LocalizationService.Current(value);

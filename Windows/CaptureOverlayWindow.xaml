@@ -28,7 +28,8 @@
             <Rectangle x:Name="MaskRight" Fill="#66000000"/><Rectangle x:Name="MaskBottom" Fill="#66000000"/>
         </Canvas>
         <Canvas x:Name="OverlayCanvas">
-            <Rectangle x:Name="DetectionRect" Visibility="Collapsed" Stroke="#3388FF" StrokeThickness="2" StrokeDashArray="6,3" Fill="#06000000" IsHitTestVisible="False"/>
+            <!-- Transparent fill so the dim mask can leave a bright hole; stroke only frames the target. -->
+            <Rectangle x:Name="DetectionRect" Visibility="Collapsed" Stroke="#4DA3FF" StrokeThickness="2" Fill="Transparent" IsHitTestVisible="False" Panel.ZIndex="3200" SnapsToDevicePixels="True"/>
             <Line x:Name="CrossHorizontal" Visibility="Collapsed" Stroke="#883388FF" StrokeThickness="1" StrokeDashArray="6,3"/>
             <Line x:Name="CrossVertical" Visibility="Collapsed" Stroke="#883388FF" StrokeThickness="1" StrokeDashArray="6,3"/>
             <Rectangle x:Name="SelectionRect" Visibility="Collapsed" Stroke="#3388FF" StrokeThickness="2" Fill="#05FFFFFF" IsHitTestVisible="False" Panel.ZIndex="3400"/>
