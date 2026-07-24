@@ -51,6 +51,7 @@ public partial class PreferencesWindow : Window
         ShowSizeBox.IsChecked = _settings.ShowCaptureSize;
         ShowElementDetectionBox.IsChecked = _settings.ShowElementDetection != false;
         ShowCaptureHintsBox.IsChecked = _settings.ShowCaptureHints;
+        ShowColorSamplerBox.IsChecked = _settings.ShowColorSampler;
         HdrColorCorrectionBox.IsChecked = _settings.CorrectHdrColors;
         ExcludeSnapAnchorBox.IsChecked = _settings.ExcludeSnapAnchorFromCapture;
         ExcludedAppsList.ItemsSource = _settings.CaptureExcludedProcesses.ToList();
@@ -212,6 +213,7 @@ public partial class PreferencesWindow : Window
         _settings.ShowCaptureSize = ShowSizeBox.IsChecked == true;
         _settings.ShowElementDetection = ShowElementDetectionBox.IsChecked == true;
         _settings.ShowCaptureHints = ShowCaptureHintsBox.IsChecked == true;
+        _settings.ShowColorSampler = ShowColorSamplerBox.IsChecked == true;
         _settings.CorrectHdrColors = HdrColorCorrectionBox.IsChecked == true;
         _settings.ExcludeSnapAnchorFromCapture = ExcludeSnapAnchorBox.IsChecked == true;
         _settings.CaptureExcludedProcesses = ExcludedAppsList.Items.Cast<string>()

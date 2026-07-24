@@ -12,6 +12,8 @@ internal static class AnnotationToolbarCatalog
         new("Marker", "Marker"),
         new("Blur", "Blur brush"),
         new("Text", "Text"),
+        new("Number", "Numbered marker"),
+        new("Callout", "Callout"),
         new("Eraser", "Eraser brush"),
         new("Ellipse", "Ellipse"),
         new("Line", "Straight line"),
@@ -20,12 +22,12 @@ internal static class AnnotationToolbarCatalog
 
     internal static readonly string[] DefaultOrder =
     [
-        "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser", "Ellipse", "Line", "Magnify"
+        "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Number", "Callout", "Eraser", "Ellipse", "Line", "Magnify"
     ];
 
     internal static readonly string[] DefaultEnabled =
     [
-        "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser"
+        "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Number", "Eraser"
     ];
 
     internal static List<string> NormalizeOrder(IEnumerable<string>? order)

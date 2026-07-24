@@ -869,16 +869,16 @@ internal static class Program
             primaryToolbar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             textToolButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var defaultsMatch = defaults.AnnotationToolbarOrder.SequenceEqual(
-                    new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser", "Ellipse", "Line", "Magnify" }) &&
+                    new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Number", "Callout", "Eraser", "Ellipse", "Line", "Magnify" }) &&
                 defaults.AnnotationToolbarEnabled.SequenceEqual(
-                    new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser" }) &&
+                    new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Number", "Eraser" }) &&
                 defaults.CaptureToolbarOrder.SequenceEqual(
                     new[] { "Cancel", "Pin", "Save", "Copy", "PinThumbnail", "QuickSave", "LongCapture", "Record", "OCR", "Recapture" }) &&
                 defaults.CaptureToolbarEnabled.SequenceEqual(new[] { "Cancel", "Pin", "Save", "Copy" }) &&
                 tags.SequenceEqual(defaults.AnnotationToolbarOrder) &&
                 visibleTags.SequenceEqual(defaults.AnnotationToolbarEnabled) &&
-                new[] { "Ellipse", "Line", "Magnify" }.All(tag => tags.Contains(tag)) &&
-                new[] { "Select", "Number", "Callout", "Mosaic" }.All(tag => !tags.Contains(tag));
+                new[] { "Ellipse", "Line", "Magnify", "Number", "Callout" }.All(tag => tags.Contains(tag)) &&
+                new[] { "Select", "Mosaic" }.All(tag => !tags.Contains(tag));
             editor.ApplyToolbarConfiguration(["Magnify", "Text"], ["Magnify", "Text"]);
             var customVisibleTags = panel.Children.OfType<Button>()
                 .Where(button => button.Visibility == Visibility.Visible)
@@ -986,7 +986,7 @@ internal static class Program
                 ellipseButton.Background == Brushes.Transparent;
             overlay.Close();
             return visibleTags.SequenceEqual(new[] { "Ellipse", "Line", "Magnify" }) &&
-                !allTags.Contains("Select") && !allTags.Contains("Number") && !allTags.Contains("Callout") &&
+                !allTags.Contains("Select") && allTags.Contains("Number") && allTags.Contains("Callout") &&
                 reviewHeader.Cursor == System.Windows.Input.Cursors.SizeAll && savePath is not null && hasRecordingIcons &&
                 finalizedSelectionHidesDetection && annotationStartsActive && captureToolTogglesOff;
         });

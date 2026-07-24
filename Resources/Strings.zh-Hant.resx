@@ -1474,4 +1474,12 @@
   <data name="Automatically detect rotated text" xml:space="preserve"><value>自動偵測旋轉文字</value></data>
   <data name="Retries low-confidence local OCR at 90, 180 and 270 degrees." xml:space="preserve"><value>當本機 OCR 信心度較低時，自動以 90、180 和 270 度重試。</value></data>
   <data name="Unmatched frame rolled back; retrying" xml:space="preserve"><value>未匹配的畫面已回復；正在重試</value></data>
+  <data name="Numbered marker" xml:space="preserve"><value>序號標記</value></data>
+  <data name="Show RGB colour sampler under the cursor" xml:space="preserve"><value>在游標下方顯示 RGB 取色器</value></data>
+  <data name="Displays the colour under the pointer while capturing. Off by default to keep pointer movement light." xml:space="preserve"><value>截圖時顯示指標下方的顏色。預設關閉以保持指標移動流暢。</value></data>
+  <data name="Welcome to SnapAnchor" xml:space="preserve"><value>歡迎使用 SnapAnchor</value></data>
+  <data name="Capture: {0} · Pin clipboard: {1} · Record: {2}. Right-click the tray icon for every action." xml:space="preserve"><value>截圖：{0} · 固定剪貼簿：{1} · 錄製：{2}。以滑鼠右鍵按一下工作列圖示可存取全部操作。</value></data>
+  <data name="Capture full screen" xml:space="preserve"><value>擷取全螢幕</value></data>
+  <data name="Whiteboard" xml:space="preserve"><value>白板</value></data>
+  <data name="Transparent whiteboard" xml:space="preserve"><value>透明白板</value></data>
 </root>

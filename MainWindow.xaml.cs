@@ -501,6 +501,40 @@ public partial class MainWindow : Window
         RefreshTrayMenu();
         _trayIcon.DoubleClick += (_, _) => Dispatcher.Invoke(ShowDashboard);
         _trayIcon.BalloonTipClicked += (_, _) => Dispatcher.Invoke(RunAvailableUpdate);
+        MaybeShowWelcomeTip();
+    }
+
+    private void MaybeShowWelcomeTip()
+    {
+        if (_settings.HasSeenWelcomeTip || _trayIcon is null) return;
+        _settings.HasSeenWelcomeTip = true;
+        SettingsService.Save(_settings);
+        _trayIcon.ShowBalloonTip(
+            9000,
+            L("Welcome to SnapAnchor"),
+            LocalizationService.Format(
+                "Capture: {0} · Pin clipboard: {1} · Record: {2}. Right-click the tray icon for every action.",
+                _captureHotkey.DisplayName,
+                _pasteHotkey.DisplayName,
+                _recordingHotkey.DisplayName),
+            Forms.ToolTipIcon.Info);
+    }
+
+    private void CaptureFullScreen()
+    {
+        try
+        {
+            if (IsVisible) Hide();
+            var fullScreen = CaptureService.CaptureVirtualScreen();
+            var region = new Int32Rect(0, 0, fullScreen.PixelWidth, fullScreen.PixelHeight);
+            Clipboard.SetImage(fullScreen);
+            var record = HistoryService.Add(fullScreen, region, fullScreen, "Full screen");
+            new PinnedImageWindow(fullScreen, startEditing: true, historyRecordId: record.Id).Show();
+        }
+        catch (Exception ex)
+        {
+            ShowError("Screen capture failed", ex.Message);
+        }
     }
 
     private void RefreshTrayMenu()
@@ -524,9 +558,12 @@ public partial class MainWindow : Window
         menu.Items.Add($"{L("Custom capture")} ({_customCaptureHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(OpenCustomCapture));
         menu.Items.Add($"{L("Record region")} ({_recordingHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(() => StartCapture(CaptureCompletionMode.RecordOnSelection)));
         menu.Items.Add(L("Capture active window"), null, (_, _) => Dispatcher.Invoke(CaptureActiveWindow));
+        menu.Items.Add(L("Capture full screen"), null, (_, _) => Dispatcher.Invoke(CaptureFullScreen));
         menu.Items.Add($"{L("Pin clipboard")} ({_pasteHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(PinClipboard));
         menu.Items.Add($"{L("Hide/show all pins")} ({_togglePinsHotkey.DisplayName})", null, (_, _) => Dispatcher.Invoke(PinnedImageWindow.ToggleAllVisibility));
         menu.Items.Add(L("Repeat last region"), null, (_, _) => Dispatcher.Invoke(RepeatLastRegion));
+        menu.Items.Add(L("Whiteboard"), null, (_, _) => Dispatcher.Invoke(() => OpenWhiteboard(false)));
+        menu.Items.Add(L("Transparent whiteboard"), null, (_, _) => Dispatcher.Invoke(() => OpenWhiteboard(true)));
         var disableItem = new Forms.ToolStripMenuItem(L("Disable hotkeys")) { Checked = !_hotkeysEnabled, CheckOnClick = true };
         disableItem.Click += (_, _) => Dispatcher.Invoke(() =>
         {

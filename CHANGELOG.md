@@ -1,5 +1,54 @@
 # Changelog
 
+## [2.1.13] - 2026-07-24
+
+- Exposed **Numbered marker** and **Callout** annotation tools in the capture and pin toolbars (already implemented; previously missing from the toolbar catalog)
+- Numbered markers are enabled by default for new installs and pure-default profiles; Callout remains available from Toolbar Preferences
+- Added optional **RGB colour sampler** under the capture cursor (Preferences → Capture, off by default)
+- First-run tray tip now lists capture, pin, and record shortcuts
+- Tray menu gains **Capture full screen**, **Whiteboard**, and **Transparent whiteboard**
+- Backfilled changelog entries for 2.1.7–2.1.12; refreshed product notes for the SnapAnchor name
+- Added a GitHub Actions CI workflow that restores, builds, and runs the smoke suite on Windows
+
+## [2.1.12] - 2026-07-23
+
+- Restored automatic window and UI-element detection outlines after an older migration incorrectly linked them to the capture-dimensions option
+- Keeps detection and dimensions as independent preferences
+- Keeps pinned-image OCR text selection disabled by default
+- Saves the pinned-image **Text selectable (OCR)** right-click toggle as the default for future pins and restarts
+
+## [2.1.11] - 2026-07-23
+
+- Click any previously drawn annotation to select and adjust it while the drawing tool stays active
+- Click empty image space to continue drawing new objects; drag a selected object to move it
+- Arrow endpoints use directional resize cursors; brush previews hide while hovering a selectable annotation
+
+## [2.1.10] - 2026-07-23
+
+- Paint-style arrow adjustment: drag the start handle (tail), end handle (length/direction), or center handle (move)
+- Arrowheads stay aligned while editing; regression coverage for all three controls
+
+## [2.1.9] - 2026-07-23
+
+- Pinned screenshots keep the original bitmap and sample it directly at every display size
+- Mouse-wheel zoom uses exact 10% steps with integer physical-pixel window sizes across mixed-DPI monitors
+- Native 100% pins stay pixel exact; resized scales use crisp linear sampling
+- Zooms around the pointer when it is over the pin
+
+## [2.1.8] - 2026-07-23
+
+- Clearer pinned screenshot text while zooming; native-size pins remain pixel exact
+- Resized pins use high-quality resampling; repeated zoom no longer enlarges a cached intermediate frame
+
+## [2.1.7] - 2026-07-23
+
+- Mouse-wheel pin resizing remains available while the pin toolbar is open; `Ctrl` + wheel still adjusts opacity
+- Long scrolling capture uses feature-weighted overlap matching, animation settling, sticky-header tolerance, rollback, and smaller-step retries
+- HDR displays receive conservative colour correction only when Windows reports HDR as active
+- Window and UI-element detection caches Automation geometry for smoother pointer movement
+- Local OCR keeps language engines warm, preprocesses low-confidence images, upscales small text, and detects text rotated by 90/180/270 degrees
+- Preferences include switches for HDR colour correction and rotated-text detection
+
 ## [2.1.6] - 2026-07-22
 
 - Adopted a physical-pixel monitor topology throughout capture, pin placement, recording, OCR, and long scrolling capture

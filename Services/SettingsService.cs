@@ -29,6 +29,8 @@ public sealed class AppSettings
     public bool ShowCaptureSize { get; set; } = true;
     public bool? ShowElementDetection { get; set; } = true;
     public bool ShowCaptureHints { get; set; } = true;
+    public bool ShowColorSampler { get; set; }
+    public bool HasSeenWelcomeTip { get; set; }
     public bool ExcludeSnapAnchorFromCapture { get; set; } = true;
     public List<string> CaptureExcludedProcesses { get; set; } = [];
     public List<string> HotkeyExcludedProcesses { get; set; } = [];
@@ -215,12 +217,22 @@ internal static class SettingsService
         settings.PinGroupDesktopBindings ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         settings.CaptureExcludedProcesses ??= [];
         settings.HotkeyExcludedProcesses ??= [];
-        var previousAnnotationOrder = new[] { "Rectangle", "Ellipse", "Arrow", "Line", "Pencil", "Marker", "Blur", "Text", "Eraser", "Magnify" };
         var previousAnnotationEnabled = settings.AnnotationToolbarEnabled ?? [];
         var previousAnnotationSet = previousAnnotationEnabled.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var migrateAnnotationDefault = (settings.AnnotationToolbarOrder ?? []).SequenceEqual(previousAnnotationOrder, StringComparer.OrdinalIgnoreCase) &&
-            ((previousAnnotationEnabled.Count == previousAnnotationOrder.Length && previousAnnotationSet.SetEquals(previousAnnotationOrder)) ||
-             previousAnnotationSet.SetEquals(AnnotationToolbarCatalog.DefaultEnabled));
+        var historicalAnnotationOrders = new[]
+        {
+            new[] { "Rectangle", "Ellipse", "Arrow", "Line", "Pencil", "Marker", "Blur", "Text", "Eraser", "Magnify" },
+            new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser", "Ellipse", "Line", "Magnify" }
+        };
+        var historicalAnnotationEnabled = new[]
+        {
+            new[] { "Rectangle", "Ellipse", "Arrow", "Line", "Pencil", "Marker", "Blur", "Text", "Eraser", "Magnify" },
+            new[] { "Rectangle", "Arrow", "Pencil", "Marker", "Blur", "Text", "Eraser" }
+        };
+        var currentOrder = settings.AnnotationToolbarOrder ?? [];
+        var migrateAnnotationDefault =
+            historicalAnnotationOrders.Any(order => currentOrder.SequenceEqual(order, StringComparer.OrdinalIgnoreCase)) &&
+            historicalAnnotationEnabled.Any(enabled => previousAnnotationSet.SetEquals(enabled));
         settings.AnnotationToolbarOrder = migrateAnnotationDefault
             ? AnnotationToolbarCatalog.DefaultOrder.ToList()
             : AnnotationToolbarCatalog.NormalizeOrder(settings.AnnotationToolbarOrder);

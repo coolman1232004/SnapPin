@@ -48,6 +48,12 @@
             <Border x:Name="SizeBadge" Visibility="Collapsed" Background="#E8212530" CornerRadius="14" Padding="10,5">
                 <TextBlock x:Name="SizeText" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
             </Border>
+            <Border x:Name="ColorSampleBadge" Visibility="Collapsed" Background="#E8212530" CornerRadius="14" Padding="8,5" IsHitTestVisible="False" Panel.ZIndex="3600">
+                <StackPanel Orientation="Horizontal">
+                    <Border x:Name="ColorSampleSwatch" Width="14" Height="14" CornerRadius="3" BorderBrush="White" BorderThickness="1" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="ColorSampleText" Foreground="White" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
             <Border x:Name="OcrAreaHint" Visibility="Collapsed" Background="#E8212530" CornerRadius="14" Padding="12,6" Panel.ZIndex="2600" IsHitTestVisible="False">
                 <TextBlock Text="Drag the smaller area to recognize" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
             </Border>
@@ -69,6 +75,8 @@
                         <Button Style="{StaticResource CaptureActionButton}" Tag="Marker" ToolTip="Marker" Click="QuickAnnotation_Click"><Path Style="{StaticResource ToolbarIconPathStyle}" Data="{StaticResource ToolbarMarkerIcon}"/></Button>
                         <Button Style="{StaticResource CaptureActionButton}" Tag="Blur" ToolTip="Blur brush" Click="QuickAnnotation_Click"><Path Style="{StaticResource ToolbarIconPathStyle}" Data="{StaticResource ToolbarBlurIcon}"/></Button>
                         <Button Style="{StaticResource CaptureActionButton}" Tag="Text" ToolTip="Text" Click="QuickAnnotation_Click"><Path Style="{StaticResource ToolbarIconPathStyle}" Data="{StaticResource ToolbarTextIcon}"/></Button>
+                        <Button Style="{StaticResource CaptureActionButton}" Tag="Number" ToolTip="Numbered marker" Click="QuickAnnotation_Click"><Path Style="{StaticResource ToolbarIconPathStyle}" Data="{StaticResource ToolbarNumberIcon}"/></Button>
+                        <Button Style="{StaticResource CaptureActionButton}" Tag="Callout" ToolTip="Callout" Click="QuickAnnotation_Click"><Path Style="{StaticResource ToolbarIconPathStyle}" Data="{StaticResource ToolbarCalloutIcon}"/></Button>
                         <Button Style="{StaticResource CaptureActionButton}" Tag="Eraser" ToolTip="Eraser" Click="QuickAnnotation_Click"><Path Style="{StaticResource ToolbarIconPathStyle}" Data="{StaticResource ToolbarEraserIcon}"/></Button>
                         <Button Style="{StaticResource CaptureActionButton}" Tag="Magnify" ToolTip="Magnifier" Click="QuickAnnotation_Click"><Path Style="{StaticResource ToolbarIconPathStyle}" Data="{StaticResource ToolbarMagnifyIcon}"/></Button>
                     </WrapPanel>

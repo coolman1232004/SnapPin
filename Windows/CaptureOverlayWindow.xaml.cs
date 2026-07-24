@@ -215,6 +215,7 @@ public partial class CaptureOverlayWindow : Window
             CrossVertical.Y2 = ActualHeight;
             CrossVertical.X1 = CrossVertical.X2 = point.X;
         }
+        UpdateColorSampler(point);
         if (_resizing)
             UpdateResize(point);
         else if (_dragging)
@@ -227,6 +228,38 @@ public partial class CaptureOverlayWindow : Window
         else if (_selection.Width >= 3 || _settings.ShowElementDetection == false)
         {
             DetectionRect.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void UpdateColorSampler(Point overlayPoint)
+    {
+        if (!_settings.ShowColorSampler || _annotationMode || _recordingRunning || _ocrAreaSelectionMode)
+        {
+            ColorSampleBadge.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var pixelX = Math.Clamp((int)Math.Floor(overlayPoint.X * _screen.PixelWidth / Math.Max(1.0, ActualWidth)), 0, _screen.PixelWidth - 1);
+        var pixelY = Math.Clamp((int)Math.Floor(overlayPoint.Y * _screen.PixelHeight / Math.Max(1.0, ActualHeight)), 0, _screen.PixelHeight - 1);
+        try
+        {
+            var cropped = new CroppedBitmap(_screen, new Int32Rect(pixelX, pixelY, 1, 1));
+            var pixels = new byte[4];
+            cropped.CopyPixels(pixels, 4, 0);
+            // BGRA from the frozen capture surface.
+            var color = Color.FromArgb(pixels[3], pixels[2], pixels[1], pixels[0]);
+            ColorSampleSwatch.Background = new SolidColorBrush(color);
+            ColorSampleText.Text = $"#{color.R:X2}{color.G:X2}{color.B:X2}  RGB({color.R}, {color.G}, {color.B})";
+            ColorSampleBadge.Visibility = Visibility.Visible;
+            ColorSampleBadge.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var left = Math.Clamp(overlayPoint.X + 18, 8, Math.Max(8, ActualWidth - ColorSampleBadge.DesiredSize.Width - 8));
+            var top = Math.Clamp(overlayPoint.Y + 18, 8, Math.Max(8, ActualHeight - ColorSampleBadge.DesiredSize.Height - 8));
+            Canvas.SetLeft(ColorSampleBadge, left);
+            Canvas.SetTop(ColorSampleBadge, top);
+        }
+        catch
+        {
+            ColorSampleBadge.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -691,14 +724,26 @@ public partial class CaptureOverlayWindow : Window
         CaptureInlineEditor.Visibility = Visibility.Visible;
         Canvas.SetLeft(CaptureInlineEditor, 0);
         Canvas.SetTop(CaptureInlineEditor, 0);
+        // Keep the hidden inline editor's tool set identical to the capture
+        // annotation toolbar so ActivateConfiguredTool can enable tools that
+        // are visible on the action bar even when they are off in Preferences.
+        var captureToolOrder = CaptureAnnotationToolPanel.Children.OfType<Button>()
+            .Select(button => button.Tag as string)
+            .Where(tag => !string.IsNullOrWhiteSpace(tag))
+            .Cast<string>()
+            .ToList();
+        var captureToolEnabled = CaptureAnnotationToolPanel.Children.OfType<Button>()
+            .Where(button => button.Visibility == Visibility.Visible && button.Tag is string)
+            .Select(button => (string)button.Tag)
+            .ToList();
+        CaptureInlineEditor.ApplyToolbarConfiguration(captureToolOrder, captureToolEnabled);
         CaptureInlineEditor.LoadImage(SelectedImage());
         CaptureInlineEditor.ConfigureCaptureOverlay(_selection, new Size(ActualWidth, ActualHeight), _selection,
             showActions: false, toolbarLeft: actionBounds.Left, toolbarTop: actionBounds.Bottom + 2,
             showPrimaryToolbar: false, allowToolToggleOff: true);
         UpdateCaptureAnnotationHistoryButtons();
         RenderSelection();
-        initialTool ??= CaptureAnnotationToolPanel.Children.OfType<Button>()
-            .FirstOrDefault(button => button.Visibility == Visibility.Visible && button.Tag is string)?.Tag as string;
+        initialTool ??= captureToolEnabled.FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(initialTool))
         {
             CaptureInlineEditor.ActivateConfiguredTool(initialTool);
@@ -1053,6 +1098,7 @@ public partial class CaptureOverlayWindow : Window
         SelectionMask.Visibility = Visibility.Collapsed;
         MaskLayer.Visibility = Visibility.Visible;
         SizeBadge.Visibility = Visibility.Collapsed;
+        ColorSampleBadge.Visibility = Visibility.Collapsed;
         ActionBar.Visibility = Visibility.Collapsed;
         DetectionRect.Visibility = Visibility.Collapsed;
     }
