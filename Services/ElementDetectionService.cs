@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Text;
 using System.Windows;
 using System.Windows.Automation;
@@ -8,89 +7,62 @@ namespace SnapAnchor.Services;
 internal sealed record DetectedScreenRegion(Rect Bounds, string Name, bool IsElement);
 
 /// <summary>
-/// Resolves the window and UI Automation element under the pointer for capture
-/// hover outlines. Public Windows APIs only (WindowFromPoint, UI Automation).
-/// Behaviour is inspired by common screenshot tools; implementation is independent.
+/// Window / UI-element hover detection for capture.
+/// Snow Shot–style architecture (independent implementation):
+/// 1) Build a geometry cache of top-level windows + UI Automation elements
+///    when capture starts (before / while the overlay is shown).
+/// 2) On mouse move, only do geometric hit-tests against that cache.
+/// Live AutomationElement.FromPoint / WindowFromPoint cannot see through our
+/// full-screen overlay, so they must not be used for hover detection.
 /// </summary>
 internal static class ElementDetectionService
 {
-    private static readonly ConcurrentDictionary<IntPtr, string> WindowTitles = new();
-    private static readonly object PointCacheSync = new();
-    private static PointCacheEntry? _pointCache;
+    private sealed record CachedRegion(
+        Rect Bounds,
+        string Name,
+        bool IsElement,
+        int ZOrder,
+        int Depth,
+        IntPtr Window);
 
-    private sealed record PointCacheEntry(
-        int BucketX,
-        int BucketY,
-        bool IncludeElements,
-        IntPtr Window,
-        IReadOnlyList<DetectedScreenRegion> Regions,
-        long TickMs);
+    private static readonly object Sync = new();
+    private static IReadOnlyList<CachedRegion> _cache = Array.Empty<CachedRegion>();
+    private static long _cacheTick;
+    private static IntPtr _excludedHwnd;
+    private static readonly TimeSpan CacheLifetime = TimeSpan.FromSeconds(8);
 
     public static DetectedScreenRegion? Detect(Point screenPoint, IntPtr excludedWindow)
         => DetectHierarchy(screenPoint, excludedWindow, includeElements: true).LastOrDefault();
 
     public static IntPtr WindowHandleAt(Point screenPoint, IntPtr excludedWindow)
-        => FindWindow(screenPoint, excludedWindow);
+    {
+        EnsureCache(excludedWindow, force: false);
+        var hit = HitTest(screenPoint, includeElements: false).FirstOrDefault();
+        return hit?.Window ?? IntPtr.Zero;
+    }
+
+    /// <summary>
+    /// Build / refresh the geometry cache. Call when the capture overlay opens.
+    /// </summary>
+    public static void RebuildCache(IntPtr excludedOverlayHwnd)
+    {
+        lock (Sync)
+        {
+            _excludedHwnd = excludedOverlayHwnd;
+            _cache = BuildCache(excludedOverlayHwnd);
+            _cacheTick = Environment.TickCount64;
+        }
+    }
 
     public static IReadOnlyList<DetectedScreenRegion> DetectHierarchy(
         Point screenPoint,
         IntPtr excludedWindow,
         bool includeElements = true)
     {
-        // Spatial cache: ignore sub-pixel jitter and re-use recent results so
-        // hover stays fluid while the pointer rests on one control.
-        var bucketX = (int)Math.Floor(screenPoint.X / 3);
-        var bucketY = (int)Math.Floor(screenPoint.Y / 3);
-        var now = Environment.TickCount64;
-        lock (PointCacheSync)
-        {
-            if (_pointCache is { } cached &&
-                cached.BucketX == bucketX &&
-                cached.BucketY == bucketY &&
-                cached.IncludeElements == includeElements &&
-                now - cached.TickMs < 80)
-            {
-                return cached.Regions;
-            }
-        }
-
-        var window = FindWindow(screenPoint, excludedWindow);
-        if (window == IntPtr.Zero) return [];
-        var windowRect = Rectangle(window);
-        if (windowRect.IsEmpty) return [];
-
-        var regions = new List<DetectedScreenRegion>(8)
-        {
-            new(windowRect, WindowLabel(window), false)
-        };
-
-        if (includeElements)
-        {
-            try
-            {
-                if (TryElementChainFromPoint(screenPoint, windowRect, out var livePath))
-                {
-                    foreach (var element in livePath)
-                    {
-                        if (!element.Bounds.Contains(screenPoint) ||
-                            regions.Any(region => NearlyEqual(region.Bounds, element.Bounds)))
-                            continue;
-                        regions.Add(new DetectedScreenRegion(element.Bounds, element.Name, true));
-                    }
-                }
-            }
-            catch
-            {
-                // Elevated or custom-rendered windows may not expose UI Automation.
-            }
-        }
-
-        IReadOnlyList<DetectedScreenRegion> result = regions;
-        lock (PointCacheSync)
-        {
-            _pointCache = new PointCacheEntry(bucketX, bucketY, includeElements, window, result, now);
-        }
-        return result;
+        EnsureCache(excludedWindow, force: false);
+        return HitTest(screenPoint, includeElements)
+            .Select(region => new DetectedScreenRegion(region.Bounds, region.Name, region.IsElement))
+            .ToList();
     }
 
     public static DetectedScreenRegion? TopExternalWindow()
@@ -98,170 +70,232 @@ internal static class ElementDetectionService
         IntPtr found = IntPtr.Zero;
         NativeMethods.EnumWindows((hwnd, _) =>
         {
-            if (!IsEligible(hwnd, IntPtr.Zero)) return true;
+            if (!IsEligibleWindow(hwnd, IntPtr.Zero)) return true;
             found = hwnd;
             return false;
         }, IntPtr.Zero);
         if (found == IntPtr.Zero) return null;
-        var rect = Rectangle(found);
-        return rect.IsEmpty ? null : new DetectedScreenRegion(rect, WindowLabel(found), false);
+        var rect = WindowRect(found);
+        return rect.IsEmpty ? null : new DetectedScreenRegion(rect, WindowTitle(found), false);
     }
 
-    private static bool TryElementChainFromPoint(Point screenPoint, Rect windowBounds, out List<(Rect Bounds, string Name)> path)
+    private static void EnsureCache(IntPtr excludedWindow, bool force)
     {
-        path = [];
-        try
+        lock (Sync)
         {
-            // FromPoint is much faster than walking the whole window tree.
-            var element = AutomationElement.FromPoint(screenPoint);
-            if (element is null) return false;
-
-            var chain = new List<(Rect Bounds, string Name)>(8);
-            var current = element;
-            for (var depth = 0; current is not null && depth < 10; depth++)
-            {
-                Rect bounds;
-                string name;
-                ControlType? controlType;
-                try
-                {
-                    var currentInfo = current.Current;
-                    bounds = currentInfo.BoundingRectangle;
-                    name = currentInfo.Name;
-                    controlType = currentInfo.ControlType;
-                }
-                catch
-                {
-                    break;
-                }
-
-                if (controlType == ControlType.Window && chain.Count > 0)
-                    break;
-
-                if (!bounds.IsEmpty && bounds.Width >= 2 && bounds.Height >= 2 &&
-                    bounds.IntersectsWith(windowBounds) &&
-                    bounds.Width <= windowBounds.Width + 8 &&
-                    bounds.Height <= windowBounds.Height + 8)
-                {
-                    var label = string.IsNullOrWhiteSpace(name)
-                        ? ControlLabel(controlType)
-                        : name.Trim();
-                    if (label.Length > 48) label = label[..45] + "...";
-                    chain.Add((bounds, label));
-                }
-
-                try { current = TreeWalker.ControlViewWalker.GetParent(current); }
-                catch { break; }
-            }
-
-            // Root → leaf (window already added separately).
-            chain.Reverse();
-            path = chain
-                .Where(item => !NearlyEqual(item.Bounds, windowBounds))
-                .GroupBy(item =>
-                    ((int)item.Bounds.X, (int)item.Bounds.Y, (int)item.Bounds.Width, (int)item.Bounds.Height))
-                .Select(group => group.First())
-                .ToList();
-            return path.Count > 0;
-        }
-        catch
-        {
-            path = [];
-            return false;
+            var age = Environment.TickCount64 - _cacheTick;
+            if (!force && _cache.Count > 0 && age >= 0 && age < CacheLifetime.TotalMilliseconds &&
+                _excludedHwnd == excludedWindow)
+                return;
+            _excludedHwnd = excludedWindow;
+            _cache = BuildCache(excludedWindow);
+            _cacheTick = Environment.TickCount64;
         }
     }
 
-    private static string ControlLabel(ControlType? controlType)
+    private static List<CachedRegion> BuildCache(IntPtr excludedOverlayHwnd)
     {
-        if (controlType is null) return "UI element";
-        var name = controlType.ProgrammaticName;
-        if (string.IsNullOrWhiteSpace(name)) return "UI element";
-        return name.Replace("ControlType.", string.Empty, StringComparison.Ordinal);
-    }
+        var regions = new List<CachedRegion>(512);
+        var zOrder = 0;
 
-    private static string WindowLabel(IntPtr hwnd)
-    {
-        if (WindowTitles.TryGetValue(hwnd, out var cached) && cached.Length > 0)
-            return cached;
-
-        try
-        {
-            var length = NativeMethods.GetWindowTextLength(hwnd);
-            if (length > 0)
-            {
-                var buffer = new StringBuilder(Math.Min(length + 1, 128));
-                if (NativeMethods.GetWindowText(hwnd, buffer, buffer.Capacity) > 0 &&
-                    !string.IsNullOrWhiteSpace(buffer.ToString()))
-                {
-                    var title = buffer.ToString().Trim();
-                    if (title.Length > 48) title = title[..45] + "...";
-                    WindowTitles[hwnd] = title;
-                    return title;
-                }
-            }
-        }
-        catch { }
-
-        WindowTitles[hwnd] = "Window";
-        return "Window";
-    }
-
-    private static IntPtr FindWindow(Point point, IntPtr excludedWindow)
-    {
-        var native = new NativeMethods.NativePoint
-        {
-            X = (int)Math.Round(point.X),
-            Y = (int)Math.Round(point.Y)
-        };
-        var hit = NativeMethods.WindowFromPoint(native);
-        if (hit != IntPtr.Zero)
-        {
-            var root = NativeMethods.GetAncestor(hit, NativeMethods.GaRoot);
-            if (root == IntPtr.Zero) root = hit;
-            if (IsEligible(root, excludedWindow) && Rectangle(root).Contains(point))
-                return root;
-
-            // Sometimes WindowFromPoint returns a child of an owned top-level
-            // window that is not the GA_ROOT we want; climb owner/parent once.
-            var parent = NativeMethods.GetAncestor(hit, 1 /* GA_PARENT */);
-            if (parent != IntPtr.Zero && parent != hit)
-            {
-                var top = NativeMethods.GetAncestor(parent, NativeMethods.GaRoot);
-                if (top == IntPtr.Zero) top = parent;
-                if (IsEligible(top, excludedWindow) && Rectangle(top).Contains(point))
-                    return top;
-            }
-        }
-
-        IntPtr found = IntPtr.Zero;
         NativeMethods.EnumWindows((hwnd, _) =>
         {
-            if (!IsEligible(hwnd, excludedWindow)) return true;
-            if (!Rectangle(hwnd).Contains(point)) return true;
-            found = hwnd;
-            return false;
+            if (!IsEligibleWindow(hwnd, excludedOverlayHwnd)) return true;
+            var rect = WindowRect(hwnd);
+            if (rect.IsEmpty || rect.Width < 8 || rect.Height < 8) return true;
+
+            var title = WindowTitle(hwnd);
+            regions.Add(new CachedRegion(rect, title, IsElement: false, ZOrder: zOrder, Depth: 0, Window: hwnd));
+
+            // Collect UI elements under this top-level window once. Hover later
+            // only does geometry tests — never live FromPoint through the overlay.
+            try
+            {
+                var root = AutomationElement.FromHandle(hwnd);
+                CollectElements(root, rect, hwnd, zOrder, depth: 1, regions, remaining: 400);
+            }
+            catch
+            {
+                // Some elevated or custom surfaces expose no UI Automation tree.
+            }
+
+            zOrder++;
+            return true;
         }, IntPtr.Zero);
-        return found;
+
+        return regions;
     }
 
-    private static bool IsEligible(IntPtr hwnd, IntPtr excludedWindow)
+    private static void CollectElements(
+        AutomationElement parent,
+        Rect windowBounds,
+        IntPtr window,
+        int zOrder,
+        int depth,
+        List<CachedRegion> destination,
+        int remaining)
     {
-        if (hwnd == IntPtr.Zero || hwnd == excludedWindow || !NativeMethods.IsWindowVisible(hwnd) || NativeMethods.IsIconic(hwnd))
-            return false;
+        if (depth > 10 || remaining <= 0) return;
+        AutomationElement? child;
+        try { child = TreeWalker.ControlViewWalker.GetFirstChild(parent); }
+        catch { return; }
+
+        var budget = remaining;
+        while (child is not null && budget > 0)
+        {
+            AutomationElement? next = null;
+            try { next = TreeWalker.ControlViewWalker.GetNextSibling(child); } catch { }
+
+            try
+            {
+                var current = child.Current;
+                if (!current.IsOffscreen)
+                {
+                    var bounds = current.BoundingRectangle;
+                    if (!bounds.IsEmpty && bounds.Width >= 4 && bounds.Height >= 4 &&
+                        bounds.IntersectsWith(windowBounds))
+                    {
+                        // Clip to the owner window so hover outlines never spill
+                        // across monitors incorrectly.
+                        var clipped = Rect.Intersect(bounds, windowBounds);
+                        if (!clipped.IsEmpty && clipped.Width >= 3 && clipped.Height >= 3)
+                        {
+                            var name = current.Name;
+                            if (string.IsNullOrWhiteSpace(name))
+                                name = ShortControlType(current.ControlType);
+                            if (name.Length > 48) name = name[..45] + "...";
+
+                            // Skip near-duplicates of the whole window chrome.
+                            if (!NearlyEqual(clipped, windowBounds))
+                            {
+                                destination.Add(new CachedRegion(
+                                    clipped, name, IsElement: true, zOrder, depth, window));
+                                budget--;
+                            }
+
+                            CollectElements(child, windowBounds, window, zOrder, depth + 1, destination, budget);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Provider may disappear mid-walk.
+            }
+
+            child = next;
+        }
+    }
+
+    private static IReadOnlyList<CachedRegion> HitTest(Point screenPoint, bool includeElements)
+    {
+        IReadOnlyList<CachedRegion> snapshot;
+        lock (Sync) snapshot = _cache;
+        if (snapshot.Count == 0) return Array.Empty<CachedRegion>();
+
+        // Top-most top-level window under the pointer (lowest ZOrder among windows).
+        CachedRegion? topWindow = null;
+        foreach (var region in snapshot)
+        {
+            if (region.IsElement) continue;
+            if (!region.Bounds.Contains(screenPoint)) continue;
+            if (topWindow is null || region.ZOrder < topWindow.ZOrder)
+                topWindow = region;
+        }
+
+        if (topWindow is null) return Array.Empty<CachedRegion>();
+
+        var hits = new List<CachedRegion> { topWindow };
+        if (!includeElements) return hits;
+
+        foreach (var region in snapshot)
+        {
+            if (!region.IsElement || region.Window != topWindow.Window) continue;
+            if (!region.Bounds.Contains(screenPoint)) continue;
+            if (hits.Any(existing => NearlyEqual(existing.Bounds, region.Bounds))) continue;
+            hits.Add(region);
+        }
+
+        // Window first, then larger containers, then the deepest / smallest control.
+        // Default hover index uses the last entry (deepest).
+        hits.Sort((left, right) =>
+        {
+            if (left.IsElement != right.IsElement)
+                return left.IsElement ? 1 : -1;
+            var areaCompare = (right.Bounds.Width * right.Bounds.Height)
+                .CompareTo(left.Bounds.Width * left.Bounds.Height);
+            if (areaCompare != 0) return areaCompare;
+            return left.Depth.CompareTo(right.Depth);
+        });
+
+        return hits;
+    }
+
+    private static bool IsEligibleWindow(IntPtr hwnd, IntPtr excludedOverlayHwnd)
+    {
+        if (hwnd == IntPtr.Zero || hwnd == excludedOverlayHwnd) return false;
+        if (!NativeMethods.IsWindowVisible(hwnd) || NativeMethods.IsIconic(hwnd)) return false;
         NativeMethods.GetWindowThreadProcessId(hwnd, out var processId);
         if (processId == Environment.ProcessId) return false;
-        if (!NativeMethods.GetWindowRect(hwnd, out var rect) || rect.Width < 8 || rect.Height < 8) return false;
+        if (!NativeMethods.GetWindowRect(hwnd, out var rect) || rect.Width < 8 || rect.Height < 8)
+            return false;
+
         var className = new StringBuilder(96);
         NativeMethods.GetClassName(hwnd, className, className.Capacity);
-        return className.ToString() is not ("Shell_TrayWnd" or "Progman" or "WorkerW" or "Shell_SecondaryTrayWnd");
+        var name = className.ToString();
+        if (name is "Shell_TrayWnd" or "Shell_SecondaryTrayWnd" or "Progman" or "WorkerW" or
+            "Windows.UI.Core.CoreWindow") // UWP shell host noise
+            return false;
+
+        // Cloaked / invisible shell windows (Win10+).
+        if (IsCloaked(hwnd)) return false;
+        return true;
     }
 
-    private static Rect Rectangle(IntPtr hwnd) =>
+    private static bool IsCloaked(IntPtr hwnd)
+    {
+        try
+        {
+            // DWMWA_CLOAKED = 14
+            if (NativeMethods.DwmGetWindowAttribute(hwnd, 14, out var cloaked, sizeof(int)) == 0)
+                return cloaked != 0;
+        }
+        catch { }
+        return false;
+    }
+
+    private static Rect WindowRect(IntPtr hwnd) =>
         NativeMethods.GetWindowRect(hwnd, out var rect)
             ? new Rect(rect.Left, rect.Top, Math.Max(0, rect.Width), Math.Max(0, rect.Height))
             : Rect.Empty;
 
+    private static string WindowTitle(IntPtr hwnd)
+    {
+        try
+        {
+            var length = NativeMethods.GetWindowTextLength(hwnd);
+            if (length <= 0) return "Window";
+            var buffer = new StringBuilder(Math.Min(length + 1, 128));
+            if (NativeMethods.GetWindowText(hwnd, buffer, buffer.Capacity) > 0 &&
+                !string.IsNullOrWhiteSpace(buffer.ToString()))
+            {
+                var title = buffer.ToString().Trim();
+                return title.Length > 48 ? title[..45] + "..." : title;
+            }
+        }
+        catch { }
+        return "Window";
+    }
+
+    private static string ShortControlType(ControlType? type)
+    {
+        if (type is null) return "UI element";
+        var name = type.ProgrammaticName;
+        if (string.IsNullOrWhiteSpace(name)) return "UI element";
+        return name.Replace("ControlType.", string.Empty, StringComparison.Ordinal);
+    }
+
     private static bool NearlyEqual(Rect first, Rect second) =>
-        Math.Abs(first.X - second.X) < 1 && Math.Abs(first.Y - second.Y) < 1 &&
-        Math.Abs(first.Width - second.Width) < 1 && Math.Abs(first.Height - second.Height) < 1;
+        Math.Abs(first.X - second.X) < 2 && Math.Abs(first.Y - second.Y) < 2 &&
+        Math.Abs(first.Width - second.Width) < 2 && Math.Abs(first.Height - second.Height) < 2;
 }

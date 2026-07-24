@@ -1,6 +1,6 @@
 param(
     [string]$DistDirectory = 'dist',
-    [string]$Version = '2.1.16',
+    [string]$Version = '2.1.17',
     [string]$CertificateThumbprint = $env:SNAPANCHOR_CERT_THUMBPRINT
 )
 
@@ -107,7 +107,7 @@ $manifest = [ordered]@{
     signed = -not [string]::IsNullOrWhiteSpace($CertificateThumbprint)
     downloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Setup-win-x64.exe'
     portableDownloadUrl = 'https://github.com/coolman1232004/SnapAnchor/releases/latest/download/SnapAnchor-Portable-win-x64.zip'
-    releaseNotes = 'SnapAnchor 2.1.16 adds a pixel-perfect colour magnifier (C to copy, Shift for RGB/HEX), with a standalone colour-picker hotkey and Preferences toggle. Includes 2.1.15 spotlight detection.'
+    releaseNotes = 'SnapAnchor 2.1.17 fixes window/UI-element hover detection with a Snow Shot-style geometry cache (no live FromPoint through the overlay). Spotlight dim/light and the colour magnifier remain.'
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dist 'release.json') -Encoding UTF8
 

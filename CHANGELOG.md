@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.17] - 2026-07-24
+
+- Fixed window/UI-element detection: hover no longer uses live `FromPoint` (which only hit SnapAnchor's own full-screen overlay)
+- Adopts a Snow Shot–style **geometry cache** built when capture starts (top-level windows + UI Automation tree), then pure hit-testing under the cursor
+- Detection uses the physical cursor position against cached `GetWindowRect` / Automation bounds for mixed-DPI reliability
+- Spotlight highlight and Tab/wheel level cycling continue to work on the rebuilt hierarchy
+
 ## [2.1.16] - 2026-07-24
 
 - Added a **Snipaste-style colour picker / magnifier** during capture: red-bordered pixel lens, crosshair, coordinates, RGB/HEX value, and copy hints

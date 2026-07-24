@@ -126,6 +126,13 @@ public partial class CaptureOverlayWindow : Window
             _overlayHandle = new WindowInteropHelper(this).Handle;
             NativeMethods.SetWindowDisplayAffinity(_overlayHandle, NativeMethods.WdaExcludeFromCapture);
             _initialized = true;
+            // Pre-build window/UI geometry before hover (Snow Shot–style cache).
+            // Live FromPoint cannot see through this full-screen overlay.
+            if (_settings.ShowElementDetection != false && !_colorPickerMode)
+            {
+                try { ElementDetectionService.RebuildCache(_overlayHandle); }
+                catch { /* detection remains best-effort */ }
+            }
             PositionFloatingPanels();
             Focus();
             if (_completionMode == CaptureCompletionMode.FullScreenDraw)
@@ -138,6 +145,8 @@ public partial class CaptureOverlayWindow : Window
                     ClearDetectionHighlight();
                     UpdateColorMagnifier(Mouse.GetPosition(OverlayCanvas));
                 });
+            else if (_settings.ShowElementDetection != false)
+                Dispatcher.BeginInvoke(() => UpdateDetectedRegion(Mouse.GetPosition(OverlayCanvas)));
         };
         Closed += (_, _) =>
         {
@@ -419,26 +428,29 @@ public partial class CaptureOverlayWindow : Window
 
     private void UpdateDetectedRegion(Point overlayPoint)
     {
+        if (_settings.ShowElementDetection == false || _colorPickerMode || _annotationMode || _recordingRunning)
+        {
+            ClearDetectionHighlight();
+            return;
+        }
+
         if (_overlayHandle == IntPtr.Zero)
         {
             _overlayHandle = new WindowInteropHelper(this).Handle;
             if (_overlayHandle == IntPtr.Zero) return;
         }
 
-        var screenPoint = OverlayToScreen(overlayPoint);
-        // Skip expensive re-query while the pointer barely moved, but still
-        // keep the bright hole under the cursor when it stays inside the target.
-        var movedLittle = !double.IsNaN(_lastDetectionScreenPoint.X) &&
-            Math.Abs(screenPoint.X - _lastDetectionScreenPoint.X) < 2 &&
-            Math.Abs(screenPoint.Y - _lastDetectionScreenPoint.Y) < 2;
-        if (movedLittle && _detectionCandidates.Count > 0 && _detectionClock.ElapsedMilliseconds < 24)
-            return;
+        // Use the physical cursor position for hit-testing. Window/UI Automation
+        // geometry is also physical-pixel based (GetWindowRect / BoundingRectangle).
+        var screenPoint = NativeMethods.GetCursorPos(out var cursor)
+            ? new Point(cursor.X, cursor.Y)
+            : OverlayToScreen(overlayPoint);
 
-        // Inside the current bright hole: re-query less often (pointer is still on target).
-        if (_detectionCandidates.Count > 0 &&
-            !_detectedSelection.IsEmpty &&
-            _detectedSelection.Contains(overlayPoint) &&
-            _detectionClock.ElapsedMilliseconds < 55)
+        // Geometry-only cache queries are cheap; still skip tiny jitter.
+        var movedLittle = !double.IsNaN(_lastDetectionScreenPoint.X) &&
+            Math.Abs(screenPoint.X - _lastDetectionScreenPoint.X) < 1.5 &&
+            Math.Abs(screenPoint.Y - _lastDetectionScreenPoint.Y) < 1.5;
+        if (movedLittle && _detectionCandidates.Count > 0 && _detectionClock.ElapsedMilliseconds < 12)
             return;
 
         _lastDetectionOverlayPoint = overlayPoint;
@@ -1093,12 +1105,11 @@ public partial class CaptureOverlayWindow : Window
                 return;
             }
             _detectElements = !_detectElements;
-            // Force a fresh query so window mode stays fast and element mode re-resolves.
+            // Force a fresh hit-test against the prebuilt geometry cache.
             _lastDetectionScreenPoint = new Point(double.NaN, double.NaN);
             _detectionClock.Reset();
             _detectionClock.Start();
-            var pointer = Mouse.GetPosition(OverlayCanvas);
-            UpdateDetectedRegion(pointer);
+            UpdateDetectedRegion(Mouse.GetPosition(OverlayCanvas));
             DetectionModeText.Text = $"{L("Mode")}: {L(_detectElements ? "UI element" : "Window")}";
             e.Handled = true;
             return;
